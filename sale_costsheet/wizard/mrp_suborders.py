@@ -3,11 +3,11 @@
 
 from odoo import fields, models
 
-class mrp_suborders(models.TransientModel):
+class mrp_suborders(models.Model):
     _name = 'mrp.suborders'
     _description = 'Manufacture Suborders'
     mrp_manufacture_id = fields.Many2one('mrp.production', 'Costsheet')
-    mrp_suborders_details_ids = fields.Many2many('mrp.suborders.details', string="Details")
+    mrp_suborders_details_ids = fields.One2many('mrp.suborders.details', 'mrp_suborders_id', string="Details")
 
     def create_sub_orders(self):
 
@@ -23,13 +23,14 @@ class mrp_suborders(models.TransientModel):
             'product_qty': self.mrp_manufacture_id.product_uom_qty,
             'move_raw_ids':manufacutre_lines
         }
-
         mrp_production_obj = self.env['mrp.production'].sudo().create(manufacutre_vals)
-        return True
+        return {'type': 'ir.actions.client', 'tag': 'reload'}
+        # return True
 class mrp_suborders_details(models.Model):
     _name = 'mrp.suborders.details'
     _description = 'Manufacture Suborders Details'
 
+    mrp_suborders_id = fields.Many2one('mrp.suborders')
     mrp_manufacture_line_id = fields.Many2one('stock.move', 'Components')
     product_id = fields.Many2one('product.product', 'Product')
     product_uom_qty = fields.Float('To Consume')

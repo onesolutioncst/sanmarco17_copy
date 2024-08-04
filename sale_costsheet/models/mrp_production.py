@@ -45,33 +45,34 @@ class mrp_production(models.Model):
         self.ensure_one()
         wizard_mrp_suborders = []
         for move_raw_obj in self.move_raw_ids:
-            wizard_mrp_suborder_id = self.env['mrp.suborders.details'].create({
+            wizard_mrp_suborder_id = self.env['mrp.suborders.details'].sudo().create({
                 'mrp_manufacture_line_id': move_raw_obj.id,
                 'product_id': move_raw_obj.product_id.id,
                 'product_uom_qty': move_raw_obj.product_uom_qty,
-                'quantity': move_raw_obj.quantity,
+                'quantity': 0.0,
 
             })
             wizard_mrp_suborders.append(wizard_mrp_suborder_id.id)
         if wizard_mrp_suborders:
-            new_wizard = self.env['mrp.suborders'].create({
+            new_wizard = self.env['mrp.suborders'].sudo().create({
                 'mrp_manufacture_id': self.id,
                 'mrp_suborders_details_ids': [(6, 0, wizard_mrp_suborders)],
             })
-        return {
-            'name': _('Costsheet Sub Orders'),
-            'view_mode': 'form',
-            'res_model': 'mrp.suborders',
-            'type': 'ir.actions.act_window',
-            'target': 'new',
-            'res_id': new_wizard.id,
-        }
+            return {
+                'name': _('Costsheet Sub Orders'),
+                'view_mode': 'form',
+                'res_model': 'mrp.suborders',
+                'type': 'ir.actions.act_window',
+                'target': 'new',
+                'res_id': new_wizard.id,
+            }
 
 
 class stock_move(models.Model):
     _inherit = "stock.move"
 
     qty_orders = fields.Float(compute="calc_qty_orders", string='Sub orders QTY')
+    quantity = fields.Float(compute="calc_qty_orders", string='QTY', readonly=False)
 
     def calc_qty_orders(self):
         for record in self:
@@ -82,6 +83,6 @@ class stock_move(models.Model):
                 for move_raw_obj in mrp_suborders_obj.move_raw_ids:
                     if move_raw_obj.product_id == record.product_id:
                         qty_orders += move_raw_obj.product_qty
-                record.qty_orders = qty_orders
-            # record.quantity = qty_orders
+            record.qty_orders = qty_orders
+            record.quantity = qty_orders
 
