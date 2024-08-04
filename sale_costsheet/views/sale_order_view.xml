@@ -1,0 +1,26 @@
+<odoo>
+    <data>
+        <record id="view_order_form_costsheet" model="ir.ui.view">
+            <field name="name">sale.order.form</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"/>
+            <field name="arch" type="xml">
+                <field name="payment_term_id" position="after">
+                    <label for="is_costsheet" class="oe_inline"/>
+                    <div>
+                        <field name="is_costsheet"/>
+                        <button name="create_sale_costsheet" string="Create/Update Costsheet" type="object"
+                                class="oe_highlight" invisible="is_costsheet == False"/>
+                    </div>
+                </field>
+                <div name="button_box" position="inside">
+                    <button name="action_view_costsheet" type="object" class="oe_stat_button" icon="fa-pencil-square-o"
+                            invisible="costsheet_count == 0">
+                        <field name="costsheet_count" widget="statinfo" string="Costsheet"/>
+                    </button>
+                </div>
+            </field>
+        </record>
+
+    </data>
+</odoo>

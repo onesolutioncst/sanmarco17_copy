@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record model="ir.ui.view" id="mrp_suborders_wizard">
+        <field name="name">mrp_suborders wizard</field>
+        <field name="model">mrp.suborders</field>
+        <field name="arch" type="xml">
+            <form string="Sub Orders" delete="0" create="0">
+                <field name="mrp_suborders_details_ids" required="1">
+                    <tree delete="0" create="0" editable="bottom" >
+                        <field name="product_id" readonly="1"/>
+                        <field name="product_uom_qty" readonly="1"/>
+                        <field name="quantity" readonly="0"/>
+                    </tree>
+                </field>
+
+                <footer>
+                    <button name="create_sub_orders" string="Create Sub Orders" type="object" class="btn-primary"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
