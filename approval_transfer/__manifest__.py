@@ -1,0 +1,22 @@
+{
+    'name': "Approval Transfer",
+    'version': '17.0',
+    'category': "",
+    'summary': """""",
+    'description': '',
+    'author': '',
+    'company': '',
+    'maintainer': '',
+    'website': "",
+    'depends': ['approvals','stock','approvals_purchase', 'purchase_stock'],
+    'data': [
+        'views/approval_category.xml',
+        'views/approval_request_views.xml',
+        'views/approval_product_line_views.xml',
+        'views/stock_picking_views.xml',
+    ],
+    'license': 'AGPL-3',
+    'installable': True,
+    'auto_install': False,
+    'application': False,
+}
