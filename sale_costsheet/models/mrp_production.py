@@ -76,6 +76,7 @@ class stock_move(models.Model):
     def calc_qty_orders(self):
         for record in self:
             qty_orders = 0.0
+            record.qty_orders = qty_orders
             mrp_suborders_objs = self.env['mrp.production'].sudo().search([('mrp_production_id','=',record.raw_material_production_id.id)])
             for mrp_suborders_obj in mrp_suborders_objs:
                 for move_raw_obj in mrp_suborders_obj.move_raw_ids:
