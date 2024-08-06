@@ -49,6 +49,7 @@ class mrp_production(models.Model):
                 'mrp_manufacture_line_id': move_raw_obj.id,
                 'product_id': move_raw_obj.product_id.id,
                 'product_uom_qty': move_raw_obj.product_uom_qty,
+                'remaining_qty': move_raw_obj.remaining_qty,
                 'quantity': 0.0,
 
             })
@@ -73,7 +74,7 @@ class stock_move(models.Model):
 
     qty_orders = fields.Float(compute="calc_qty_orders", string='Sub orders QTY')
     quantity = fields.Float(compute="calc_qty_orders", string='QTY', readonly=False)
-
+    remaining_qty = fields.Float(compute="calc_qty_orders", string='Remaining QTY')
     def calc_qty_orders(self):
         for record in self:
             qty_orders = 0.0
@@ -84,5 +85,6 @@ class stock_move(models.Model):
                     if move_raw_obj.product_id == record.product_id:
                         qty_orders += move_raw_obj.product_qty
             record.qty_orders = qty_orders
+            record.remaining_qty = record.product_uom_qty - qty_orders
             record.quantity = qty_orders
 
