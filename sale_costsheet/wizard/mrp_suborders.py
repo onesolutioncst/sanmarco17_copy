@@ -13,10 +13,11 @@ class mrp_suborders(models.Model):
 
         manufacutre_lines=[]
         for mrp_suborders_details_obj in self.mrp_suborders_details_ids:
-            manufacutre_lines.append((0, 0, {
-                'product_id': mrp_suborders_details_obj.product_id.id,
-                'product_uom_qty': mrp_suborders_details_obj.quantity
-            }))
+            if mrp_suborders_details_obj.quantity > 0:
+                manufacutre_lines.append((0, 0, {
+                    'product_id': mrp_suborders_details_obj.product_id.id,
+                    'product_uom_qty': mrp_suborders_details_obj.quantity
+                }))
         manufacutre_vals = {
             'mrp_production_id': self.mrp_manufacture_id.id,
             'product_id': self.mrp_manufacture_id.product_id.id,
@@ -34,4 +35,5 @@ class mrp_suborders_details(models.Model):
     mrp_manufacture_line_id = fields.Many2one('stock.move', 'Components')
     product_id = fields.Many2one('product.product', 'Product')
     product_uom_qty = fields.Float('To Consume')
+    remaining_qty = fields.Float('Remaining Quantity')
     quantity = fields.Float('Quantity')
