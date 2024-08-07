@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record model="ir.ui.view" id="sh_pos_product_toppings_config_settings_inherit">
+        <field name="name">res.config.settings.view.form.inherit.sh_pos_product_toppings</field>
+        <field name="model">res.config.settings</field>
+        <field name="inherit_id" ref="point_of_sale.res_config_settings_view_form" />
+        <field name="arch" type="xml">
+            <block id="pos_interface_section" position="after">
+                <block title="POS Product Modifier">
+                    <setting>
+                        <field name="pos_sh_enable_toppings" />
+                    </setting>
+                    <setting  invisible="not pos_sh_enable_toppings">
+                        <field name="pos_sh_add_toppings_on_click_product"/>
+                    </setting>
+                    <setting  invisible="not pos_sh_enable_toppings">
+                        <field name="pos_sh_allow_same_product_different_qty"/>
+                    </setting>
+                </block>
+            </block>
+        </field>
+    </record>
+</odoo>
