@@ -17,13 +17,15 @@ class sale_order(models.Model):
                     sale_line_obj.mrp_production_costsheet_id.write({'product_id': sale_line_obj.product_id.id,
                                                                      'product_qty': sale_line_obj.product_uom_qty})
                 else:
-                    mrp_production_costsheet_obj = sale_line_obj.mrp_production_costsheet_id.create({
-                        'product_id': sale_line_obj.product_id.id,
-                        'product_qty': sale_line_obj.product_uom_qty,
-                        'sale_costsheet_id': record.id,
-                        'sale_line_costsheet_id': sale_line_obj.id
-                    })
-                    sale_line_obj.mrp_production_costsheet_id = mrp_production_costsheet_obj.id
+                    if sale_line_obj.product_id.costsheet:
+                        mrp_production_costsheet_obj = sale_line_obj.mrp_production_costsheet_id.create({
+                            'product_id': sale_line_obj.product_id.id,
+                            'product_qty': sale_line_obj.product_uom_qty,
+                            'sale_costsheet_id': record.id,
+                            'sale_line_costsheet_id': sale_line_obj.id,
+                            'is_costsheet': True
+                        })
+                        sale_line_obj.mrp_production_costsheet_id = mrp_production_costsheet_obj.id
         return True
 
     def action_view_costsheet(self):

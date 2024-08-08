@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="product_template_only_form_view_inherit" model="ir.ui.view">
+            <field name="name">product.template.form</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page string="Options">
+                        <group col="4">
+                            <field name="is_discount"/>
+                            <field name="is_retention_ar"/>
+                            <field name="is_retention_ap"/>
+                            <field name="is_advanced_ar"/>
+                            <field name="is_advanced_ap"/>
+                            <field name="insurance"/>
+                            <field name="refundable"/>
+                            <field name="subcontractor"/>
+                            <field name="variation_Order"/>
+                            <field name="wages"/>
+                            <field name="supplier"/>
+                            <field name="customer"/>
+                            <field name="costsheet"/>
+                            <label for="is_fleet" class="oe_inline"/>
+                            <div>
+                                <field name="is_fleet"/>
+                                <field name="fleet_vehicle_id"/>
+                            </div>
+                            <label for="is_equipment" class="oe_inline"/>
+                            <div>
+                                <field name="is_equipment"/>
+                                <field name="maintenance_equipment_id" invisible="is_equipment == False" readonly="1"/>
+                            </div>
+                        </group>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+
+        <record id="product_normal_form_view_inherit" model="ir.ui.view">
+            <field name="name">product.product.form</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page string="Options">
+                        <group col="4">
+                            <field name="is_discount"/>
+                            <field name="is_retention_ar"/>
+                            <field name="is_retention_ap"/>
+                            <field name="is_advanced_ar"/>
+                            <field name="is_advanced_ap"/>
+                            <field name="insurance"/>
+                            <field name="refundable"/>
+                            <field name="subcontractor"/>
+                            <field name="variation_Order"/>
+                            <field name="wages"/>
+                            <field name="supplier"/>
+                            <field name="customer"/>
+                            <field name="costsheet"/>
+                            <label for="is_fleet" class="oe_inline"/>
+                            <div>
+                                <field name="is_fleet"/>
+                                <field name="fleet_vehicle_id" invisible="is_fleet == False" readonly="1"/>
+                                <button name="create_fleet" string="Create/Update Fleet" type="object"
+                                        class="oe_highlight" invisible="is_fleet == False"/>
+                            </div>
+                            <label for="is_equipment" class="oe_inline"/>
+                            <div>
+                                <field name="is_equipment"/>
+                                <field name="maintenance_equipment_id" invisible="is_equipment == False" readonly="1"/>
+                                <button name="create_equipment" string="Create/Update Equipment" type="object"
+                                        class="oe_highlight" invisible="is_equipment == False"/>
+                            </div>
+                        </group>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+
+
+    </data>
+</odoo>

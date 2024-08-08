@@ -18,8 +18,9 @@ class mrp_production(models.Model):
     sale_costsheet_id = fields.Many2one('sale.order')
     sale_line_costsheet_id = fields.Many2one('sale.order.line')
     suborder_count = fields.Integer(compute="calc_suborder_count")
+    requisition_count = fields.Integer(compute="calc_suborder_count")
     mrp_production_id = fields.Many2one('mrp.production')
-
+    purchase_requisition_id = fields.Many2one('purchase.requisition', )
     @api.onchange('is_costsheet')
     def check_onchange_is_costsheet(self):
         for record in self:
@@ -33,13 +34,32 @@ class mrp_production(models.Model):
             'res_model': 'mrp.production',
             'type': 'ir.actions.act_window',
             'target': 'current',
-            'domain': [('mrp_production_id','=',self.id)],
-            'context':{'default_mrp_production_id': self.id, 'default_product_id': self.product_id.id}
+            'context':{'default_mrp_production_id': self.id}
+        }
+
+    def action_view_requisition(self):
+        requisition_objs = self.env['purchase.requisition'].sudo().search([('mrp_production_id', '=', self.id)])
+        requisition = requisition_objs.ids
+        if requisition_objs and self.purchase_requisition_id and self.purchase_requisition_id.id not in requisition_objs.ids:
+            # requisition_objs.ids.append(self.purchase_requisition_id.id)
+            requisition.append(self.purchase_requisition_id.id)
+        return {
+            'name': _('Purchase Requisition'),
+            'view_mode': 'tree,form',
+            'res_model': 'purchase.requisition',
+            'type': 'ir.actions.act_window',
+            'target': 'current',
+            'domain': [('id', 'in', requisition)],
+            # 'context': {'default_mrp_production_id': self.id}
         }
 
     def calc_suborder_count(self):
         for record in self:
             record.suborder_count = self.search_count([('mrp_production_id','=',record.id)])
+            record.requisition_count = self.env['purchase.requisition'].sudo().search_count([('mrp_production_id', '=', record.id)])
+            requisition_objs = self.env['purchase.requisition'].sudo().search([('mrp_production_id', '=', record.id)])
+            if requisition_objs and self.purchase_requisition_id and self.purchase_requisition_id.id not in requisition_objs.ids:
+                record.requisition_count = len(requisition_objs) + 1
 
     def action_create_suborder(self):
         self.ensure_one()
@@ -69,7 +89,37 @@ class mrp_production(models.Model):
                 'res_id': new_wizard.id,
             }
 
+    def action_create_agreement(self):
+        new_wizard = self.env['manufacture.agreement'].sudo().create({})
+        if len(self)>1:
+            return {
+                'name': _('Agreement Order'),
+                'view_mode': 'form',
+                'res_model': 'manufacture.agreement',
+                'type': 'ir.actions.act_window',
+                'target': 'current',
+                'context': {},
+                'target': 'new',
+                'res_id': new_wizard.id,
+            }
+        else:
+            new_wizard = self.env['manufacture.agreement'].sudo().create({
+                'mrp_production_id': self.id,
+            })
+            return {
+                'name': _('Agreement Order'),
+                'view_mode': 'form',
+                'res_model': 'manufacture.agreement',
+                'type': 'ir.actions.act_window',
+                'target': 'current',
+                'context': {'default_mrp_production_id': self.id, 'default_product_id': self.product_id.id},
+                'target': 'new',
+                'res_id': new_wizard.id,
+            }
 
+    def action_add_from_catalog(self):
+        order = self.browse(self.env.context.get('order_id'))
+        return order.action_add_from_catalog()
 class stock_move(models.Model):
     _inherit = "stock.move"
 
@@ -89,3 +139,6 @@ class stock_move(models.Model):
             record.remaining_qty = record.product_uom_qty - qty_orders
             record.quantity = qty_orders
 
+    # def action_add_from_catalog(self):
+    #     order = self.browse(self.env.context.get('order_id'))
+    #     return order.action_add_from_catalog()
