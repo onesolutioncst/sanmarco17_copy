@@ -50,7 +50,7 @@ class mrp_suborders_details(models.Model):
 
     mrp_suborders_id = fields.Many2one('mrp.suborders')
     mrp_manufacture_line_id = fields.Many2one('stock.move', 'Components')
-    product_id = fields.Many2one('product.product', 'Product')
+    product_id = fields.Many2one('product.product', 'Product', domain=[('costsheet','=',True)])
     product_uom_qty = fields.Float('To Consume')
     delivery_qty = fields.Float('Delivery')
     remaining_qty = fields.Float('Remaining')
