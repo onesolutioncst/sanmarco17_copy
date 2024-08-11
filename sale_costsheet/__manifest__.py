@@ -20,7 +20,7 @@
 #
 ###################################################################################
 {
-    'name': 'Costsheet from sale order',
+    'name': 'Costsheet Customization',
     'version': '17.0',
     'summary': 'sale, mrp',
     'description': """
@@ -41,8 +41,8 @@
         'views/sale_order_view.xml',
         'wizard/mrp_suborders_view.xml',
         'views/product_template_view.xml',
-        'views/maintenance_equipment_view.xml',
-        'views/fleet_vehicle_view.xml',
+        # 'views/maintenance_equipment_view.xml',
+        # 'views/fleet_vehicle_view.xml',
     ],
     'images': [],
     'license': 'AGPL-3',

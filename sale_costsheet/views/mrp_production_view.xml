@@ -28,9 +28,9 @@
                     </button>
                 </div>
                 <header position="inside">
-                    <button name="action_create_suborder" invisible="state != 'confirmed'" type="object"
+                    <button name="action_create_suborder" invisible="state in ['draft','done','cancel']" type="object"
                             string="Create Sub Orders"/>
-                    <button name="action_create_agreement" invisible="state != 'confirmed'" type="object"
+                    <button name="action_create_agreement" invisible="state in ['draft','done','cancel']" type="object"
                             string="Create Agreement"/>
                 </header>
                 <xpath expr="//field[@name='move_raw_ids']//tree" position="inside">

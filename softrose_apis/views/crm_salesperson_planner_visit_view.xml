@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record model="ir.ui.view" id="crm_salesperson_planner_visit_form_inherit">
+        <field name="name">CRM - Salesperson Planner Visit Form</field>
+        <field name="model">crm.salesperson.planner.visit</field>
+        <field name="inherit_id" ref="crm_salesperson_planner.crm_salesperson_planner_visit_form_view"/>
+        <field name="arch" type="xml">
+            <field name="user_id" position="after">
+                <field name="duration" />
+            </field>
+            <notebook position="inside">
+                <page string="Details">
+                    <group>
+                        <group string="Start">
+                            <field name="start_datetime" />
+                            <field name="start_location" />
+                            <field name="start_lat" />
+                            <field name="start_long" />
+                        </group>
+                        <group string="End">
+                            <field name="end_datetime" />
+                            <field name="end_location" />
+                            <field name="end_lat" />
+                            <field name="end_long" />
+                        </group>
+                    </group>
+                </page>
+            </notebook>
+        </field>
+    </record>
+</odoo>

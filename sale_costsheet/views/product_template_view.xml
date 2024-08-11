@@ -8,7 +8,7 @@
             <field name="arch" type="xml">
                 <notebook position="inside">
                     <page string="Options">
-                        <group col="4">
+                        <group col="4" name="options">
                             <field name="is_discount"/>
                             <field name="is_retention_ar"/>
                             <field name="is_retention_ap"/>
@@ -22,16 +22,6 @@
                             <field name="supplier"/>
                             <field name="customer"/>
                             <field name="costsheet"/>
-                            <label for="is_fleet" class="oe_inline"/>
-                            <div>
-                                <field name="is_fleet"/>
-                                <field name="fleet_vehicle_id"/>
-                            </div>
-                            <label for="is_equipment" class="oe_inline"/>
-                            <div>
-                                <field name="is_equipment"/>
-                                <field name="maintenance_equipment_id" invisible="is_equipment == False" readonly="1"/>
-                            </div>
                         </group>
                     </page>
                 </notebook>
@@ -44,8 +34,8 @@
             <field name="inherit_id" ref="product.product_normal_form_view"/>
             <field name="arch" type="xml">
                 <notebook position="inside">
-                    <page string="Options">
-                        <group col="4">
+                    <page string="Options" name="options_page">
+                        <group col="4" name="options">
                             <field name="is_discount"/>
                             <field name="is_retention_ar"/>
                             <field name="is_retention_ap"/>
@@ -59,26 +49,21 @@
                             <field name="supplier"/>
                             <field name="customer"/>
                             <field name="costsheet"/>
-                            <label for="is_fleet" class="oe_inline"/>
-                            <div>
-                                <field name="is_fleet"/>
-                                <field name="fleet_vehicle_id" invisible="is_fleet == False" readonly="1"/>
-                                <button name="create_fleet" string="Create/Update Fleet" type="object"
-                                        class="oe_highlight" invisible="is_fleet == False"/>
-                            </div>
-                            <label for="is_equipment" class="oe_inline"/>
-                            <div>
-                                <field name="is_equipment"/>
-                                <field name="maintenance_equipment_id" invisible="is_equipment == False" readonly="1"/>
-                                <button name="create_equipment" string="Create/Update Equipment" type="object"
-                                        class="oe_highlight" invisible="is_equipment == False"/>
-                            </div>
                         </group>
                     </page>
                 </notebook>
             </field>
         </record>
-
+        <record id="product_template_form_view_bom_button_boqall" model="ir.ui.view">
+            <field name="name">product.template.boq.all</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="mrp.product_template_form_view_bom_button"/>
+            <field name="arch" type="xml">
+                <button name="%(mrp.template_open_bom)d" position="attributes">
+                    <attribute name="invisible">0</attribute>
+                </button>
+            </field>
+        </record>
 
     </data>
 </odoo>
