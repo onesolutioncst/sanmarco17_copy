@@ -44,8 +44,9 @@ class mrp_suborders(models.Model):
                         'product_uom_qty': mrp_suborders_details_obj.quantity
                     }))
         if manufacutre_lines:
-            next_seq = self.env['mrp.production'].sudo().search_count([('id','=',self.mrp_manufacture_id.id)])
+            next_seq = self.env['mrp.production'].sudo().search_count([('mrp_production_id','=',self.mrp_manufacture_id.id)])
             name = self.mrp_manufacture_id._get_name_backorder(self.mrp_manufacture_id.name, next_seq+1)
+
             manufacutre_vals = {
                 'name': name,
                 'origin': self.mrp_manufacture_id.name,
