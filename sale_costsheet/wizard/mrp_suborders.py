@@ -36,8 +36,8 @@ class mrp_suborders(models.Model):
                                             'res_id': self.mrp_manufacture_id.id,
                                             'user_id': project_obj.user_id.id,
                                         })
-                            # raise UserError("The quantity cannot be negative!")
-                            # raise ValidationError(_("Sorry Delivery Quantity is greater than remaining, Ask Project Manager"))
+                        if not self.user_has_groups('sale_costsheet.group_costsheet_up_consume'):
+                            raise ValidationError(_("Sorry Delivery Quantity is greater than remaining, Ask Project Manager"))
                 else:
                     manufacutre_lines.append((0, 0, {
                         'product_id': mrp_suborders_details_obj.product_id.id,
