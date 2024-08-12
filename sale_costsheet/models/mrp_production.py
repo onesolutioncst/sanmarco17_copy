@@ -148,10 +148,10 @@ class mrp_production(models.Model):
 class stock_move(models.Model):
     _inherit = "stock.move"
 
-    qty_orders = fields.Float(compute="calc_qty_orders", string='Delivery')
-    quantity = fields.Float(compute="calc_qty_orders", string='QTY', readonly=False)
-    remaining_qty = fields.Float(compute="calc_qty_orders", string='Remaining ')
-    upconsume_qty = fields.Float(compute="calc_qty_orders", string='Up Consume ')
+    qty_orders = fields.Float(compute="calc_qty_orders", string='D S', help="Delivery SubOrder")
+    quantity = fields.Float(compute="calc_qty_orders", string='Q S', readonly=False, help="Quantity SubOrder")
+    remaining_qty = fields.Float(compute="calc_qty_orders", string='R S ', help="Remaining SubOrder")
+    upconsume_qty = fields.Float(compute="calc_qty_orders", string='Up C S ', help="Up Consume SubOrder")
     def calc_qty_orders(self):
         for record in self:
             qty_orders = 0.0

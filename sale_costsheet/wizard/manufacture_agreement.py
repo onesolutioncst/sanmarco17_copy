@@ -27,7 +27,8 @@ class manufacture_agreement(models.TransientModel):
                 for mrp_suborders_details_obj in mrp_production.move_raw_ids:
                     purchase_requisition.append((0, 0, {
                         'product_id': mrp_suborders_details_obj.product_id.id,
-                        'product_qty': mrp_suborders_details_obj.product_uom_qty
+                        'product_qty': mrp_suborders_details_obj.product_uom_qty,
+                        'analytic_distribution': mrp_production.analytic_distribution,
                     }))
         purchase_requisition_vals.update({
             'vendor_id': self.partner_id.id,
