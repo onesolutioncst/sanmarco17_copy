@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <record id='fleet_vehicle_view_form_inherit_product' model='ir.ui.view'>
+        <field name="name">fleet.vehicle.form.inherit.product</field>
+        <field name="model">fleet.vehicle</field>
+        <field name="inherit_id" ref="fleet.fleet_vehicle_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='location']" position="after">
+                <label for="is_product" class="oe_inline"/>
+                <div>
+                    <field name="is_product"/>
+                    <field name="product_product_id" invisible="is_product == False" readonly="1"/>
+                    <button name="create_fleet_product" string="Create/Update Product" type="object"
+                            class="oe_highlight" invisible="is_product == False"/>
+                </div>
+                <label for="is_employee" class="oe_inline"/>
+                <div>
+                    <field name="is_employee"/>
+                    <field name="hr_employee_id" invisible="is_employee == False" readonly="1"/>
+                    <button name="create_fleet_employee" string="Create/Update Employee" type="object"
+                            class="oe_highlight" invisible="is_employee == False"/>
+                </div>
+            </xpath>
+        </field>
+    </record>
+</odoo>

@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_crm_partner_assign_form_location" model="ir.ui.view">
+        <field name="name">res.partner.assign.inherit</field>
+        <field name="model">res.partner</field>
+        <field name="inherit_id" ref="base_geolocalize.view_crm_partner_geo_form"/>
+        <field name="arch" type="xml">
+            <data>
+                <page name="geo_location" position="replace">
+                    <page string="Partner Assignment" name="geo_location">
+                        <group>
+                            <group string="Geolocation">
+                                <label for="date_localization" string="Geo Location"/>
+                                <div>
+                                    <field name="client_location" placeholder="Location URL"/>
+                                    <span>Lat :
+                                        <field name="partner_latitude" nolabel="1" class="oe_inline"/>
+                                    </span>
+                                    <br/>
+                                    <span>Long:
+                                        <field name="partner_longitude" nolabel="1" class="oe_inline"/>
+                                    </span>
+                                    <br/>
+                                    <span invisible="date_localization == False">Updated on:
+                                        <field name="date_localization" nolabel="1" readonly="1" class="oe_inline"/>
+                                        <br/>
+                                    </span>
+                                    <div name="geo_localize_button">
+                                        <button invisible="1"
+                                                icon="fa-gear" string="Compute based on address"
+                                                title="Compute Localization"
+                                                name="geo_localize" type="object" class="btn btn-link p-0"/>
+                                        <button invisible="1"
+                                                icon="fa-refresh" string="Refresh" title="Refresh Localization"
+                                                name="geo_localize" type="object" class="btn btn-link p-0"/>
+                                    </div>
+                                </div>
+                            </group>
+                        </group>
+                    </page>
+                </page>
+
+
+                <!--                <xpath expr="//page[@name='geo_location']/group/group" position="replace">-->
+                <!--                    <group string="Geolocation">-->
+                <!--                        <label for="date_localization" string="Geo Location"/>-->
+                <!--                        <div>-->
+                <!--                            <field name="client_location" placeholder="Location URL"/>-->
+                <!--                            <span>Lat :-->
+                <!--                                <field name="partner_latitude" nolabel="1" class="oe_inline"/>-->
+                <!--                            </span>-->
+                <!--                            <br/>-->
+                <!--                            <span>Long:-->
+                <!--                                <field name="partner_longitude" nolabel="1" class="oe_inline"/>-->
+                <!--                            </span>-->
+                <!--                            <br/>-->
+                <!--                            <span attrs="{'invisible': [('date_localization', '=', False)]}">Updated on:-->
+                <!--                                <field name="date_localization" nolabel="1" readonly="1" class="oe_inline"/>-->
+                <!--                                <br/>-->
+                <!--                            </span>-->
+                <!--                        </div>-->
+                <!--                    </group>-->
+                <!--                </xpath>-->
+                <notebook position="inside">
+                    <page string="Visits">
+                        <field name="crm_salesperson_planner_visit_ids" readonly="1"/>
+                    </page>
+                </notebook>
+            </data>
+        </field>
+    </record>
+</odoo>
