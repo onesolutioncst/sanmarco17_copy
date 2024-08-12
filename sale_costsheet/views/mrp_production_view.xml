@@ -36,6 +36,7 @@
                 <xpath expr="//field[@name='move_raw_ids']//tree" position="inside">
                     <field name="qty_orders" optional="hide"/>
                     <field name="remaining_qty" optional="hide"/>
+                    <field name="upconsume_qty" optional="hide"/>
 <!--                    <control>-->
 <!--                        <button name="action_add_from_catalog" string="Catalog" type="object" class="px-4 btn-link"-->
 <!--                                context="{'order_id': parent.id}"/>-->
