@@ -48,14 +48,20 @@ class mrp_suborders(models.Model):
             name = self.mrp_manufacture_id._get_name_backorder(self.mrp_manufacture_id.name, next_seq+1)
             manufacutre_vals = {
                 'name': name,
+                'origin': self.mrp_manufacture_id.name,
                 'mrp_production_id': self.mrp_manufacture_id.id,
                 'product_id': self.mrp_manufacture_id.product_id.id,
                 'product_qty': self.mrp_manufacture_id.product_uom_qty,
                 'move_raw_ids':manufacutre_lines
             }
             mrp_production_obj = self.env['mrp.production'].sudo().create(manufacutre_vals)
-        return {'type': 'ir.actions.client', 'tag': 'reload'}
-        # return True
+            mrp_production_obj.message_post_with_source(
+                'mail.message_origin_link',
+                render_values={'self': mrp_production_obj, 'origin': self,'edit': True},
+                subtype_xmlid='mail.mt_note',
+            )
+        # return {'type': 'ir.actions.client', 'tag': 'reload'}
+        return True
 class mrp_suborders_details(models.Model):
     _name = 'mrp.suborders.details'
     _description = 'Manufacture Suborders Details'

@@ -19,6 +19,7 @@ class sale_order(models.Model):
                 else:
                     if sale_line_obj.product_id.costsheet:
                         mrp_production_costsheet_obj = sale_line_obj.mrp_production_costsheet_id.create({
+                            'origin': self.name,
                             'product_id': sale_line_obj.product_id.id,
                             'product_qty': sale_line_obj.product_uom_qty,
                             'sale_costsheet_id': record.id,
@@ -26,6 +27,12 @@ class sale_order(models.Model):
                             'is_costsheet': True
                         })
                         sale_line_obj.mrp_production_costsheet_id = mrp_production_costsheet_obj.id
+                        sale_line_obj.mrp_production_costsheet_id.message_post_with_source(
+                            'mail.message_origin_link',
+                            render_values={'self': sale_line_obj.mrp_production_costsheet_id, 'origin': self,
+                                           'edit': True},
+                            subtype_xmlid='mail.mt_note',
+                        )
         return True
 
     def action_view_costsheet(self):
