@@ -25,7 +25,7 @@
                     <button name="action_view_requisition" type="object" class="oe_stat_button"
                             icon="fa-pencil-square-o"
                             invisible="requisition_count == 0">
-                        <field name="requisition_count" widget="statinfo" string="Purchase Requisition"/>
+                        <field name="requisition_count" widget="statinfo" string="Agreement"/>
                     </button>
                 </div>
                 <header position="inside">
