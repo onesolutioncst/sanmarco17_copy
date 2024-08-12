@@ -72,6 +72,7 @@ class mrp_production(models.Model):
                 'product_uom_qty': move_raw_obj.product_uom_qty,
                 'delivery_qty': move_raw_obj.qty_orders,
                 'remaining_qty': move_raw_obj.remaining_qty,
+                'upconsume_qty': move_raw_obj.upconsume_qty,
                 'quantity': 0.0,
 
             })
@@ -150,6 +151,7 @@ class stock_move(models.Model):
     qty_orders = fields.Float(compute="calc_qty_orders", string='Delivery')
     quantity = fields.Float(compute="calc_qty_orders", string='QTY', readonly=False)
     remaining_qty = fields.Float(compute="calc_qty_orders", string='Remaining ')
+    upconsume_qty = fields.Float(compute="calc_qty_orders", string='Up Consume ')
     def calc_qty_orders(self):
         for record in self:
             qty_orders = 0.0
@@ -160,7 +162,11 @@ class stock_move(models.Model):
                     if move_raw_obj.product_id == record.product_id:
                         qty_orders += move_raw_obj.product_qty
             record.qty_orders = qty_orders
-            record.remaining_qty = record.product_uom_qty - qty_orders
+            if qty_orders > record.product_uom_qty:
+                record.upconsume_qty = qty_orders - record.product_uom_qty
+            else:
+                record.remaining_qty = record.product_uom_qty - qty_orders
+
             record.quantity = qty_orders
 
     # def action_add_from_catalog(self):
