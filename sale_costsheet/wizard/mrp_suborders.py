@@ -57,7 +57,7 @@ class mrp_suborders(models.Model):
             mrp_production_obj = self.env['mrp.production'].sudo().create(manufacutre_vals)
             mrp_production_obj.message_post_with_source(
                 'mail.message_origin_link',
-                render_values={'self': mrp_production_obj, 'origin': self,'edit': True},
+                render_values={'self': mrp_production_obj, 'origin': self.mrp_manufacture_id,'edit': True},
                 subtype_xmlid='mail.mt_note',
             )
         # return {'type': 'ir.actions.client', 'tag': 'reload'}
@@ -73,3 +73,4 @@ class mrp_suborders_details(models.Model):
     delivery_qty = fields.Float('Delivery')
     remaining_qty = fields.Float('Remaining')
     quantity = fields.Float('Quantity')
+    upconsume_qty = fields.Float('Up Consume ')
