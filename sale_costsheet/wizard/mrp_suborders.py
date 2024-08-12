@@ -53,6 +53,10 @@ class mrp_suborders(models.Model):
                 'mrp_production_id': self.mrp_manufacture_id.id,
                 'product_id': self.mrp_manufacture_id.product_id.id,
                 'product_qty': self.mrp_manufacture_id.product_uom_qty,
+                'analytic_distribution': self.mrp_manufacture_id.analytic_distribution,
+                'picking_type_id': self.mrp_manufacture_id.picking_type_id.id,
+                'location_src_id':self.mrp_manufacture_id.location_src_id.id,
+                'location_dest_id': self.mrp_manufacture_id.location_dest_id.id,
                 'move_raw_ids':manufacutre_lines
             }
             mrp_production_obj = self.env['mrp.production'].sudo().create(manufacutre_vals)
