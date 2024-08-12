@@ -41,7 +41,7 @@
         'views/sale_order_view.xml',
         'wizard/mrp_suborders_view.xml',
         'views/product_template_view.xml',
-        # 'views/maintenance_equipment_view.xml',
+        'views/purchase_requisition_view.xml',
         # 'views/fleet_vehicle_view.xml',
     ],
     'images': [],

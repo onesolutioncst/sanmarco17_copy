@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_purchase_requisition_form_inherit_construction" model="ir.ui.view">
+            <field name="name">purchase.requisition.form.construction</field>
+            <field name="model">purchase.requisition</field>
+            <field name="inherit_id" ref="purchase_requisition.view_purchase_requisition_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='line_ids']//tree" position="inside">
+                    <field name="remaining_qty" optional="hide"/>
+                    <field name="upconsume_qty" optional="hide"/>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

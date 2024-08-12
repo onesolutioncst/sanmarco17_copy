@@ -148,16 +148,24 @@ class mrp_production(models.Model):
 class stock_move(models.Model):
     _inherit = "stock.move"
 
-    qty_orders = fields.Float(compute="calc_qty_orders", string='Delivery')
-    quantity = fields.Float(compute="calc_qty_orders", string='QTY', readonly=False)
-    remaining_qty = fields.Float(compute="calc_qty_orders", string='Remaining ')
-    upconsume_qty = fields.Float(compute="calc_qty_orders", string='Up Consume ')
+    qty_orders = fields.Float(compute="calc_qty_orders", string='D S', help="Delivery SubOrder")
+    quantity = fields.Float(compute="calc_qty_orders", string='Q S', readonly=False, help="Quantity SubOrder")
+    remaining_qty = fields.Float(compute="calc_qty_orders", string='R S ', help="Remaining SubOrder")
+    upconsume_qty = fields.Float(compute="calc_qty_orders", string='Up C S ', help="Up Consume SubOrder")
+
+    qty_orders_agreement = fields.Float(compute="calc_qty_orders", string='D A', help="Delivery Agreement")
+    remaining_qty_agreement = fields.Float(compute="calc_qty_orders", string='R A ', help="Remaining Agreement")
+    upconsume_qty_agreement = fields.Float(compute="calc_qty_orders", string='Up C A', help="Up Consume Agreement")
+
     def calc_qty_orders(self):
         for record in self:
             qty_orders = 0.0
             record.qty_orders = qty_orders
             record.upconsume_qty = 0.0
             record.remaining_qty = 0.0
+            record.upconsume_qty_agreement = 0.0
+            record.remaining_qty_agreement = 0.0
+            qty_orders_agreement = 0.0
             mrp_suborders_objs = self.env['mrp.production'].sudo().search([('mrp_production_id','=',record.raw_material_production_id.id)])
             for mrp_suborders_obj in mrp_suborders_objs:
                 for move_raw_obj in mrp_suborders_obj.move_raw_ids:
@@ -168,9 +176,14 @@ class stock_move(models.Model):
                 record.upconsume_qty = qty_orders - record.product_uom_qty
             else:
                 record.remaining_qty = record.product_uom_qty - qty_orders
-
             record.quantity = qty_orders
-
-    # def action_add_from_catalog(self):
-    #     order = self.browse(self.env.context.get('order_id'))
-    #     return order.action_add_from_catalog()
+            purchase_requisition_objs = self.env['purchase.requisition'].sudo().search([('mrp_production_id', '=', record.raw_material_production_id.id)])
+            for purchase_requisition_obj in purchase_requisition_objs:
+                for move_raw_obj in purchase_requisition_obj.line_ids:
+                    if move_raw_obj.product_id == record.product_id:
+                        qty_orders_agreement += move_raw_obj.qty_ordered
+            record.qty_orders_agreement = qty_orders_agreement
+            if qty_orders_agreement > record.product_qty:
+                record.upconsume_qty_agreement = qty_orders_agreement - record.product_qty
+            else:
+                record.remaining_qty_agreement = record.product_qty - qty_orders_agreement
