@@ -20,7 +20,9 @@ class manufacture_agreement(models.TransientModel):
             mrp_production_obj = self.env['mrp.production'].browse(self._context.get('active_ids'))
 
         purchase_requisition = []
+        origin = ''
         for mrp_production in mrp_production_obj:
+            origin += mrp_production.name + ','
             if not mrp_production.mrp_production_id:
                 for mrp_suborders_details_obj in mrp_production.move_raw_ids:
                     purchase_requisition.append((0, 0, {
@@ -29,6 +31,7 @@ class manufacture_agreement(models.TransientModel):
                     }))
         purchase_requisition_vals.update({
             'vendor_id': self.partner_id.id,
+            'origin': origin,
             'line_ids': purchase_requisition
         })
 
@@ -48,5 +51,5 @@ class manufacture_agreement(models.TransientModel):
             mrp_production_obj.purchase_requisition_id = purchase_requisition_obj.id
 
 
-
-        return {'type': 'ir.actions.client', 'tag': 'reload'}
+        return True
+        # return {'type': 'ir.actions.client', 'tag': 'reload'}
