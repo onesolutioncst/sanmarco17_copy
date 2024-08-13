@@ -9,7 +9,14 @@
                 <xpath expr="//field[@name='line_ids']//tree" position="inside">
                     <field name="remaining_qty" optional="hide"/>
                     <field name="upconsume_qty" optional="hide"/>
+                    <field name="milestone_qty" optional="hide"/>
+                    <field name="remaining_milestone_qty" optional="hide"/>
                 </xpath>
+                <div name="button_box" position="inside">
+                    <button name="action_view_milestone" type="object" class="oe_stat_button" icon="fa-list-alt" invisible="state == 'draft'" context="{'default_purchase_requisition_id': active_id}">
+                        <field name="milestone_count" widget="statinfo" string="Milestones"/>
+                    </button>
+                </div>
             </field>
         </record>
     </data>

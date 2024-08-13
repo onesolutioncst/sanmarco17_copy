@@ -34,7 +34,6 @@
                     <button name="action_create_suborder" invisible="not mrp_production_id" type="object"
                             groups="sale_costsheet.group_create_sub_order_agreement"
                             string="Create Sub Orders" />
-
                     <button name="action_create_agreement" invisible="state in ['draft','done','cancel'] or mrp_production_id" type="object"
                             string="Create Agreement"/>
                     <button name="action_create_agreement" invisible="not mrp_production_id" type="object"

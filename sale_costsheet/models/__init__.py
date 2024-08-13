@@ -5,3 +5,5 @@ from . import sale_order
 from . import product_template
 from . import purchase_requisition
 from . import mrp_bom
+from . import requisition_milestone
+from . import purchase_order
