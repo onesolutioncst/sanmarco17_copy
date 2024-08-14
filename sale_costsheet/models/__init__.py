@@ -7,3 +7,5 @@ from . import purchase_requisition
 from . import mrp_bom
 from . import requisition_milestone
 from . import purchase_order
+from . import res_company
+from . import res_config_setting
