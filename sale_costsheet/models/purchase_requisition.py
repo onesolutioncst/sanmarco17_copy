@@ -10,7 +10,15 @@ class purchase_requisition(models.Model):
 
     mrp_production_id = fields.Many2one('mrp.production', trace=True)
     milestone_count = fields.Integer(compute='_compute_milestone_count')
-
+    is_retention_ar = fields.Boolean('Is Retention')
+    rentention_dis_type = fields.Selection([('fixed','Fixed'), ('percentage','Percentage')], 'Type')
+    rentention_amount = fields.Float('Amount')
+    is_advanced_ar = fields.Boolean('Is Advanced')
+    advanced_dis_type = fields.Selection([('fixed', 'Fixed'), ('percentage', 'Percentage')], 'Type')
+    advanced_amount = fields.Float('Amount')
+    is_insurance_ar = fields.Boolean('Is Insurance')
+    insurance_dis_type = fields.Selection([('fixed', 'Fixed'), ('percentage', 'Percentage')], 'Type')
+    insurance_amount = fields.Float('Amount')
 
     def action_view_milestone(self):
         return {

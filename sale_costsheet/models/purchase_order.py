@@ -10,15 +10,77 @@ DATES_FORMAT = "%Y-%m-%d"
 class purchase_order(models.Model):
     _inherit = "purchase.order"
 
+    @api.model
+    def create(self, vals):
+        purchase_obj = super(purchase_order, self).create(vals)
+        total_amount = purchase_obj.amount_total
+        if purchase_obj.requisition_id and purchase_obj.requisition_id.is_retention_ar and self.env.user.company_id.retention_ar_default_product_id:
+            if purchase_obj.requisition_id.rentention_dis_type and purchase_obj.requisition_id.rentention_dis_type == 'fixed':
+                rentention_amount = purchase_obj.requisition_id.rentention_amount
+            elif purchase_obj.requisition_id.rentention_dis_type and purchase_obj.requisition_id.rentention_dis_type == 'percentage':
+                rentention_amount = purchase_obj.requisition_id.rentention_amount * total_amount
+            else:
+                rentention_amount = 0.0
+            if rentention_amount:
+                self.env['purchase.order.line'].sudo().create(
+                    {
+                        'name': self.env.user.company_id.retention_ar_default_product_id.name,
+                        'product_id': self.env.user.company_id.retention_ar_default_product_id.id,
+                        'order_id': purchase_obj.id,
+                        'product_qty': 1,
+                        'price_unit': rentention_amount * -1
+                        # 'analytic_distribution': False,
+                    }
+                )
+        if purchase_obj.requisition_id and purchase_obj.requisition_id.is_advanced_ar and self.env.user.company_id.advanced_ar_default_product_id:
+            if purchase_obj.requisition_id.advanced_dis_type and purchase_obj.requisition_id.advanced_dis_type == 'fixed':
+                advanced_amount = purchase_obj.requisition_id.advanced_amount
+            elif purchase_obj.requisition_id.advanced_dis_type and purchase_obj.requisition_id.advanced_dis_type == 'percentage':
+                advanced_amount = purchase_obj.requisition_id.advanced_amount * total_amount
+            else:
+                advanced_amount = 0.0
+            if advanced_amount:
+                self.env['purchase.order.line'].sudo().create(
+                    {
+                        'name': self.env.user.company_id.advanced_ar_default_product_id.name,
+                        'product_id': self.env.user.company_id.advanced_ar_default_product_id.id,
+                        'order_id': purchase_obj.id,
+                        'product_qty': 1,
+                        'price_unit': advanced_amount * -1
+                        # 'analytic_distribution': False,
+                    }
+                )
+        if purchase_obj.requisition_id and purchase_obj.requisition_id.is_insurance_ar and self.env.user.company_id.insurance_ar_default_product_id:
+            if purchase_obj.requisition_id.insurance_dis_type and purchase_obj.requisition_id.insurance_dis_type == 'fixed':
+                insurance_amount = purchase_obj.requisition_id.insurance_amount
+            elif purchase_obj.requisition_id.insurance_dis_type and purchase_obj.requisition_id.insurance_dis_type == 'percentage':
+                insurance_amount = purchase_obj.requisition_id.insurance_amount * total_amount
+            else:
+                insurance_amount = 0.0
+            if insurance_amount:
+                self.env['purchase.order.line'].sudo().create(
+                    {
+                        'name': self.env.user.company_id.insurance_ar_default_product_id.name,
+                        'product_id': self.env.user.company_id.insurance_ar_default_product_id.id,
+                        'order_id': purchase_obj.id,
+                        'product_qty': 1,
+                        'price_unit': insurance_amount * -1
+                        # 'analytic_distribution': False,
+                    }
+                )
+
+        return purchase_obj
+
     def check_see_rfq(self, requisition_id):
         for record in requisition_id:
             for line_obj in record.line_ids:
-                purchase_order_line_objs = self.env['purchase.order.line'].sudo().search([('purchase_requisition_line_id', '=', line_obj.id)])
-                remaining_milestone_qty = sum(purchase_order_line_obj.product_qty for purchase_order_line_obj in purchase_order_line_objs)
+                purchase_order_line_objs = self.env['purchase.order.line'].sudo().search(
+                    [('purchase_requisition_line_id', '=', line_obj.id)])
+                remaining_milestone_qty = sum(
+                    purchase_order_line_obj.product_qty for purchase_order_line_obj in purchase_order_line_objs)
                 if line_obj.milestone_qty > remaining_milestone_qty:
                     return True
         return False
-
 
     @api.onchange('requisition_id')
     def _onchange_requisition_id(self):
@@ -69,10 +131,10 @@ class purchase_order(models.Model):
                 name += '\n' + product_lang.description_purchase
 
             # Compute taxes
-            taxes_ids = fpos.map_tax(line.product_id.supplier_taxes_id.filtered(lambda tax: tax.company_id == requisition.company_id)).ids
+            taxes_ids = fpos.map_tax(
+                line.product_id.supplier_taxes_id.filtered(lambda tax: tax.company_id == requisition.company_id)).ids
 
             # Compute quantity and price_unit
-
 
             if line.product_uom_id != line.product_id.uom_po_id:
                 product_qty = line.product_uom_id._compute_quantity(line.product_qty, line.product_id.uom_po_id)
@@ -95,6 +157,7 @@ class purchase_order(models.Model):
                     name=name, product_qty=product_qty, price_unit=price_unit,
                     taxes_ids=taxes_ids)
                 order_lines.append((0, 0, order_line_values))
+
         self.order_line = order_lines
 
 
