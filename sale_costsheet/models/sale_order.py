@@ -10,6 +10,16 @@ class sale_order(models.Model):
 
     is_costsheet = fields.Boolean('Costsheet')
     costsheet_count = fields.Integer('costsheet count', compute="calc_costsheet_count")
+    is_retention_ar = fields.Boolean('Is Retention')
+    rentention_dis_type = fields.Selection([('fixed', 'Fixed'), ('percentage', 'Percentage')], 'Type')
+    rentention_amount = fields.Float('Amount')
+    is_advanced_ar = fields.Boolean('Is Advanced')
+    advanced_dis_type = fields.Selection([('fixed', 'Fixed'), ('percentage', 'Percentage')], 'Type')
+    advanced_amount = fields.Float('Amount')
+    is_insurance_ar = fields.Boolean('Is Insurance')
+    insurance_dis_type = fields.Selection([('fixed', 'Fixed'), ('percentage', 'Percentage')], 'Type')
+    insurance_amount = fields.Float('Amount')
+
     def create_sale_costsheet(self):
         for record in self:
             for sale_line_obj in record.order_line:
@@ -43,6 +53,12 @@ class sale_order(models.Model):
 
     def calc_costsheet_count(self):
         self.costsheet_count = len(self.order_line.mapped('mrp_production_costsheet_id'))
+
+    def _prepare_invoice(self):
+        invoice_vals = super(sale_order, self)._prepare_invoice()
+        invoice_vals['cons_sale_id'] = self.id
+        return invoice_vals
+
 class sale_order_line(models.Model):
     _inherit = "sale.order.line"
 

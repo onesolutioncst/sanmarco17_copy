@@ -18,7 +18,7 @@ class purchase_order(models.Model):
             if purchase_obj.requisition_id.rentention_dis_type and purchase_obj.requisition_id.rentention_dis_type == 'fixed':
                 rentention_amount = purchase_obj.requisition_id.rentention_amount
             elif purchase_obj.requisition_id.rentention_dis_type and purchase_obj.requisition_id.rentention_dis_type == 'percentage':
-                rentention_amount = purchase_obj.requisition_id.rentention_amount/100 * total_amount
+                rentention_amount = purchase_obj.requisition_id.rentention_amount * total_amount
             else:
                 rentention_amount = 0.0
             if rentention_amount:
@@ -36,7 +36,7 @@ class purchase_order(models.Model):
             if purchase_obj.requisition_id.advanced_dis_type and purchase_obj.requisition_id.advanced_dis_type == 'fixed':
                 advanced_amount = purchase_obj.requisition_id.advanced_amount
             elif purchase_obj.requisition_id.advanced_dis_type and purchase_obj.requisition_id.advanced_dis_type == 'percentage':
-                advanced_amount = purchase_obj.requisition_id.advanced_amount/100 * total_amount
+                advanced_amount = purchase_obj.requisition_id.advanced_amount * total_amount
             else:
                 advanced_amount = 0.0
             if advanced_amount:
@@ -54,7 +54,7 @@ class purchase_order(models.Model):
             if purchase_obj.requisition_id.insurance_dis_type and purchase_obj.requisition_id.insurance_dis_type == 'fixed':
                 insurance_amount = purchase_obj.requisition_id.insurance_amount
             elif purchase_obj.requisition_id.insurance_dis_type and purchase_obj.requisition_id.insurance_dis_type == 'percentage':
-                insurance_amount = purchase_obj.requisition_id.insurance_amount/100 * total_amount
+                insurance_amount = purchase_obj.requisition_id.insurance_amount * total_amount
             else:
                 insurance_amount = 0.0
             if insurance_amount:
