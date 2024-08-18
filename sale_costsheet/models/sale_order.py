@@ -34,7 +34,9 @@ class sale_order(models.Model):
             retention_ar_default_product_id = self.env.user.company_id.retention_ar_default_product_id
             advanced_ar_default_product_id = self.env.user.company_id.advanced_ar_default_product_id
             insurance_ar_default_product_id = self.env.user.company_id.insurance_ar_default_product_id
-            account_move_objs = self.env['account.move'].sudo().search([('state','=',['draft','posted']), '|', ('cons_sale_id','=',record.id),('invoice_origin','=',record.name)])
+            account_move_objs = self.env['account.move'].sudo().search(
+                [('state', '=', ['draft', 'posted']), '|', ('cons_sale_id', '=', record.id),
+                 ('invoice_origin', '=', record.name)])
             for account_move_obj in account_move_objs:
                 for invoice_line_obj in account_move_obj.invoice_line_ids:
                     if invoice_line_obj.product_id == retention_ar_default_product_id:
@@ -58,14 +60,23 @@ class sale_order(models.Model):
                                                                      'product_qty': sale_line_obj.product_uom_qty})
                 else:
                     if sale_line_obj.product_id.costsheet:
-                        mrp_production_costsheet_obj = sale_line_obj.mrp_production_costsheet_id.create({
+                        mrp_dic = {
                             'origin': self.name,
                             'product_id': sale_line_obj.product_id.id,
                             'product_qty': sale_line_obj.product_uom_qty,
                             'sale_costsheet_id': record.id,
                             'sale_line_costsheet_id': sale_line_obj.id,
                             'is_costsheet': True
-                        })
+                        }
+                        if self.env['stock.picking.type'].sudo().search(
+                                [('code', '=', 'mrp_operation'), ('warehouse_id', '=', record.warehouse_id.id)],
+                                limit=1):
+                            mrp_dic.update({
+                                'picking_type_id': self.env['stock.picking.type'].sudo().search(
+                                    [('code', '=', 'mrp_operation'), ('warehouse_id', '=', record.warehouse_id.id)],
+                                    limit=1).id
+                            })
+                        mrp_production_costsheet_obj = sale_line_obj.mrp_production_costsheet_id.create(mrp_dic)
                         sale_line_obj.mrp_production_costsheet_id = mrp_production_costsheet_obj.id
                         sale_line_obj.mrp_production_costsheet_id.message_post_with_source(
                             'mail.message_origin_link',
@@ -88,6 +99,17 @@ class sale_order(models.Model):
         invoice_vals = super(sale_order, self)._prepare_invoice()
         invoice_vals['cons_sale_id'] = self.id
         return invoice_vals
+
+    def action_confirm(self):
+        res = super(sale_order, self).action_confirm()
+        for order in self:
+            warehouse = self.env['stock.warehouse'].sudo().create({
+                'name': f'{order.name} Warehouse',
+                'code': f'{order.name[:5].upper()}',
+            })
+            order.warehouse_id = warehouse.id
+        return res
+
 
 class sale_order_line(models.Model):
     _inherit = "sale.order.line"
