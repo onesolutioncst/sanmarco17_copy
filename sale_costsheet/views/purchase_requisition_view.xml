@@ -61,6 +61,21 @@
                         </div>
                     </div>
                 </field>
+                <xpath expr="//field[@name='line_ids']" position="after">
+                    <group>
+                        <group>
+                            <field name="retention_ar_amount" widget='monetary' options="{'currency_field': 'currency_id'}"
+                                   readonly="True"/>
+                            <field name="advanced_ar_amount" widget='monetary' options="{'currency_field': 'currency_id'}"
+                                   readonly="True"/>
+                            <field name="insurance_ar_amount" widget='monetary' options="{'currency_field': 'currency_id'}"
+                                   readonly="True"/>
+                            <field name="costsheet_inv_total_amount" widget='monetary' options="{'currency_field': 'currency_id'}"
+                                   readonly="True"/>
+                        </group>
+
+                    </group>
+                </xpath>
             </field>
         </record>
     </data>

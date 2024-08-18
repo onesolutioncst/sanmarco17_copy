@@ -10,11 +10,6 @@
                     <page string="Options">
                         <group col="4" name="options">
                             <field name="is_discount"/>
-                            <field name="is_retention_ar"/>
-                            <field name="is_retention_ap"/>
-                            <field name="is_advanced_ar"/>
-                            <field name="is_advanced_ap"/>
-                            <field name="insurance"/>
                             <field name="refundable"/>
                             <field name="subcontractor"/>
                             <field name="variation_Order"/>
@@ -37,11 +32,6 @@
                     <page string="Options" name="options_page">
                         <group col="4" name="options">
                             <field name="is_discount"/>
-                            <field name="is_retention_ar"/>
-                            <field name="is_retention_ap"/>
-                            <field name="is_advanced_ar"/>
-                            <field name="is_advanced_ap"/>
-                            <field name="insurance"/>
                             <field name="refundable"/>
                             <field name="subcontractor"/>
                             <field name="variation_Order"/>

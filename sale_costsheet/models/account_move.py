@@ -27,8 +27,8 @@ class account_move(models.Model):
                         'product_id': self.env.user.company_id.retention_ar_default_product_id.id,
                         'move_id': account_move_obj.id,
                         'quantity': 1,
-                        'price_unit': rentention_amount * -1
-                        # 'analytic_distribution': False,
+                        'price_unit': rentention_amount * -1,
+                        'analytic_distribution': {account_move_obj.cons_sale_id.analytic_account_id.id: 100},
                     }
                 )
         if account_move_obj.cons_sale_id and account_move_obj.cons_sale_id.is_advanced_ar and self.env.user.company_id.advanced_ar_default_product_id:
@@ -45,8 +45,8 @@ class account_move(models.Model):
                         'product_id': self.env.user.company_id.advanced_ar_default_product_id.id,
                         'move_id': account_move_obj.id,
                         'quantity': 1,
-                        'price_unit': advanced_amount * -1
-                        # 'analytic_distribution': False,
+                        'price_unit': advanced_amount * -1,
+                        'analytic_distribution': {account_move_obj.cons_sale_id.analytic_account_id.id: 100},
                     }
                 )
         if account_move_obj.cons_sale_id and account_move_obj.cons_sale_id.is_insurance_ar and self.env.user.company_id.insurance_ar_default_product_id:
@@ -63,8 +63,8 @@ class account_move(models.Model):
                         'product_id': self.env.user.company_id.insurance_ar_default_product_id.id,
                         'move_id': account_move_obj.id,
                         'quantity': 1,
-                        'price_unit': insurance_amount * -1
-                        # 'analytic_distribution': False,
+                        'price_unit': insurance_amount * -1,
+                        'analytic_distribution': {account_move_obj.cons_sale_id.analytic_account_id.id: 100},
                     }
                 )
 

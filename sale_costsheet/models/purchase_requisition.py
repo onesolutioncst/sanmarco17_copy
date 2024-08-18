@@ -1,5 +1,5 @@
 from odoo import api, fields, models, _, SUPERUSER_ID, tools
-import logging
+import logging, json
 
 _logger = logging.getLogger(__name__)
 DATES_FORMAT = "%Y-%m-%d"
@@ -7,6 +7,7 @@ DATES_FORMAT = "%Y-%m-%d"
 
 class purchase_requisition(models.Model):
     _inherit = "purchase.requisition"
+    _inherit = ['mrp.bom', 'analytic.mixin']
 
     mrp_production_id = fields.Many2one('mrp.production', trace=True)
     milestone_count = fields.Integer(compute='_compute_milestone_count')
@@ -19,6 +20,37 @@ class purchase_requisition(models.Model):
     is_insurance_ar = fields.Boolean('Is Insurance')
     insurance_dis_type = fields.Selection([('fixed', 'Fixed'), ('percentage', 'Percentage')], 'Type')
     insurance_amount = fields.Float('Amount')
+
+    costsheet_inv_total_amount = fields.Float('Total Amount', compute="calc_costsheet_total_amount")
+    retention_ar_amount = fields.Float('Retention(AR) Amount', compute="calc_costsheet_total_amount")
+    advanced_ar_amount = fields.Float('Advanced(AR) Amount', compute="calc_costsheet_total_amount")
+    insurance_ar_amount = fields.Float('Insurance(AR) Amount', compute="calc_costsheet_total_amount")
+
+    def calc_costsheet_total_amount(self):
+        for record in self:
+            retention_ar_amount = 0.0
+            advanced_ar_amount = 0.0
+            insurance_ar_amount = 0.0
+            costsheet_inv_total_amount = 0.0
+            retention_ar_default_product_id = self.env.user.company_id.retention_ar_default_product_id
+            advanced_ar_default_product_id = self.env.user.company_id.advanced_ar_default_product_id
+            insurance_ar_default_product_id = self.env.user.company_id.insurance_ar_default_product_id
+            purchase_order_objs = self.env['purchase.order'].sudo().search(
+                [('state', '=', ['draft', 'posted']), ('requisition_id', '=', record.id)])
+            for purchase_order_obj in purchase_order_objs:
+                for order_line_obj in purchase_order_obj.order_line:
+                    if order_line_obj.product_id == retention_ar_default_product_id:
+                        retention_ar_amount += order_line_obj.price_total
+                    elif order_line_obj.product_id == advanced_ar_default_product_id:
+                        advanced_ar_amount += order_line_obj.price_total
+                    elif order_line_obj.product_id == insurance_ar_default_product_id:
+                        insurance_ar_amount += order_line_obj.price_total
+                    else:
+                        costsheet_inv_total_amount += order_line_obj.price_total
+            record.retention_ar_amount = retention_ar_amount
+            record.advanced_ar_amount = advanced_ar_amount
+            record.insurance_ar_amount = insurance_ar_amount
+            record.costsheet_inv_total_amount = costsheet_inv_total_amount
 
     def action_view_milestone(self):
         return {
