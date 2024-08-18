@@ -33,6 +33,8 @@ class manufacture_agreement(models.TransientModel):
         purchase_requisition_vals.update({
             'vendor_id': self.partner_id.id,
             'origin': origin,
+            'mrp_production_id': mrp_production.id,
+            'analytic_account_id': mrp_production.analytic_distribution.id,
             'line_ids': purchase_requisition
         })
 

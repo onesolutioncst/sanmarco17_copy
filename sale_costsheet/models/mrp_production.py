@@ -145,9 +145,17 @@ class mrp_production(models.Model):
                     bom_line
                 ))
         return moves
+
+    # def action_confirm(self):
+    #     action_confirm_mrp = super(mrp_production, self).action_confirm()
+    #     if self.mrp_production_id:
+    #         for move_raw_obj in self.mrp_production_id.move_raw_ids:
+    #             move_raw_obj.product_uom_qty = move_raw_obj.remaining_qty
+    #     return action_confirm_mrp
 class stock_move(models.Model):
     _inherit = "stock.move"
 
+    origin_qty = fields.Float('Origin Quantity')
     qty_orders = fields.Float(compute="calc_qty_orders", string='D S', help="Delivery SubOrder")
     quantity = fields.Float(compute="calc_qty_orders", string='Q S', readonly=False, help="Quantity SubOrder")
     remaining_qty = fields.Float(compute="calc_qty_orders", string='R S ', help="Remaining SubOrder")
@@ -156,7 +164,11 @@ class stock_move(models.Model):
     qty_orders_agreement = fields.Float(compute="calc_qty_orders", string='D A', help="Delivery Agreement")
     remaining_qty_agreement = fields.Float(compute="calc_qty_orders", string='R A ', help="Remaining Agreement")
     upconsume_qty_agreement = fields.Float(compute="calc_qty_orders", string='Up C A', help="Up Consume Agreement")
-
+    @api.model
+    def create(self, vals):
+        if 'product_uom_qty' in vals and vals.get('product_uom_qty') > 0.0:
+            vals['origin_qty'] = vals.get('product_uom_qty')
+        return super(stock_move, self).create(vals)
     def calc_qty_orders(self):
         for record in self:
             qty_orders = 0.0
@@ -177,6 +189,8 @@ class stock_move(models.Model):
             else:
                 record.remaining_qty = record.product_uom_qty - qty_orders
             record.quantity = qty_orders
+            if not record.raw_material_production_id.mrp_production_id:
+                record.product_uom_qty = record.remaining_qty
             purchase_requisition_objs = self.env['purchase.requisition'].sudo().search([('mrp_production_id', '=', record.raw_material_production_id.id)])
             for purchase_requisition_obj in purchase_requisition_objs:
                 for move_raw_obj in purchase_requisition_obj.line_ids:

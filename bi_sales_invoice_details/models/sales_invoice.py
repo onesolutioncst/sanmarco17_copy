@@ -16,7 +16,8 @@ class SaleOrderUpdate(models.Model):
 
     def _compute_invoice_amount(self):
         for record in self:
-            invoice_id = self.env['account.move'].search(['&',('invoice_origin','=', record.name),'|',('state','=','draft'),('state','=','posted'),('payment_state', 'not in', ['reversed', 'invoicing_legacy'])])
+            invoice_id = self.env['account.move'].search(['&',('invoice_origin','=', record.name),'|',('state','=','draft'),('state','=','posted'),
+                                                          ('payment_state', 'not in', ['reversed', 'invoicing_legacy'])])
             total = 0
 
             if invoice_id:
@@ -32,7 +33,6 @@ class SaleOrderUpdate(models.Model):
         for record in self:
             invoice_ids = self.env['account.move'].search(['&',('invoice_origin','=', record.name),'|',('state','=','draft'),('state','=','posted'),('payment_state', 'not in', ['reversed', 'invoicing_legacy'])])
             amount = 0
-
             if invoice_ids:
                 for inv in invoice_ids:
                     amount  += inv.amount_residual   

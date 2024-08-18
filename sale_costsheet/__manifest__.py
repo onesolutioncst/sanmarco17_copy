@@ -31,7 +31,7 @@
     'company': 'Onsolutionc LLC.',
     'maintainer': 'Onesolutionc Development Team',
     'website': "https://www.onesolutionc.com",
-    'depends': ['sale','mrp_account','purchase_requisition', 'fleet'],
+    'depends': ['sale','mrp_account','purchase_requisition', 'fleet','account'],
     'data': [
         'data/server_action.xml',
         'security/delivery_security.xml',

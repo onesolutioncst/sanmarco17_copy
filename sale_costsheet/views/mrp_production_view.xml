@@ -40,6 +40,10 @@
                             groups="sale_costsheet.group_create_sub_order_agreement"
                             string="Create Agreement"/>
                 </header>
+                <xpath expr="//field[@name='move_raw_ids']//tree/field[@name='product_uom_qty']" position="after">
+                    <field name="origin_qty" optional="hide" readonly="parent.state != 'draft'"/>
+                </xpath>
+
                 <xpath expr="//field[@name='move_raw_ids']//tree" position="inside">
                     <field name="qty_orders" optional="hide"/>
                     <field name="remaining_qty" optional="hide"/>
