@@ -7,7 +7,6 @@ DATES_FORMAT = "%Y-%m-%d"
 
 class purchase_requisition(models.Model):
     _inherit = "purchase.requisition"
-    _inherit = ['mrp.bom', 'analytic.mixin']
 
     mrp_production_id = fields.Many2one('mrp.production', trace=True)
     milestone_count = fields.Integer(compute='_compute_milestone_count')
