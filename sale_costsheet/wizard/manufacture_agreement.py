@@ -34,9 +34,19 @@ class manufacture_agreement(models.TransientModel):
             'vendor_id': self.partner_id.id,
             'origin': origin,
             'mrp_production_id': mrp_production.id,
-            'analytic_account_id': mrp_production.analytic_distribution.id,
             'line_ids': purchase_requisition
         })
+        if self.env['stock.picking.type'].sudo().search(
+                [('code', '=', 'incoming'), ('warehouse_id', '=', mrp_production.sale_costsheet_id.warehouse_id.id)],
+                limit=1):
+            purchase_requisition_vals.update({
+                'picking_type_id': self.env['stock.picking.type'].sudo().search(
+                    [('code', '=', 'incoming'), ('warehouse_id', '=', mrp_production.sale_costsheet_id.warehouse_id.id)],
+                    limit=1).id
+            })
+
+        # if mrp_production.analytic_distribution:
+        #     purchase_requisition_vals.update({'analytic_distribution': mrp_production.analytic_distribution})
 
         purchase_requisition_obj = self.env['purchase.requisition'].sudo().create(purchase_requisition_vals)
         if self.mrp_production_id:

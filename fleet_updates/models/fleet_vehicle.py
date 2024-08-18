@@ -9,7 +9,7 @@ class fleet_vehicle(models.Model):
 
     is_product = fields.Boolean('Is Product')
     product_product_id = fields.Many2one('product.product', 'Product')
-    is_employee = fields.Boolean('Is Employee')
+    is_employee = fields.Boolean('Is Timesheet')
     hr_employee_id = fields.Many2one('hr.employee', 'Employee')
 
     def create_fleet_product(self):
@@ -21,13 +21,13 @@ class fleet_vehicle(models.Model):
         return True
 
     def create_fleet_employee(self):
-        if self.is_employee:
+        if self.hr_employee_id:
             self.hr_employee_id.write(
-                {'name': self.name, 'is_equipment': True, 'employee_equipment_id': self.id,
-                 'employee_type': 'equipment'})
+                {'name': self.name, 'is_fleet': True, 'employee_fleet_id': self.id,
+                 'employee_type': 'fleet'})
         else:
             hr_employee_obj = self.env['hr.employee'].sudo().create(
-                {'name': self.name, 'is_equipment': True, 'employee_equipment_id': self.id,
-                 'employee_type': 'equipment'})
+                {'name': self.name, 'is_fleet': True, 'employee_fleet_id': self.id,
+                 'employee_type': 'fleet'})
             self.hr_employee_id = hr_employee_obj.id
         return True
