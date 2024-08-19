@@ -7,8 +7,9 @@ DATES_FORMAT = "%Y-%m-%d"
 class account_analytic_line(models.Model):
     _inherit = "account.analytic.line"
 
-    equipment_existing_employee_id = fields.Many2many('res.users', compute='_compute_equipment_existing_employee_ids')
+    equipment_existing_employee_id = fields.Many2many('hr.employee', compute='_compute_equipment_existing_employee_ids')
 
     def _compute_equipment_existing_employee_ids(self):
         for record in self:
-            record.equipment_existing_id = self.env['hr.employee'].sudo().search([('is_equipment','=',True), ('employee_type','=','equipment')])
+            hr_employee_objs = self.env['hr.employee'].sudo().search([('is_equipment', '=', True), ('employee_type', '=', 'equipment')])
+            record.equipment_existing_employee_id = hr_employee_objs.ids
