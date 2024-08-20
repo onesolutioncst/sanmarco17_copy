@@ -1,0 +1,2 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_fleet_vehicle_log_services_lines,Full access on fleet.vehicle.log.services.lines,model_fleet_vehicle_log_services_lines,,1,1,1,1

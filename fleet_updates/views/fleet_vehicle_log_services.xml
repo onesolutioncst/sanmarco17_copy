@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="fleet_vehicle_log_services_view_form_inherit" model="ir.ui.view">
+            <field name="name">fleet_vehicle_log_services_view_form_inherit</field>
+            <field name="model">fleet.vehicle.log.services</field>
+            <field name="inherit_id" ref="fleet.fleet_vehicle_log_services_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header" position="inside">
+                    <button name="run" type="object" string="Set Running" invisible="state != 'new'"/>
+                    <button name="done" type="object" string="Done" invisible="state != 'running'"/>
+                    <button name="cancel" type="object" string="Cancel" invisible="state not in ['new','running']"/>
+                    <button name="reset_to_draft" type="object" string="Reset To Draft"
+                            invisible="state not in ['done','cancelled']"/>
+                    <button name="create_order" type="object" string="Create Order"
+                            invisible="type not in ['sale','purchase'] or purchase_id or sale_id"/>
+                    <button name="create_invoice" type="object" string="Create Invoice"
+                            invisible="type not in ['vendor_bill','customer_invoice'] or invoice_id"/>
+                </xpath>
+                <field name="vendor_id" position="after">
+                    <field name="customer_id"
+                           invisible="type not in ['sale','customer_invoice']"
+                           required="type in ['sale','customer_invoice']"
+                           readonly="state in ['done','cancelled']"/>
+                    <field name="sale_id" invisible="type !='sale'" readonly="1"/>
+                    <field name="purchase_id" invisible="type !='purchase'" readonly="1"/>
+                    <field name="invoice_id" string="Vendor Bill" readonly="1" force_save="1"
+                           invisible="type !='vendor_bill'"/>
+                    <field name="invoice_id" string="Customer Invoice" readonly="1" force_save="1"
+                           invisible="type !='customer_invoice'"/>
+                </field>
+                <field name="purchaser_id" position="after">
+                    <field name="fleet_owner" options="{'no_create': True, 'no_create_edit':True}"/>
+                </field>
+                <field name="vendor_id" position="attributes">
+                    <attribute name="invisible">type not in ['purchase','vendor_bill']</attribute>
+                    <attribute name="required">type in ['purchase','vendor_bill']</attribute>
+                    <attribute name="readonly">type in ['done','cancelled']</attribute>
+                </field>
+                <field name="service_type_id" position="after">
+                    <field name="type" required="1"/>
+                </field>
+                <xpath expr="//sheet" position="inside">
+                    <field name="lines_ids" readonly="state in ['done','cancelled']">
+                        <tree editable="bottom">
+                            <field name="product_id"/>
+                            <field name="name" required="1"/>
+                            <field name="qty" required="1"/>
+                            <field name="price_unit" required="1"/>
+                            <field name="taxes_id" widget="many2many_tags"/>
+                        </tree>
+                    </field>
+                </xpath>
+                <field name="description" position="attributes">
+                    <attribute name="readonly">state in ['done','cancelled']</attribute>
+                </field>
+                <field name="service_type_id" position="attributes">
+                    <attribute name="readonly">state in ['done','cancelled']</attribute>
+                    <attribute name="options">{'no_create': True, 'no_create_edit':True}</attribute>
+                </field>
+                <field name="date" position="attributes">
+                    <attribute name="readonly">state in ['done','cancelled']</attribute>
+                    <attribute name="required">1</attribute>
+                </field>
+                <field name="vehicle_id" position="attributes">
+                    <attribute name="readonly">state in ['done','cancelled']</attribute>
+                </field>
+                <field name="purchaser_id" position="attributes">
+                    <attribute name="readonly">state in ['done','cancelled']</attribute>
+                </field>
+                <field name="odometer" position="attributes">
+                    <attribute name="readonly">state in ['done','cancelled']</attribute>
+                </field>
+                <field name="notes" position="attributes">
+                    <attribute name="readonly">state in ['done','cancelled']</attribute>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</odoo>
