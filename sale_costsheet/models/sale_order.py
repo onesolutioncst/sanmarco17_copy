@@ -1,6 +1,6 @@
 from odoo import api, fields, models, _, SUPERUSER_ID, tools
 import logging
-
+from datetime import datetime, timedelta
 _logger = logging.getLogger(__name__)
 DATES_FORMAT = "%Y-%m-%d"
 
@@ -25,6 +25,10 @@ class sale_order(models.Model):
     advanced_ar_amount = fields.Float('Advanced(AR) Amount', compute="calc_costsheet_total_amount")
     insurance_ar_amount = fields.Float('Insurance(AR) Amount', compute="calc_costsheet_total_amount")
 
+    project_startdate = fields.Date('Project Start Date', trace=True)
+    project_enddate = fields.Date('Project Start Date', trace=True)
+    is_warehouse = fields.Boolean('IS Warehouse')
+    project_task_type_ids = fields.Many2many('project.task.type', string="Project Stages")
     def calc_costsheet_total_amount(self):
         for record in self:
             retention_ar_amount = 0.0
@@ -103,11 +107,12 @@ class sale_order(models.Model):
     def action_confirm(self):
         res = super(sale_order, self).action_confirm()
         for order in self:
-            warehouse = self.env['stock.warehouse'].sudo().create({
-                'name': f'{order.name} Warehouse',
-                'code': f'{order.name[:5].upper()}',
-            })
-            order.warehouse_id = warehouse.id
+            if order.is_warehouse:
+                warehouse = self.env['stock.warehouse'].sudo().create({
+                    'name': f'{order.name} Warehouse',
+                    'code': f'{order.name[:5].upper()}',
+                })
+                order.warehouse_id = warehouse.id
         return res
 
 
@@ -115,3 +120,24 @@ class sale_order_line(models.Model):
     _inherit = "sale.order.line"
 
     mrp_production_costsheet_id = fields.Many2one('mrp.production')
+
+    def _timesheet_create_project(self):
+        project = super(sale_order_line, self)._timesheet_create_project()
+        if self.order_id.project_task_type_ids:
+            for project_task_type_obj in self.order_id.project_task_type_ids:
+                project_task_type_obj.project_ids = [(4, project.id)]
+        return project
+
+    def _timesheet_create_project_prepare_values(self):
+        """Generate project values"""
+        values = super(sale_order_line, self)._timesheet_create_project_prepare_values()
+        if self.order_id and self.order_id.project_startdate and self.order_id.project_enddate:
+            values['date_start'] = self.order_id.project_startdate
+            values['date'] = self.order_id.project_enddate
+        return values
+
+    def _timesheet_create_task_prepare_values(self, project):
+        res = super(sale_order_line, self)._timesheet_create_task_prepare_values(project)
+        if self.order_id and self.order_id.project_startdate and self.product_id.project_age:
+            res.update({'date_deadline': self.order_id.project_startdate + timedelta(days=self.product_id.project_age)})
+        return res

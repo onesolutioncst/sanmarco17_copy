@@ -11,7 +11,7 @@ class project_task(models.Model):
         'res.users',
         'project_task_fleet_user_rel',
         'task_id', 'user_id',
-        string='Fleet Users',
+        string='Assign Fleets',
         domain="[ ('id', 'in', fleet_existing_id)]"
     )
 

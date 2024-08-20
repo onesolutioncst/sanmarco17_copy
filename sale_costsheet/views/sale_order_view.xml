@@ -63,21 +63,51 @@
                 <xpath expr="//field[@name='note']" position="after">
                     <group>
                         <group>
-                            <field name="retention_ar_amount" widget='monetary' options="{'currency_field': 'currency_id'}"
+                            <field name="retention_ar_amount" widget='monetary'
+                                   options="{'currency_field': 'currency_id'}"
                                    readonly="True"/>
-                            <field name="advanced_ar_amount" widget='monetary' options="{'currency_field': 'currency_id'}"
+                            <field name="advanced_ar_amount" widget='monetary'
+                                   options="{'currency_field': 'currency_id'}"
                                    readonly="True"/>
-                            <field name="insurance_ar_amount" widget='monetary' options="{'currency_field': 'currency_id'}"
+                            <field name="insurance_ar_amount" widget='monetary'
+                                   options="{'currency_field': 'currency_id'}"
                                    readonly="True"/>
-                            <field name="costsheet_inv_total_amount" widget='monetary' options="{'currency_field': 'currency_id'}"
+                            <field name="costsheet_inv_total_amount" widget='monetary'
+                                   options="{'currency_field': 'currency_id'}"
                                    readonly="True"/>
                         </group>
 
                     </group>
                 </xpath>
-
             </field>
         </record>
 
+        <record id="view_order_form_inherit_sale_stock_iswarehouse" model="ir.ui.view">
+            <field name="name">sale.order.form.sale.stock</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock"/>
+            <field name="arch" type="xml">
+                <field name="warehouse_id" position="before">
+                    <field name="is_warehouse" readonly="state != 'draft'"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_order_form_inherit_sale_project_projectstartend" model="ir.ui.view">
+            <field name='name'>sale.order.form.projectstartend</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale_project.view_order_form_inherit_sale_project"/>
+            <field name="arch" type="xml">
+                <field name="project_id" position="after">
+                    <field name="project_startdate" string="Planned Date" widget="daterange"
+                           options='{"end_date_field": "project_enddate", "always_range": "1"}'
+                           required="project_startdate or project_enddate"/>
+                    <field name="project_enddate" invisible="1" required="project_startdate"/>
+                    <field name="project_task_type_ids" widget="many2many_tags"
+                           options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                </field>
+
+            </field>
+        </record>
     </data>
 </odoo>
