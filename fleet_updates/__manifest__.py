@@ -33,11 +33,13 @@
     'website': "https://www.onesolutionc.com",
     'depends': ['fleet', 'hr','project','sale_costsheet','hr_timesheet'],
     'data': [
+        'security/ir.model.access.csv',
         'views/hr_employee_view.xml',
         'views/fleet_vehicle_view.xml',
         'views/product_template_view.xml',
         'views/project_tasks_views.xml',
         'views/project_project_views.xml',
+        'views/fleet_vehicle_log_services.xml',
     ],
     'images': [],
     'license': 'AGPL-3',

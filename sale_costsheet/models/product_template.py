@@ -15,6 +15,7 @@ class product_template(models.Model):
     supplier = fields.Boolean('Is Supplier')
     customer = fields.Boolean('Is Customer')
     costsheet = fields.Boolean('Is Costsheet')
+    project_age = fields.Integer('Product Age')
 
 
 # class product_product(models.Model):

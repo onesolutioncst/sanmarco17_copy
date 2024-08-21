@@ -11,7 +11,7 @@ class project_task(models.Model):
         'res.users',
         'project_task_equipment_user_rel',
         'task_id', 'user_id',
-        string='Equipment Users',
+        string='Assign Equipments',
         domain="[ ('id', 'in', equipment_existing_id)]"
     )
     equipment_existing_id = fields.Many2many('res.users', compute='_compute_equipment_existing_user_ids')
