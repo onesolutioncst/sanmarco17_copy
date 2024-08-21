@@ -11,6 +11,7 @@ class FleetVehicleLogServices(models.Model):
     sale_id = fields.Many2one("sale.order", "Sale Order")
     purchase_id = fields.Many2one("purchase.order", "Purchase Order")
     invoice_id = fields.Many2one("account.move", "Invoice")
+    repair_id = fields.Many2one('repair.order', 'Repair Order')
     lines_ids = fields.One2many("fleet.vehicle.log.services.lines", "fleet_log_id", "Lines")
     fleet_owner = fields.Many2one('res.partner', string='Fleet Owner', copy=False)
     service_type_id = fields.Many2one(
@@ -146,10 +147,33 @@ class FleetVehicleLogServices(models.Model):
             })
             self.invoice_id = invoice_obj.id
 
+    def get_picking_type_id(self):
+        companies = self.company_id or self.env.company
+        default_warehouse = self.env.user.with_company(companies.id)._get_default_warehouse_id()
+        if default_warehouse and default_warehouse.repair_type_id:
+            return default_warehouse.repair_type_id.id
+
+    def create_repair(self):
+        if self.service_type_id.type == 'repair':
+            lines = []
+            for line in self.lines_ids:
+                lines.append((0, 0, {
+                    'repair_line_type': line.type,
+                    'product_id': line.product_id.id,
+                    'product_uom_qty': line.qty,
+                }))
+            repair_obj = self.env['repair.order'].sudo().create({
+                'partner_id': self.customer_id.id,
+                'picking_type_id': self.get_picking_type_id(),
+                'fleet_vehicle_id': self.vehicle_id.id,
+                'move_ids': lines,
+            })
+            self.repair_id = repair_obj.id
 
 class FleetVehicleLogServicesLines(models.Model):
     _name = 'fleet.vehicle.log.services.lines'
 
+    type = fields.Selection([('add','Add'), ('remove','Remove'),('recycle','Recycle')], 'Repair Type', default="add")
     fleet_log_id = fields.Many2one("fleet.vehicle.log.services", "Service")
     product_id = fields.Many2one("product.product", "Product", )
     name = fields.Char('Description')

@@ -17,11 +17,13 @@
                             invisible="type not in ['sale','purchase'] or purchase_id or sale_id"/>
                     <button name="create_invoice" type="object" string="Create Invoice"
                             invisible="type not in ['vendor_bill','customer_invoice'] or invoice_id"/>
+                    <button name="create_repair" type="object" string="Create Repair"
+                            invisible="type not in ['sale','customer_invoice','repair'] or repair_id"/>
                 </xpath>
                 <field name="vendor_id" position="after">
                     <field name="customer_id"
-                           invisible="type not in ['sale','customer_invoice']"
-                           required="type in ['sale','customer_invoice']"
+                           invisible="type not in ['sale','customer_invoice','repair']"
+                           required="type in ['sale','customer_invoice','repair']"
                            readonly="state in ['done','cancelled']"/>
                     <field name="sale_id" invisible="type !='sale'" readonly="1"/>
                     <field name="purchase_id" invisible="type !='purchase'" readonly="1"/>
@@ -29,6 +31,9 @@
                            invisible="type !='vendor_bill'"/>
                     <field name="invoice_id" string="Customer Invoice" readonly="1" force_save="1"
                            invisible="type !='customer_invoice'"/>
+                    <field name="repair_id" string="Repair" readonly="1" force_save="1"
+                           invisible="type !='repair'"/>
+
                 </field>
                 <field name="purchaser_id" position="after">
                     <field name="fleet_owner" options="{'no_create': True, 'no_create_edit':True}"/>
@@ -44,6 +49,7 @@
                 <xpath expr="//sheet" position="inside">
                     <field name="lines_ids" readonly="state in ['done','cancelled']">
                         <tree editable="bottom">
+                            <field name="type" readonly="parent.type != 'repair'" column_invisible="parent.type != 'repair'"/>
                             <field name="product_id"/>
                             <field name="name" required="1"/>
                             <field name="qty" required="1"/>

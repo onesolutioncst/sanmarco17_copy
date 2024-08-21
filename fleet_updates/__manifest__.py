@@ -43,6 +43,7 @@
         'views/fleet_vehicle_log_services.xml',
         'views/fleet_vehicle_log_contract.xml',
         'views/fleet_contract_template_view.xml',
+        'views/repair_order_view.xml',
     ],
     'images': [],
     'license': 'AGPL-3',
