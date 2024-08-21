@@ -13,6 +13,7 @@
                     <button name="create_fleet_product" string="Create/Update Product" type="object"
                             class="oe_highlight" invisible="is_product == False"/>
                 </div>
+                <field name="task_state" widget="statusbar" options="{'clickable': '1', 'fold_field': 'fold'}"/>
                 <label for="is_employee" class="oe_inline"/>
                 <div>
                     <field name="is_employee"/>
@@ -31,6 +32,18 @@
                     </button>
                 </xpath>
             </xpath>
+        </field>
+    </record>
+    <record id='fleet.fleet_vehicle_service_types_view_tree' model='ir.ui.view'>
+        <field name="name">fleet.service.type.tree</field>
+        <field name="model">fleet.service.type</field>
+        <field name="arch" type="xml">
+            <tree string="Service Types" editable="bottom">
+                <field name="name"/>
+                <field name="category"/>
+                <field name="user_ids" options="{'no_create': True, 'no_create_edit':True}" widget="many2many_tags"/>
+                <field name="type"/>
+            </tree>
         </field>
     </record>
 </odoo>

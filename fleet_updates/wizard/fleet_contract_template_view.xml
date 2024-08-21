@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="fleet_contract_template_view_form">
+            <field name="name">Fleet Contract</field>
+            <field name="model">fleet.contract.template.wizard</field>
+            <field name="arch" type="xml">
+                <form string="Fleet Contract Templates">
+                    <group>
+                        <field name="type" invisible="1"/>
+                        <field name="template_id" required="1" domain="[('type','=',type)]" options="{'no_open':True,'no_create':True}"/>
+                    </group>
+                    <footer>
+                        <button name="template_download_global" string="Download" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+        <record id="action_fleet_contract_template_view_form" model="ir.actions.act_window">
+            <field name="name">Fleet Contract Reports</field>
+            <field name="res_model">fleet.contract.template.wizard</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="fleet_contract_template_view_form"/>
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>

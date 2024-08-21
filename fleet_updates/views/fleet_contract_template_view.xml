@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="view_fleet_contract_template_form" model="ir.ui.view">
+            <field name="name">view.fleet_contract_template.form</field>
+            <field name="model">fleet.contract.template</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Fleet Contract Template">
+                    <sheet string="Fleet Contract Template">
+                        <group col="4">
+                            <field name="name" required="1"/>
+                            <field name="active"/>
+                            <field name="type" required="1"/>
+                            <field name="template" required="1" filename="template_filename"/>
+                            <field name="template_filename" invisible="1"/>
+                        </group>
+                        <separator string="Keywords User can use the following keywords to define template variables"/>
+                        <!--                        <label string="User can use the following keywords to define template variables"/>-->
+                        <h2>
+                            Contract Information
+                        </h2>
+                        <p>
+                            Day Name = {{day_name}}
+                        </p>
+                        <p>
+                            Contract Start Date? = {{start_date}}
+                        </p>
+                        <p>
+                            Buyer = {{buyer_name}}
+                        </p>
+                        <p>
+                            Buyer Civil ID = {{buyer_civil_id}}
+                        </p>
+                        <p>
+                            Buyer address = {{buyer_address}}
+                        </p>
+                        <p>
+                            Buyer Mobile = {{buyer_mobile}}
+                        </p>
+                        <p>
+                            Buyer Country = {{buyer_country}}
+                        </p>
+                        -------------------------------------------
+                        <p>
+                            Customer = {{customer_name}}
+                        </p>
+                        <p>
+                            Customer Civil ID = {{customer_civil_id}}
+                        </p>
+                        <p>
+                            Customer address= {{customer_address}}
+                        </p>
+                        <p>
+                            Customer Mobile = {{customer_mobile}}
+                        </p>
+                        <p>
+                            Customer Country = {{customer_country}}
+                        </p>
+                        -------------------------------------------
+                        <p>
+                            Vendor = {{vendor_name}}
+                        </p>
+                        <p>
+                            Vendor Civil ID = {{vendor_civil_id}}
+                        </p>
+                        <p>
+                            Vendor address= {{vendor_address}}
+                        </p>
+                        <p>
+                            Vendor Mobile = {{vendor_mobile}}
+                        </p>
+                        <p>
+                            Vendor Country = {{vendor_country}}
+                        </p>
+                        -------------------------------------------
+                        <h2>
+                            Vehicle Information
+                        </h2>
+                        <p>
+                            Vehicle = {{vehicle_name}}
+                        </p>
+                        <p>
+                            Vehicle Model = {{vehicle_model_name}}
+                        </p>
+                        <p>
+                            Vehicle Model (Factory) = {{vehicle_model_factoru}}
+                        </p>
+                        <p>
+                            Vehicle (License Plate) = {{vehicle_license_plate}}
+                        </p>
+                        <p>
+                            Vehicle (Model Year) = {{vehicle_model_year}}
+                        </p>
+                        <p>
+                            Vehicle (Origin) = {{vehicle_country}}
+                        </p>
+                        <p>
+                            Vehicle (Color) = {{vehicle_color}}
+                        </p>
+                        <p>
+                            Vehicle (Odoometer) = {{vehicle_odoometer}}
+                        </p>
+                        <p>
+                            Vehicle (Chassis Number) = {{vehicle_chassis_number}}
+                        </p>
+                        <p>
+                            Vehicle (Engine number) = {{vehicle_en_num}}
+                        </p>
+                        <p>
+                            Vehicle (License Number) = {{vehicle_license_number}}
+                        </p>
+<!--                        <p>-->
+<!--                            Vehicle (Licence Issuance) = {{vehicle_license_i}}-->
+<!--                        </p>-->
+                        <p>
+                            Vehicle (Purchase amount) = {{vehicle_net_car_value}}
+                        </p>
+                         <p>
+                            Vehicle (Purchase amount Text) = {{vehicle_net_car_value_text}}
+                        </p>
+                        <p>
+                            Vehicle (Sale Amount) = {{vehicle_sale_car_value}}
+                        </p>
+                         <p>
+                            Vehicle (Sale Amount Text) = {{vehicle_sale_car_value_text}}
+                        </p>
+                        <p>
+                            Vehicle (Down payment) = {{vehicle_down_payment}}
+                        </p>
+                        <p>
+                            Vehicle (Remaining Payment) = {{vehicle_rem_payment}}
+                        </p>
+                        <p>
+                            Vehicle (Delivery Date) = {{vehicle_commitment_date}}
+                        </p>
+                        <p>
+                            Vehicle (Delivery Date Name) = {{vehicle_commitment_date_name}}
+                        </p>
+                        <p>
+                            Vehicle (Delivery Time) = {{vehicle_commitment_date_time}}
+                        </p>
+
+
+                        <p>
+                            Responsible = {{user_name}}
+                        </p>
+                        <p>
+                            Type = {{type}}
+                        </p>
+
+
+                        <p>
+                            Type = {{type}}
+                        </p>
+                        <p>
+                            Reference = {{ins_ref}}
+                        </p>
+                        <p>
+                            Activation Cost = {{amount}}
+                        </p>
+                        <p>
+                            Recurring Cost = {{cost_generated}}
+                        </p>
+                        <p>
+                            Driver = {{driver_name}}
+                        </p>
+                        <p>
+                            Invoice Date = {{date}}
+                        </p>
+                        <p>
+                            Contract Start Date? = {{start_date}}
+                        </p>
+                        <p>
+                            Day Name = {{day_name}}
+                        </p>
+                        <p>
+                            Contract Expiration Date = {{expiration_date}}
+                        </p>
+                        <p>
+                            Terms and Conditions = {{notes}}
+                        </p>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids" widget="mail_followers"/>
+                        <field name="message_ids" widget="mail_thread"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_fleet_contract_template_tree" model="ir.ui.view">
+            <field name="name">view.fleet.contract.template.tree</field>
+            <field name="model">fleet.contract.template</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                <tree string="Fleet Contract Template">
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_fleet_contract_template_search" model="ir.ui.view">
+            <field name="name">view.hr.ksa.employee_letter.template.search</field>
+            <field name="model">fleet.contract.template</field>
+            <field name="arch" type="xml">
+                <search string="Fleet Contract Template">
+                    <field name="name"/>
+                </search>
+            </field>
+        </record>
+
+
+        <record id="action_fleet_contract_template" model="ir.actions.act_window">
+            <field name="name">Fleet Contract Template</field>
+            <field name="res_model">fleet.contract.template</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_fleet_contract_template_search"/>
+        </record>
+
+        <menuitem id="menu_fleet_contract_template" sequence="200" action="action_fleet_contract_template"
+                  parent="fleet.fleet_configuration"/>
+
+    </data>
+</odoo>

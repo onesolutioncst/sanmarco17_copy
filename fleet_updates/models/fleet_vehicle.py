@@ -4,6 +4,11 @@ import logging
 
 _logger = logging.getLogger(__name__)
 DATES_FORMAT = "%Y-%m-%d"
+CLOSED_STATES = {
+    '1_done': 'Done',
+    '1_canceled': 'Canceled',
+}
+
 
 class fleet_vehicle(models.Model):
     _inherit = "fleet.vehicle"
@@ -13,6 +18,24 @@ class fleet_vehicle(models.Model):
     is_employee = fields.Boolean('Is Timesheet')
     hr_employee_id = fields.Many2one('hr.employee', 'Employee')
     has_timesheet = fields.Boolean(compute='_compute_has_timesheet')
+    en_num = fields.Char(string="Engine number", )
+    license = fields.Char(string="License Number", )
+    sale_car_value = fields.Float(string='Sales Value')
+    task_state = fields.Selection([
+        ('01_in_progress', 'In Progress'),
+        ('02_changes_requested', 'Changes Requested'),
+        ('03_approved', 'Approved'),
+        *CLOSED_STATES.items(),
+        ('04_waiting_normal', 'Waiting'),
+    ], string='State',compute="get_task_state"
+    )
+    def get_task_state(self):
+        for record in self:
+            record.task_state = ''
+            if record.is_employee and record.hr_employee_id and record.hr_employee_id.user_id:
+                project_task_objs = self.env['project.task'].sudo().search([('fleet_user_ids','=',record.hr_employee_id.user_id.id)], limit=1)
+                if project_task_objs:
+                    record.task_state=project_task_objs.state
 
     def _compute_has_timesheet(self):
         self.env.cr.execute("""
@@ -30,7 +53,8 @@ class fleet_vehicle(models.Model):
         if self.product_product_id:
             self.product_product_id.write({'name': self.name, 'is_fleet': True, 'fleet_vehicle_id': self.id})
         else:
-            product_product_obj = self.env['product.product'].sudo().create({'name': self.name, 'is_fleet': True, 'fleet_vehicle_id': self.id})
+            product_product_obj = self.env['product.product'].sudo().create(
+                {'name': self.name, 'is_fleet': True, 'fleet_vehicle_id': self.id})
             self.product_product_id = product_product_obj.id
         return True
 
