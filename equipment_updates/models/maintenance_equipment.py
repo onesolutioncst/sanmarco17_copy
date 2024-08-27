@@ -1,9 +1,13 @@
 from ast import literal_eval
 from odoo import api, fields, models, _, SUPERUSER_ID, tools
 import logging
-
+from collections import defaultdict
 _logger = logging.getLogger(__name__)
 DATES_FORMAT = "%Y-%m-%d"
+CLOSED_STATES = {
+    '1_done': 'Done',
+    '1_canceled': 'Canceled',
+}
 
 
 class maintenance_equipment(models.Model):
@@ -14,6 +18,43 @@ class maintenance_equipment(models.Model):
     is_employee = fields.Boolean('Is Timesheet')
     hr_employee_id= fields.Many2one('hr.employee', 'Employee')
     has_timesheet = fields.Boolean(compute='_compute_has_timesheet')
+    task_state = fields.Selection([
+        ('01_in_progress', 'In Progress'),
+        ('02_changes_requested', 'Changes Requested'),
+        ('03_approved', 'Approved'),
+        *CLOSED_STATES.items(),
+        ('04_waiting_normal', 'Waiting'),
+    ], string='State', compute="get_task_state"
+    )
+    service_count = fields.Integer(compute="_compute_count_all", string='Services')
+    contract_count = fields.Integer(compute="_compute_count_all", string='Contract Count')
+    def _compute_count_all(self):
+        for vehicle in self:
+            vehicle.service_count = self.env['equipment.vehicle.log.services'].search_count([('maintenance_equipment_id', 'in', self.ids)])
+            vehicle.contract_count =self.env['equipment.vehicle.log.contract'].search_count([('maintenance_equipment_id', 'in', self.ids)])
+
+    def return_action_to_open(self):
+        """ This opens the xml view specified in xml_id for the current vehicle """
+        self.ensure_one()
+        xml_id = self.env.context.get('xml_id')
+        if xml_id:
+
+            res = self.env['ir.actions.act_window']._for_xml_id('equipment_updates.%s' % xml_id)
+            res.update(
+                context=dict(self.env.context, default_maintenance_equipment_id=self.id,maintenance_equipment_id=self.id, group_by=False),
+                domain=[('maintenance_equipment_id', '=', self.id)]
+            )
+            return res
+        return False
+
+    def get_task_state(self):
+        for record in self:
+            record.task_state = ''
+            if record.is_employee and record.hr_employee_id and record.hr_employee_id.user_id:
+                project_task_objs = self.env['project.task'].sudo().search(
+                    [('equipment_user_ids', '=', record.hr_employee_id.user_id.id)], limit=1)
+                if project_task_objs:
+                    record.task_state = project_task_objs.state
 
     def _compute_has_timesheet(self):
         self.env.cr.execute("""

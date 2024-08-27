@@ -18,7 +18,7 @@
                     <button name="create_invoice" type="object" string="Create Invoice"
                             invisible="type not in ['vendor_bill','customer_invoice'] or invoice_id"/>
                     <button name="create_repair" type="object" string="Create Repair"
-                            invisible="type not in ['sale','customer_invoice','repair'] or repair_id"/>
+                            invisible="type not in ['repair'] or repair_id"/>
                 </xpath>
                 <field name="vendor_id" position="after">
                     <field name="customer_id"
