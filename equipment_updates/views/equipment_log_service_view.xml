@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <odoo>
+        <record id='equipment_log_services_view_form' model='ir.ui.view'>
+            <field name="name">equipment.vehicle.log.services.form</field>
+            <field name="model">equipment.vehicle.log.services</field>
+            <field name="arch" type="xml">
+                <form string="Services Logs">
+                    <field name="active" invisible="1"/>
+                    <field name="currency_id" invisible="1"/>
+                    <header>
+                        <button name="run" type="object" string="Set Running" invisible="state != 'new'"/>
+                        <button name="done" type="object" string="Done" invisible="state != 'running'"/>
+                        <button name="cancel" type="object" string="Cancel" invisible="state not in ['new','running']"/>
+                        <button name="reset_to_draft" type="object" string="Reset To Draft"
+                                invisible="state not in ['done','cancelled']"/>
+                        <button name="create_order" type="object" string="Create Order"
+                                invisible="type not in ['sale','purchase'] or purchase_id or sale_id"/>
+                        <button name="create_invoice" type="object" string="Create Invoice"
+                                invisible="type not in ['vendor_bill','customer_invoice'] or invoice_id"/>
+                        <button name="create_repair" type="object" string="Create Repair"
+                                invisible="type not in ['repair'] or repair_id"/>
+                        <field name="state" widget="statusbar" options="{'clickable': '0'}"/>
+                    </header>
+                    <sheet>
+                        <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                        <group col="2">
+                            <group>
+                                <field name="description" readonly="state in ['done','cancelled'] or invoice_id or sale_id or purchase_id or repair_id"/>
+                                <field name="service_type_id" options="{'no_create': True, 'no_create_edit':True}"
+                                       readonly="state in ['done','cancelled'] or invoice_id or sale_id or purchase_id or repair_id"/>
+                                <field name="type" required="1" readonly="1"/>
+                                <field name="date" required="1" readonly="state in ['done','cancelled'] or invoice_id or sale_id or purchase_id or repair_id"/>
+                                <field name="amount" widget="monetary" readonly="state in ['done','cancelled'] or invoice_id or sale_id or purchase_id or repair_id"/>
+                            </group>
+                            <group>
+                                <field name="maintenance_equipment_id" readonly="state in ['done','cancelled'] or invoice_id or sale_id or purchase_id or repair_id"/>
+                                <field name="vendor_id" widget="many2one_avatar"
+                                       invisible="type not in ['purchase','vendor_bill','repair']"
+                                       required="type in ['purchase','vendor_bill','repair']"
+                                       readonly="state in ['done','cancelled'] or invoice_id or sale_id or purchase_id or repair_id"/>
+                                <field name="customer_id"
+                                       invisible="type not in ['sale','customer_invoice','repair']"
+                                       required="type in ['sale','customer_invoice','repair']"
+                                       readonly="state in ['done','cancelled'] or invoice_id or sale_id or purchase_id or repair_id"/>
+                                <field name="sale_id" invisible="type !='sale'" readonly="1"/>
+                                <field name="purchase_id" invisible="type !='purchase'" readonly="1"/>
+                                <field name="invoice_id" string="Vendor Bill" readonly="1" force_save="1"
+                                       invisible="type !='vendor_bill'"/>
+                                <field name="invoice_id" string="Customer Invoice" readonly="1" force_save="1"
+                                       invisible="type !='customer_invoice'"/>
+                                <field name="repair_id" string="Repair" readonly="1" force_save="1"
+                                       invisible="type !='repair'"/>
+
+                            </group>
+                        </group>
+                        <separator string="Notes"/>
+                        <field nolabel="1" name="notes" readonly="state in ['done','cancelled'] or invoice_id or sale_id or purchase_id or repair_id"
+                               placeholder="Write here any other information related to the service completed."/>
+                        <field name="lines_ids" readonly="state in ['done','cancelled'] or invoice_id or sale_id or purchase_id or repair_id">
+                            <tree editable="bottom">
+                                <field name="type" readonly="parent.type != 'repair'"
+                                       column_invisible="parent.type != 'repair'"/>
+                                <field name="product_id"/>
+                                <field name="name" required="1"/>
+                                <field name="qty" required="1"/>
+                                <field name="price_unit" required="1"/>
+                                <field name="taxes_id" widget="many2many_tags"/>
+                            </tree>
+                        </field>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+        <record id='equipment_log_services_view_tree' model='ir.ui.view'>
+            <field name="name">equipment.vehicle.log.services.tree</field>
+            <field name="model">equipment.vehicle.log.services</field>
+            <field name="arch" type="xml">
+                <tree string="Services Logs" multi_edit="1" expand="1">
+                    <field name="date" readonly="1"/>
+                    <field name="description"/>
+                    <field name="service_type_id"/>
+                    <field name="notes" optional="show"/>
+                    <field name="amount" sum="Total" widget="monetary"/>
+                    <field name="currency_id" column_invisible="True"/>
+                    <field name="state" readonly="1" widget="badge" decoration-success="state == 'done'"
+                           decoration-warning="state == 'new'" decoration-info="state == 'running'"/>
+                </tree>
+            </field>
+        </record>
+        <record id='equipment_vehicle_log_services_action' model='ir.actions.act_window'>
+            <field name="name">Services</field>
+            <field name="res_model">equipment.vehicle.log.services</field>
+            <field name="view_mode">tree,kanban,form,graph,pivot,activity</field>
+            <field name="context">{'search_default_groupby_service_type_id': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new service entry
+                </p>
+                <p>
+                    Track all the services done on your vehicle.
+                    Services can be of many types: occasional repair, fixed maintenance, etc.
+                </p>
+            </field>
+        </record>
+        <menuitem action="fleet.fleet_vehicle_service_types_action" parent="maintenance.menu_maintenance_configuration" name="Types"
+                  id="equipment_vehicle_service_types_menu" sequence="1" groups="base.group_no_one"/>
+
+    </odoo>
+</odoo>

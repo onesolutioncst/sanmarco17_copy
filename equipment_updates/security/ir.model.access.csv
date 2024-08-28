@@ -1,0 +1,9 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_equipment_vehicle_log_services,equipment_vehicle_log_services,model_equipment_vehicle_log_services,,1,1,1,1
+access_equipment_vehicle_log_services_lines,equipment_vehicle_log_services_lines,model_equipment_vehicle_log_services_lines,,1,1,1,1
+access_equipment_vehicle_log_contract_lines,equipment_vehicle_log_contract_lines,model_equipment_vehicle_log_contract_lines,,1,1,1,1
+access_equipment_vehicle_log_contract,equipment_vehicle_log_contract,model_equipment_vehicle_log_contract,,1,1,1,1
+
+
+
+

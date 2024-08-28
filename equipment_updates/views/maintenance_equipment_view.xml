@@ -7,6 +7,25 @@
             <field name="model">maintenance.equipment</field>
             <field name="inherit_id" ref="maintenance.hr_equipment_view_form"/>
             <field name="arch" type="xml">
+                <div name="button_box" position="inside">
+                    <button name="return_action_to_open" type="object" class="oe_stat_button text-warning"
+                            icon="fa-wrench"
+                            context="{'xml_id':'equipment_vehicle_log_services_action', 'search_default_inactive': not active}"
+                            help="show the services logs for this vehicle">
+                        <field name="service_count" widget="statinfo" string="Services"/>
+                    </button>
+                    <button name="return_action_to_open"
+                            type="object"
+                            class="oe_stat_button"
+                            icon="fa-wrench"
+                            context="{'xml_id':'equipment_log_contract_action', 'search_default_inactive': not active}"
+                            help="show the Contract logs for this Equipment">
+                        <field name="contract_count" widget="statinfo" string="Contracts"/>
+                    </button>
+                </div>
+                <sheet position="inside">
+                    <field name="task_state" widget="statusbar" options="{'clickable': '1', 'fold_field': 'fold'}"/>
+                </sheet>
                 <xpath expr="//field[@name='workcenter_id']" position="after">
                     <label for="is_product" class="oe_inline"/>
                     <div>
@@ -22,6 +41,7 @@
                         <button name="create_equipment_employee" string="Create/Update Employee" type="object"
                                 class="oe_highlight" invisible="is_employee == False"/>
                     </div>
+
                 </xpath>
                 <xpath expr="//div[@name='button_box']" position="inside">
                     <field name="has_timesheet" groups="hr_timesheet.group_hr_timesheet_user" invisible="1"/>
