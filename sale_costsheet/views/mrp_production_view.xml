@@ -6,6 +6,22 @@
             <field name="model">mrp.production</field>
             <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
             <field name="arch" type="xml">
+
+                <button name="button_mark_done" position="attributes">
+                    <attribute name="invisible">is_costsheet</attribute>
+                </button>
+                <button name="button_mark_done" position="attributes">
+                    <attribute name="invisible">is_costsheet</attribute>
+                </button>
+                <button name="button_mark_done" position="attributes">
+                    <attribute name="invisible">is_costsheet</attribute>
+                </button>
+                <button name="button_mark_done" position="attributes">
+                    <attribute name="invisible">is_costsheet</attribute>
+                </button>
+                <button name="button_scrap" position="attributes">
+                    <attribute name="invisible">is_costsheet</attribute>
+                </button>
                 <field name="product_id" position="after">
                     <field name="is_costsheet" invisible="1"/>
                     <field name="mrp_production_id" invisible="1"/>
@@ -88,5 +104,23 @@
                   id="menu_mrp_production_costsheet_action"
                   parent="mrp.menu_mrp_manufacturing"
                   sequence="2"/>
+
+        <record id="mrp.mrp_production_action" model="ir.actions.act_window">
+            <field name="name">Manufacturing Orders</field>
+            <field name="res_model">mrp.production</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+            <field name="view_id" eval="False"/>
+            <field name="search_view_id" ref="mrp.view_mrp_production_filter"/>
+            <field name="context">{'search_default_todo': True, 'default_company_id': allowed_company_ids[0]}</field>
+            <field name="domain">[('picking_type_id.active', '=', True),('is_costsheet', '=', False)]</field>
+            <field name="help" type="html">
+              <p class="o_view_nocontent_smiling_face">
+                No manufacturing order found. Let's create one.
+              </p><p>
+                Use Manufacturing Orders (MO) to build finished products while consuming components: i.e. 1 Table = 4 Table Legs + 1 Table Top
+              </p>
+            </field>
+        </record>
+
     </data>
 </odoo>

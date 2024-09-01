@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- Inherit Form View to Modify it -->
+        <record model="ir.ui.view" id="view_move_form_costsheet">
+            <field name="name">view_move_form.costsheet</field>
+            <field name="model">account.move</field>
+            <field name="inherit_id" ref="account.view_move_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='narration']" position="after">
+                    <group>
+                        <group>
+                            <field name="retention_ar_amount" widget='monetary'
+                                   options="{'currency_field': 'currency_id'}"
+                                   readonly="True"/>
+                            <field name="advanced_ar_amount" widget='monetary'
+                                   options="{'currency_field': 'currency_id'}"
+                                   readonly="True"/>
+                            <field name="insurance_ar_amount" widget='monetary'
+                                   options="{'currency_field': 'currency_id'}"
+                                   readonly="True"/>
+                            <field name="costsheet_inv_total_amount" widget='monetary'
+                                   options="{'currency_field': 'currency_id'}"
+                                   readonly="True"/>
+                        </group>
+                    </group>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

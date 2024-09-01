@@ -46,6 +46,8 @@
         'views/purchase_order_view.xml',
         'views/requisition_milestone_view.xml',
         'views/res_config_setting_view.xml',
+        'views/account_move_view.xml',
+        'report/stock_move_report_view.xml',
     ],
     'images': [],
     'license': 'AGPL-3',
