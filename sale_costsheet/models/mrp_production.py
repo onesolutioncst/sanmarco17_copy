@@ -156,14 +156,14 @@ class stock_move(models.Model):
     _inherit = "stock.move"
 
     origin_qty = fields.Float('Origin Quantity')
-    qty_orders = fields.Float(compute="calc_qty_orders", string='D S', help="Delivery SubOrder")
-    quantity = fields.Float(compute="calc_qty_orders", string='Q S', readonly=False, help="Quantity SubOrder")
-    remaining_qty = fields.Float(compute="calc_qty_orders", string='R S ', help="Remaining SubOrder")
-    upconsume_qty = fields.Float(compute="calc_qty_orders", string='Up C S ', help="Up Consume SubOrder")
+    qty_orders = fields.Float(compute="calc_qty_orders", string='D S', help="Delivery SubOrder", store=True, precompute=True)
+    quantity = fields.Float(compute="calc_qty_orders", string='Q S', readonly=False, help="Quantity SubOrder", store=True, precompute=True)
+    remaining_qty = fields.Float(compute="calc_qty_orders", string='R S ', help="Remaining SubOrder", store=True, precompute=True)
+    upconsume_qty = fields.Float(compute="calc_qty_orders", string='Up C S ', help="Up Consume SubOrder", store=True, precompute=True)
 
-    qty_orders_agreement = fields.Float(compute="calc_qty_orders", string='D A', help="Delivery Agreement")
-    remaining_qty_agreement = fields.Float(compute="calc_qty_orders", string='R A ', help="Remaining Agreement")
-    upconsume_qty_agreement = fields.Float(compute="calc_qty_orders", string='Up C A', help="Up Consume Agreement")
+    qty_orders_agreement = fields.Float(compute="calc_qty_orders", string='D A', help="Delivery Agreement", store=True, precompute=True)
+    remaining_qty_agreement = fields.Float(compute="calc_qty_orders", string='R A ', help="Remaining Agreement", store=True, precompute=True)
+    upconsume_qty_agreement = fields.Float(compute="calc_qty_orders", string='Up C A', help="Up Consume Agreement", store=True, precompute=True)
     @api.model
     def create(self, vals):
         if 'product_uom_qty' in vals and vals.get('product_uom_qty') > 0.0:

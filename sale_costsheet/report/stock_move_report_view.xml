@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_stock_move_report_search" model="ir.ui.view">
+            <field name="name">stock_move_report.search</field>
+            <field name="model">stock.move.report</field>
+            <field name="arch" type="xml">
+                <search string="Costsheet Analysis">
+                    <field name="name"/>
+                    <field name="date_start"/>
+                    <field name="date_finished"/>
+                    <field name="main_product_id"/>
+                    <field name="sub_product_id"/>
+                </search>
+            </field>
+        </record>
+
+        <!-- Inherit Form View to Modify it -->
+        <record id="view_stock_move_report_form" model="ir.ui.view">
+            <field name="name">stock_move_report.form</field>
+            <field name="model">stock.move.report</field>
+            <field name="arch" type="xml">
+                <form string="Costsheet Analysis" create="0" default_order="id desc">
+                    <group>
+                        <field name="date_start"/>
+                        <field name="date_finished"/>
+                        <field name="main_product_id"/>
+                        <field name="sub_product_id"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <!-- Inherit Form View to Modify it -->
+        <record id="view_stock_move_report_tree" model="ir.ui.view">
+            <field name="name">stock_move_report.tree</field>
+            <field name="model">stock.move.report</field>
+            <field name="arch" type="xml">
+                <tree string="Costsheet Analysis" create="0" default_order="id desc">
+                    <field name="date_start"/>
+                    <field name="date_finished"/>
+                    <field name="main_product_id"/>
+                    <field name="sub_product_id"/>
+                </tree>
+            </field>
+        </record>
+        <record id="view_stock_move_report_pivot" model="ir.ui.view">
+            <field name="name">stock_move_report.pivot</field>
+            <field name="model">stock.move.report</field>
+            <field name="arch" type="xml">
+                <pivot string="Costsheet Analysis" sample="1">
+                    <field name="name" type="row"/>
+                    <field name="date_start" type="col"/>
+                    <field name="main_product_id" type="row"/>
+                    <field name="sub_product_id"  type="row"/>
+                </pivot>
+            </field>
+        </record>
+
+        <record id="stock_move_report_action" model="ir.actions.act_window">
+            <field name="name">Costsheet Analysis</field>
+            <field name="res_model">stock.move.report</field>
+            <field name="view_id" ref="view_stock_move_report_tree"/>
+            <field name="search_view_id" ref="view_stock_move_report_search"/>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No stock move found
+                </p>
+                <p>
+                    This menu gives you the full traceability of inventory
+                    operations on a specific product. You can filter on the product
+                    to see all the past or future movements for the product.
+                </p>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_stock_move_report_action_tree">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_stock_move_report_tree"/>
+            <field name="act_window_id" ref="stock_move_report_action"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_stock_move_report_action_form">
+            <field name="sequence" eval="3"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_stock_move_report_form"/>
+            <field name="act_window_id" ref="stock_move_report_action"/>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_stock_move_report_action_pivot">
+            <field name="sequence" eval="1"/>
+            <field name="view_mode">pivot</field>
+            <field name="view_id" ref="view_stock_move_report_pivot"/>
+            <field name="act_window_id" ref="stock_move_report_action"/>
+        </record>
+
+        <!--        <record model="ir.actions.act_window.view" id="action_stock_move_graph_all">-->
+        <!--            <field name="sequence" eval="3"/>-->
+        <!--            <field name="view_mode">graph</field>-->
+        <!--            <field name="view_id" ref="view_move_graph"/>-->
+        <!--            <field name="act_window_id" ref="stock_move_action"/>-->
+        <!--        </record>-->
+
+        <!--        <record model="ir.actions.act_window.view" id="action_stock_move_kanban_all">-->
+        <!--            <field name="sequence" eval="4"/>-->
+        <!--            <field name="view_mode">kanban</field>-->
+        <!--            <field name="view_id" ref="view_move_kandan"/>-->
+        <!--            <field name="act_window_id" ref="stock_move_action"/>-->
+        <!--        </record>-->
+        <menuitem action="stock_move_report_action" id="menu_stock_move_report_action" name="Costsheet Analysis"
+                  parent="sale.menu_sale_report" sequence="230"/>
+
+    </data>
+</odoo>
+

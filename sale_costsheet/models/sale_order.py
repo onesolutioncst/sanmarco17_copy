@@ -29,6 +29,7 @@ class sale_order(models.Model):
     project_enddate = fields.Date('Project Start Date', trace=True)
     is_warehouse = fields.Boolean('IS Warehouse')
     project_task_type_ids = fields.Many2many('project.task.type', string="Project Stages")
+
     def calc_costsheet_total_amount(self):
         for record in self:
             retention_ar_amount = 0.0
