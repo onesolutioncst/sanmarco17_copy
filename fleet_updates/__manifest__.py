@@ -35,6 +35,7 @@
     'data': [
         'security/ir.model.access.csv',
         'wizard/fleet_contract_template_view.xml',
+        'wizard/model_fleet_product_view.xml',
         'views/hr_employee_view.xml',
         'views/fleet_vehicle_view.xml',
         'views/product_template_view.xml',
