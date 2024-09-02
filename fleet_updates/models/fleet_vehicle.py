@@ -51,10 +51,10 @@ class fleet_vehicle(models.Model):
 
     def create_fleet_product(self):
         if self.product_product_id:
-            self.product_product_id.write({'name': self.name, 'is_fleet': True, 'fleet_vehicle_id': self.id})
+            self.product_product_id.write({'name': self.name, 'is_fleet': True, 'fleet_vehicle_id': self.id, 'detailed_type':'service', 'service_policy': 'delivered_timesheet'})
         else:
             product_product_obj = self.env['product.product'].sudo().create(
-                {'name': self.name, 'is_fleet': True, 'fleet_vehicle_id': self.id})
+                {'name': self.name, 'is_fleet': True, 'fleet_vehicle_id': self.id, 'detailed_type':'service', 'service_policy': 'delivered_timesheet'})
             self.product_product_id = product_product_obj.id
         return True
 
@@ -78,3 +78,9 @@ class fleet_vehicle(models.Model):
         context['grid_range'] = "week"
         action['context'] = context
         return action
+
+    def create(self, vals):
+        fleet_vehicle_obj = super(fleet_vehicle, self).create(vals)
+        if fleet_vehicle_obj.product_product_id:
+            fleet_vehicle_obj.product_product_id.fleet_vehicle_id = fleet_vehicle_obj.id
+        return fleet_vehicle_obj

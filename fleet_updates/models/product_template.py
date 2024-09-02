@@ -26,3 +26,17 @@ class product_product(models.Model):
             fleet_vehicle_obj = self.env['fleet.vehicle'].sudo().create({'name': self.name, 'product_product_id': self.id})
             self.fleet_vehicle_id = fleet_vehicle_obj.id
         return True
+
+    def open_fleet_product(self):
+        fleet_action =  {
+            'name': 'Fleet Product',
+            'view_mode': 'form',
+            'view_type': 'form',
+            'res_model': 'fleet.vehicle',
+            'type': 'ir.actions.act_window',
+            'context': {'default_product_product_id': self.id, 'default_is_product': True},
+            'target': 'new',
+        }
+        if self.fleet_vehicle_id:
+            fleet_action.update({'res_id': self.fleet_vehicle_id.id})
+        return fleet_action

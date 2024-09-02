@@ -71,10 +71,10 @@ class maintenance_equipment(models.Model):
     def create_equipment_product(self):
         if self.product_product_id:
             self.product_product_id.write(
-                {'name': self.name, 'is_equipment': True, 'maintenance_equipment_id': self.id})
+                {'name': self.name, 'is_equipment': True, 'maintenance_equipment_id': self.id, 'detailed_type':'service', 'service_policy': 'delivered_timesheet'})
         else:
             product_product_obj = self.env['product.product'].sudo().create(
-                {'name': self.name, 'is_equipment': True, 'maintenance_equipment_id': self.id})
+                {'name': self.name, 'is_equipment': True, 'maintenance_equipment_id': self.id, 'detailed_type':'service', 'service_policy': 'delivered_timesheet'})
             self.product_product_id = product_product_obj.id
 
         return True

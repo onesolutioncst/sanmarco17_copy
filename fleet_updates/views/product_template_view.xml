@@ -26,8 +26,9 @@
                     <div>
                         <field name="is_fleet"/>
                         <field name="fleet_vehicle_id" invisible="is_fleet == False" readonly="1"/>
-                        <button name="create_fleet" string="Create/Update Fleet" type="object"
-                                class="oe_highlight" invisible="is_fleet == False"/>
+                        <button name="open_fleet_product" invisible="is_fleet == False"
+                                type="object" string="Create/Update Fleet" class="oe_highlight"
+                                context="{'default_product_product_id': active_id, 'default_is_product': True}"/>
                     </div>
                 </group>
             </field>

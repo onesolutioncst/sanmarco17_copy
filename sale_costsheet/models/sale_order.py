@@ -20,15 +20,22 @@ class sale_order(models.Model):
     insurance_dis_type = fields.Selection([('fixed', 'Fixed'), ('percentage', 'Percentage')], 'Type')
     insurance_amount = fields.Float('Amount')
 
-    costsheet_inv_total_amount = fields.Float('Total Amount', compute="calc_costsheet_total_amount")
-    retention_ar_amount = fields.Float('Retention(AR) Amount', compute="calc_costsheet_total_amount")
-    advanced_ar_amount = fields.Float('Advanced(AR) Amount', compute="calc_costsheet_total_amount")
-    insurance_ar_amount = fields.Float('Insurance(AR) Amount', compute="calc_costsheet_total_amount")
+    costsheet_inv_total_amount = fields.Float('Total Amount', compute="calc_costsheet_total_amount", store=True, precompute=True)
+    retention_ar_amount = fields.Float('Retention(AR) Amount', compute="calc_costsheet_total_amount", store=True, precompute=True)
+    advanced_ar_amount = fields.Float('Advanced(AR) Amount', compute="calc_costsheet_total_amount", store=True, precompute=True)
+    insurance_ar_amount = fields.Float('Insurance(AR) Amount', compute="calc_costsheet_total_amount", store=True, precompute=True)
 
     project_startdate = fields.Date('Project Start Date', trace=True)
     project_enddate = fields.Date('Project Start Date', trace=True)
     is_warehouse = fields.Boolean('IS Warehouse')
     project_task_type_ids = fields.Many2many('project.task.type', string="Project Stages")
+    can_see_contract_terms = fields.Boolean('Can See Contract Terms', compute="calc_can_see_contract_terms")
+
+    def calc_can_see_contract_terms(self):
+        for record in self:
+            record.can_see_contract_terms = False
+            if self.user_has_groups('sale_costsheet.group_costsheet_contract_terms'):
+                record.can_see_contract_terms=True
 
     def calc_costsheet_total_amount(self):
         for record in self:
@@ -106,15 +113,14 @@ class sale_order(models.Model):
         return invoice_vals
 
     def action_confirm(self):
-        res = super(sale_order, self).action_confirm()
         for order in self:
-            if order.is_warehouse:
+            if order.is_warehouse and not self.env['stock.warehouse'].sudo().search([('code','=',f'{order.name.upper()}')]):
                 warehouse = self.env['stock.warehouse'].sudo().create({
                     'name': f'{order.name} Warehouse',
-                    'code': f'{order.name[:5].upper()}',
+                    'code': f'{order.name.upper()}',
                 })
                 order.warehouse_id = warehouse.id
-        return res
+        return super(sale_order, self).action_confirm()
 
 
 class sale_order_line(models.Model):
