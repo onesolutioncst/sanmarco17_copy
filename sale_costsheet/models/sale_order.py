@@ -20,10 +20,10 @@ class sale_order(models.Model):
     insurance_dis_type = fields.Selection([('fixed', 'Fixed'), ('percentage', 'Percentage')], 'Type')
     insurance_amount = fields.Float('Amount')
 
-    costsheet_inv_total_amount = fields.Float('Total Amount', compute="calc_costsheet_total_amount")
-    retention_ar_amount = fields.Float('Retention(AR) Amount', compute="calc_costsheet_total_amount")
-    advanced_ar_amount = fields.Float('Advanced(AR) Amount', compute="calc_costsheet_total_amount")
-    insurance_ar_amount = fields.Float('Insurance(AR) Amount', compute="calc_costsheet_total_amount")
+    costsheet_inv_total_amount = fields.Float('Total Amount', compute="calc_costsheet_total_amount", store=True, precompute=True)
+    retention_ar_amount = fields.Float('Retention(AR) Amount', compute="calc_costsheet_total_amount", store=True, precompute=True)
+    advanced_ar_amount = fields.Float('Advanced(AR) Amount', compute="calc_costsheet_total_amount", store=True, precompute=True)
+    insurance_ar_amount = fields.Float('Insurance(AR) Amount', compute="calc_costsheet_total_amount", store=True, precompute=True)
 
     project_startdate = fields.Date('Project Start Date', trace=True)
     project_enddate = fields.Date('Project Start Date', trace=True)
