@@ -45,12 +45,14 @@
                     </button>
                 </div>
                 <header position="inside">
-                    <button name="action_create_suborder" invisible="state in ['draft','done','cancel'] or mrp_production_id" type="object"
-                            string="Create Sub Orders" />
+                    <button name="action_create_suborder"
+                            invisible="state in ['draft','done','cancel'] or mrp_production_id" type="object"
+                            string="Create Sub Orders"/>
                     <button name="action_create_suborder" invisible="not mrp_production_id" type="object"
                             groups="sale_costsheet.group_create_sub_order_agreement"
-                            string="Create Sub Orders" />
-                    <button name="action_create_agreement" invisible="state in ['draft','done','cancel'] or mrp_production_id" type="object"
+                            string="Create Sub Orders"/>
+                    <button name="action_create_agreement"
+                            invisible="state in ['draft','done','cancel'] or mrp_production_id" type="object"
                             string="Create Agreement"/>
                     <button name="action_create_agreement" invisible="not mrp_production_id" type="object"
                             groups="sale_costsheet.group_create_sub_order_agreement"
@@ -68,10 +70,11 @@
                     <field name="qty_orders_agreement" optional="hide"/>
                     <field name="remaining_qty_agreement" optional="hide"/>
                     <field name="upconsume_qty_agreement" optional="hide"/>
-<!--                    <control>-->
-<!--                        <button name="action_add_from_catalog" string="Catalog" type="object" class="px-4 btn-link"-->
-<!--                                context="{'order_id': parent.id}"/>-->
-<!--                    </control>-->
+                    <field name="constru_unit_price" optional="hide"/>
+                    <!--                    <control>-->
+                    <!--                        <button name="action_add_from_catalog" string="Catalog" type="object" class="px-4 btn-link"-->
+                    <!--                                context="{'order_id': parent.id}"/>-->
+                    <!--                    </control>-->
                 </xpath>
                 <!--                <xpath expr="//field[@name='move_raw_ids']//tree/field[@name='product_id']" position="attributes">-->
                 <!--                    <attribute name="domain">[('raw_material_production_id.is_costsheet','=',True), ('costsheet','=',True)]</attribute>-->
@@ -114,11 +117,13 @@
             <field name="context">{'search_default_todo': True, 'default_company_id': allowed_company_ids[0]}</field>
             <field name="domain">[('picking_type_id.active', '=', True),('is_costsheet', '=', False)]</field>
             <field name="help" type="html">
-              <p class="o_view_nocontent_smiling_face">
-                No manufacturing order found. Let's create one.
-              </p><p>
-                Use Manufacturing Orders (MO) to build finished products while consuming components: i.e. 1 Table = 4 Table Legs + 1 Table Top
-              </p>
+                <p class="o_view_nocontent_smiling_face">
+                    No manufacturing order found. Let's create one.
+                </p>
+                <p>
+                    Use Manufacturing Orders (MO) to build finished products while consuming components: i.e. 1 Table =
+                    4 Table Legs + 1 Table Top
+                </p>
             </field>
         </record>
 
