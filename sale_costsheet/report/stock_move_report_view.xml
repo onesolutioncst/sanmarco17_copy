@@ -49,9 +49,8 @@
             <field name="model">stock.move.report</field>
             <field name="arch" type="xml">
                 <pivot string="Costsheet Analysis" sample="1">
-                    <field name="name" type="row"/>
-                    <field name="date_start" type="col"/>
                     <field name="main_product_id" type="row"/>
+                    <field name="date_start" type="col"/>
                     <field name="sub_product_id"  type="row"/>
                 </pivot>
             </field>

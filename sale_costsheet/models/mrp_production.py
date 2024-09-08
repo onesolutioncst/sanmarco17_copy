@@ -157,18 +157,35 @@ class stock_move(models.Model):
 
     origin_qty = fields.Float('Origin Quantity')
     qty_orders = fields.Float(compute="calc_qty_orders", string='D S', help="Delivery SubOrder", store=True, precompute=True)
-    quantity = fields.Float(compute="calc_qty_orders", string='Q S', readonly=False, help="Quantity SubOrder", store=True, precompute=True)
+    quantity = fields.Float(compute="calc_qty_orders", string='Quantity', readonly=False, help="Quantity SubOrder", store=True, precompute=True)
     remaining_qty = fields.Float(compute="calc_qty_orders", string='R S ', help="Remaining SubOrder", store=True, precompute=True)
     upconsume_qty = fields.Float(compute="calc_qty_orders", string='Up C S ', help="Up Consume SubOrder", store=True, precompute=True)
 
     qty_orders_agreement = fields.Float(compute="calc_qty_orders", string='D A', help="Delivery Agreement", store=True, precompute=True)
     remaining_qty_agreement = fields.Float(compute="calc_qty_orders", string='R A ', help="Remaining Agreement", store=True, precompute=True)
     upconsume_qty_agreement = fields.Float(compute="calc_qty_orders", string='Up C A', help="Up Consume Agreement", store=True, precompute=True)
+
+    constru_standard_price = fields.Float('Standard Price', related="product_id.standard_price", store=True)
+    # constru_unit_price = fields.Float(compute="calc_constru_unit_price", string='Unit Price' ,store=True,precompute=True)
     @api.model
     def create(self, vals):
         if 'product_uom_qty' in vals and vals.get('product_uom_qty') > 0.0:
             vals['origin_qty'] = vals.get('product_uom_qty')
         return super(stock_move, self).create(vals)
+
+    # @api.depends('raw_material_production_id', 'product_id')
+    # def calc_constru_unit_price(self):
+    #     for record in self:
+    #         record.constru_unit_price = 0.0
+    #         purchase_requisition_line_obj = self.env['purchase.requisition.line'].sudo().search(
+    #             [
+    #                 ('product_id','=',record.product_id.id),
+    #                 ('requisition_id.mrp_production_id','=',record.raw_material_production_id.id),
+    #                 ('requisition_id.state', 'not in', ['draft','cancel']),
+    #             ], limit=1
+    #         )
+    #         if purchase_requisition_line_obj :
+    #             record.constru_unit_price = purchase_requisition_line_obj.price_unit
     def calc_qty_orders(self):
         for record in self:
             qty_orders = 0.0
