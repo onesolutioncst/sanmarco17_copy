@@ -7,10 +7,13 @@
             <field name="arch" type="xml">
                 <search string="Costsheet Analysis">
                     <field name="name"/>
+                    <field name="write_date"/>
                     <field name="date_start"/>
                     <field name="date_finished"/>
                     <field name="main_product_id"/>
                     <field name="sub_product_id"/>
+                    <filter string="Today" name="updates_today"
+                        domain="[('write_date', '=', context_today().strftime('%Y-%m-%d'))]"/>
                 </search>
             </field>
         </record>
@@ -61,6 +64,7 @@
             <field name="res_model">stock.move.report</field>
             <field name="view_id" ref="view_stock_move_report_tree"/>
             <field name="search_view_id" ref="view_stock_move_report_search"/>
+                <field name="context">{'search_default_updates_today': 1}</field>
             <field name="help" type="html">
                 <p class="o_view_nocontent_smiling_face">
                     No stock move found
