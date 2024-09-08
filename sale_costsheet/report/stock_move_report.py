@@ -41,6 +41,7 @@ class stock_move_report(models.Model):
     qty_orders_agreement = fields.Float( string='D A', help="Delivery Agreement")
     remaining_qty_agreement = fields.Float( string='R A ', help="Remaining Agreement")
     upconsume_qty_agreement = fields.Float(string='Up C A', help="Up Consume Agreement")
+    planned_price = fields.Float(string='Planned Price')
     # constru_unit_price = fields.Float(string='Unit Price', readonly=True)
 
     def _query(self):
@@ -66,7 +67,8 @@ class stock_move_report(models.Model):
 		
 		sm.qty_orders_agreement as qty_orders_agreement,
 		sm.remaining_qty_agreement as remaining_qty_agreement,
-		sm.upconsume_qty_agreement as upconsume_qty_agreement
+		sm.upconsume_qty_agreement as upconsume_qty_agreement,
+		sm.planned_price as planned_price
 		
                 FROM stock_move sm inner join mrp_production mp on mp.id=sm.raw_material_production_id
                     inner join product_product pp on pp.id=sm.product_id
