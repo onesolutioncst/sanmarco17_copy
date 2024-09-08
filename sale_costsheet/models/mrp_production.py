@@ -218,7 +218,7 @@ class stock_move(models.Model):
                 record.remaining_qty = record.product_uom_qty - qty_orders
             # record.quantity = qty_orders
             if not record.raw_material_production_id.mrp_production_id:
-                record.product_uom_qty = record.remaining_qty
+                record.product_uom_qty = record.origin_qty - record.qty_orders
 
             record.qty_orders_cost = qty_orders * record.constru_standard_price
             record.remaining_qty_cost = record.remaining_qty * record.constru_standard_price
