@@ -9,6 +9,7 @@ class stock_move_report(models.Model):
     _rec_name = 'name'
     id = fields.Integer()
     name = fields.Char(string="Costsheet Reference", readonly=True)
+    write_date= fields.Datetime('Last Update On', readonly=True)
     date_start = fields.Datetime(string="Order Date", readonly=True)
     date_finished = fields.Datetime(string="Date Finished", readonly=True)
     main_product_id = fields.Many2one(comodel_name='product.product', string="Main Product", readonly=True)
@@ -45,6 +46,7 @@ class stock_move_report(models.Model):
     def _query(self):
         return """
         SELECT mp.id as id, mp.name as name ,mp.product_id as main_product_id, mp.date_start as date_start,mp.date_finished as date_finished,
+        mp.write_date as write_date, 
 		sm.product_id as sub_product_id, 
 		sm.constru_standard_price as standard_price,
 		sm.product_packaging_id as product_packaging_id,
