@@ -156,6 +156,7 @@ class stock_move(models.Model):
     _inherit = "stock.move"
 
     origin_qty = fields.Float('Origin Quantity')
+    planned_price = fields.Float('Planned Price')
     qty_orders = fields.Float(compute="calc_qty_orders", string='D S', help="Delivery SubOrder", store=True, precompute=True)
     quantity = fields.Float(compute="calc_qty_orders", string='Quantity', readonly=False, help="Quantity SubOrder", store=True, precompute=True)
     remaining_qty = fields.Float(compute="calc_qty_orders", string='R S ', help="Remaining SubOrder", store=True, precompute=True)
@@ -165,7 +166,7 @@ class stock_move(models.Model):
     remaining_qty_agreement = fields.Float(compute="calc_qty_orders", string='R A ', help="Remaining Agreement", store=True, precompute=True)
     upconsume_qty_agreement = fields.Float(compute="calc_qty_orders", string='Up C A', help="Up Consume Agreement", store=True, precompute=True)
 
-    constru_standard_price = fields.Float('Standard Price', related="product_id.standard_price", store=True)
+    constru_standard_price = fields.Float('Cost Price', related="product_id.standard_price", store=True)
     # constru_unit_price = fields.Float(compute="calc_constru_unit_price", string='Unit Price' ,store=True,precompute=True)
     @api.model
     def create(self, vals):
