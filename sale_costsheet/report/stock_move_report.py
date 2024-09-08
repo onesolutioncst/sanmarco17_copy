@@ -68,7 +68,7 @@ class stock_move_report(models.Model):
 		
                 FROM stock_move sm inner join mrp_production mp on mp.id=sm.raw_material_production_id
                     inner join product_product pp on pp.id=sm.product_id
-            
+        where mp.is_costsheet=true
         """
 
     @property
