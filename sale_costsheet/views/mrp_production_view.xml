@@ -70,7 +70,7 @@
                     <field name="qty_orders_agreement" optional="hide"/>
                     <field name="remaining_qty_agreement" optional="hide"/>
                     <field name="upconsume_qty_agreement" optional="hide"/>
-                    <field name="constru_unit_price" optional="hide"/>
+<!--                    <field name="constru_unit_price" optional="hide"/>-->
                     <!--                    <control>-->
                     <!--                        <button name="action_add_from_catalog" string="Catalog" type="object" class="px-4 btn-link"-->
                     <!--                                context="{'order_id': parent.id}"/>-->
