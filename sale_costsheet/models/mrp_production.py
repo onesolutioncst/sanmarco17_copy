@@ -1,6 +1,8 @@
 from odoo import api, fields, models, _, SUPERUSER_ID, tools
 import logging
 
+from odoo.addons.test_convert.tests.test_env import record
+
 _logger = logging.getLogger(__name__)
 DATES_FORMAT = "%Y-%m-%d"
 
@@ -70,7 +72,7 @@ class mrp_production(models.Model):
                 'mrp_manufacture_line_id': move_raw_obj.id,
                 'product_id': move_raw_obj.product_id.id,
                 'product_uom_qty': move_raw_obj.product_uom_qty,
-                'delivery_qty': move_raw_obj.qty_orders,
+                'delivery_qty': 0.0,
                 'remaining_qty': move_raw_obj.remaining_qty,
                 'upconsume_qty': move_raw_obj.upconsume_qty,
                 'quantity': 0.0,
@@ -157,14 +159,22 @@ class stock_move(models.Model):
 
     origin_qty = fields.Float('Origin Quantity')
     planned_price = fields.Float('Planned Price')
-    qty_orders = fields.Float(compute="calc_qty_orders", string='D S', help="Delivery SubOrder", store=True, precompute=True)
-    quantity = fields.Float(compute="calc_qty_orders", string='Quantity', readonly=False, help="Quantity SubOrder", store=True, precompute=True)
-    remaining_qty = fields.Float(compute="calc_qty_orders", string='R S ', help="Remaining SubOrder", store=True, precompute=True)
-    upconsume_qty = fields.Float(compute="calc_qty_orders", string='Up C S ', help="Up Consume SubOrder", store=True, precompute=True)
 
-    qty_orders_agreement = fields.Float(compute="calc_qty_orders", string='D A', help="Delivery Agreement", store=True, precompute=True)
-    remaining_qty_agreement = fields.Float(compute="calc_qty_orders", string='R A ', help="Remaining Agreement", store=True, precompute=True)
-    upconsume_qty_agreement = fields.Float(compute="calc_qty_orders", string='Up C A', help="Up Consume Agreement", store=True, precompute=True)
+    # quantity = fields.Float(compute="calc_qty_orders", string='Quantity', readonly=False, help="Quantity SubOrder", )
+    qty_orders = fields.Float(compute="calc_qty_orders", string='D S', help="Delivery SubOrder", )
+    remaining_qty = fields.Float(compute="calc_qty_orders", string='R S ', help="Remaining SubOrder", )
+    upconsume_qty = fields.Float(compute="calc_qty_orders", string='Up C S ', help="Up Consume SubOrder", )
+    qty_orders_cost = fields.Float(compute="calc_qty_orders", string='D S Cost', help="Delivery SubOrder", )
+    remaining_qty_cost = fields.Float(compute="calc_qty_orders", string='R S Cost', help="Remaining SubOrder", )
+    upconsume_qty_cost = fields.Float(compute="calc_qty_orders", string='Up C S Cost', help="Up Consume SubOrder", )
+
+    qty_orders_agreement = fields.Float(compute="calc_qty_orders", string='D A', help="Delivery Agreement", )
+    remaining_qty_agreement = fields.Float(compute="calc_qty_orders", string='R A ', help="Remaining Agreement", )
+    upconsume_qty_agreement = fields.Float(compute="calc_qty_orders", string='Up C A', help="Up Consume Agreement", )
+
+    qty_orders_agreement_cost = fields.Float(compute="calc_qty_orders", string='D A Cost', help="Delivery Agreement", )
+    remaining_qty_agreement_cost = fields.Float(compute="calc_qty_orders", string='R A Cost', help="Remaining Agreement", )
+    upconsume_qty_agreement_cost = fields.Float(compute="calc_qty_orders", string='Up C A Cost', help="Up Consume Agreement", )
 
     constru_standard_price = fields.Float('Cost Price', related="product_id.standard_price", store=True)
     # constru_unit_price = fields.Float(compute="calc_constru_unit_price", string='Unit Price' ,store=True,precompute=True)
@@ -206,9 +216,15 @@ class stock_move(models.Model):
                 record.upconsume_qty = qty_orders - record.product_uom_qty
             else:
                 record.remaining_qty = record.product_uom_qty - qty_orders
-            record.quantity = qty_orders
+            # record.quantity = qty_orders
             if not record.raw_material_production_id.mrp_production_id:
                 record.product_uom_qty = record.remaining_qty
+
+            record.qty_orders_cost = qty_orders * record.constru_standard_price
+            record.remaining_qty_cost = record.remaining_qty * record.constru_standard_price
+            record.upconsume_qty_cost = record.upconsume_qty * record.constru_standard_price
+
+
             purchase_requisition_objs = self.env['purchase.requisition'].sudo().search([('mrp_production_id', '=', record.raw_material_production_id.id)])
             for purchase_requisition_obj in purchase_requisition_objs:
                 for move_raw_obj in purchase_requisition_obj.line_ids:
@@ -219,3 +235,7 @@ class stock_move(models.Model):
                 record.upconsume_qty_agreement = qty_orders_agreement - record.product_qty
             else:
                 record.remaining_qty_agreement = record.product_qty - qty_orders_agreement
+
+            record.qty_orders_agreement_cost = record.qty_orders_agreement * record.constru_standard_price
+            record.remaining_qty_agreement_cost = record.remaining_qty_agreement * record.constru_standard_price
+            record.upconsume_qty_agreement_cost = record.upconsume_qty_agreement * record.constru_standard_price
