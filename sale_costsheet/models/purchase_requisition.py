@@ -92,6 +92,7 @@ class purchase_requisition_line(models.Model):
     upconsume_qty = fields.Float(compute="calc_qty_orders", string='Up C A ', help="Up Consume QTY")
     milestone_qty = fields.Float(string="Milestone QTY", related="purchase_requisition_milestone_id.product_uom_qty")
     remaining_milestone_qty = fields.Float(string="Milestone QTY", compute="calc_remaining_milestone_qty")
+    mrp_manufacture_line_id = fields.Many2one('stock.move', 'Components')
 
     def calc_remaining_milestone_qty(self):
         for record in self:
