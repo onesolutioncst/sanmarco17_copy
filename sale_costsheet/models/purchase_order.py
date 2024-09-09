@@ -30,7 +30,8 @@ class purchase_order(models.Model):
                     'price_unit': rentention_amount * -1
                 }
                 if purchase_obj.requisition_id and purchase_obj.requisition_id.mrp_production_id and purchase_obj.requisition_id.mrp_production_id.analytic_distribution:
-                    purchase_line_dic.update({'analytic_distribution': purchase_obj.requisition_id.mrp_production_id.analytic_distribution})
+                    purchase_line_dic.update(
+                        {'analytic_distribution': purchase_obj.requisition_id.mrp_production_id.analytic_distribution})
                 self.env['purchase.order.line'].sudo().create(purchase_line_dic)
         if purchase_obj.requisition_id and purchase_obj.requisition_id.is_advanced_ar and self.env.user.company_id.advanced_ap_default_product_id:
             if purchase_obj.requisition_id.advanced_dis_type and purchase_obj.requisition_id.advanced_dis_type == 'fixed':
@@ -160,6 +161,14 @@ class purchase_order(models.Model):
                 order_lines.append((0, 0, order_line_values))
 
         self.order_line = order_lines
+
+    def button_confirm(self):
+        res = super(purchase_order, self).button_confirm()
+        for record in self:
+            for purchase_order_line_obj in record.order_line:
+                if purchase_order_line_obj.purchase_requisition_line_id and purchase_order_line_obj.purchase_requisition_line_id.mrp_manufacture_line_id:
+                    purchase_order_line_obj.purchase_requisition_line_id.mrp_manufacture_line_id.product_uom_qty = purchase_order_line_obj.purchase_requisition_line_id.mrp_manufacture_line_id.product_uom_qty - purchase_order_line_obj.product_qty
+        return res
 
 
 class purchase_order_line(models.Model):
