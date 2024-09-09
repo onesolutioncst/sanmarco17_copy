@@ -4,10 +4,13 @@ from odoo import api, fields, models
 
 class stock_move_report(models.Model):
     _name = "stock.move.report"
+
+class stock_move_new_report(models.Model):
+    _name = "stock.move.new.report"
     _description = "Costsheet Moves Analysis Report"
-    _auto = False
     _rec_name = 'name'
-    id = fields.Integer()
+
+    stock_move_id = fields.Many2one('stock.move')
     name = fields.Char(string="Costsheet Reference", readonly=True)
     write_date= fields.Datetime('Last Update On', readonly=True)
     date_start = fields.Datetime(string="Order Date", readonly=True)
@@ -42,39 +45,39 @@ class stock_move_report(models.Model):
     remaining_qty_agreement = fields.Float( string='R A ', help="Remaining Agreement")
     upconsume_qty_agreement = fields.Float(string='Up C A', help="Up Consume Agreement")
     planned_price = fields.Float(string='Planned Price')
-    # constru_unit_price = fields.Float(string='Unit Price', readonly=True)
+    constru_unit_price = fields.Float(string='Unit Price', readonly=True)
 
-    def _query(self):
-        return """
-        SELECT mp.id as id, mp.name as name ,mp.product_id as main_product_id, mp.date_start as date_start,mp.date_finished as date_finished,
-        mp.write_date as write_date, 
-		sm.product_id as sub_product_id, 
-		sm.constru_standard_price as standard_price,
-		sm.product_packaging_id as product_packaging_id,
-		sm.location_id as location_id,
-		sm.product_uom_qty as product_uom_qty,
-		sm.quantity as quantity,
-		sm.product_uom as product_uom,
-		sm.picked as picked,
-		sm.picking_type_id as picking_type_id,
-		sm.location_dest_id as location_dest_id,
-		sm.state as state,
-		
-		sm.origin_qty as origin_qty,
-		sm.qty_orders as qty_orders,
-		sm.remaining_qty as remaining_qty,
-		sm.upconsume_qty as upconsume_qty,
-		
-		sm.qty_orders_agreement as qty_orders_agreement,
-		sm.remaining_qty_agreement as remaining_qty_agreement,
-		sm.upconsume_qty_agreement as upconsume_qty_agreement,
-		sm.planned_price as planned_price
-		
-                FROM stock_move sm inner join mrp_production mp on mp.id=sm.raw_material_production_id
-                    inner join product_product pp on pp.id=sm.product_id
-        where mp.is_costsheet=true
-        """
-
-    @property
-    def _table_query(self):
-        return self._query()
+    # def _query(self):
+    #     return """
+    #     SELECT mp.id as id, mp.name as name ,mp.product_id as main_product_id, mp.date_start as date_start,mp.date_finished as date_finished,
+    #     mp.write_date as write_date,
+	# 	sm.product_id as sub_product_id,
+	# 	sm.constru_standard_price as standard_price,
+	# 	sm.product_packaging_id as product_packaging_id,
+	# 	sm.location_id as location_id,
+	# 	sm.product_uom_qty as product_uom_qty,
+	# 	sm.quantity as quantity,
+	# 	sm.product_uom as product_uom,
+	# 	sm.picked as picked,
+	# 	sm.picking_type_id as picking_type_id,
+	# 	sm.location_dest_id as location_dest_id,
+	# 	sm.state as state,
+	#
+	# 	sm.origin_qty as origin_qty,
+	# 	sm.qty_orders as qty_orders,
+	# 	sm.remaining_qty as remaining_qty,
+	# 	sm.upconsume_qty as upconsume_qty,
+	#
+	# 	sm.qty_orders_agreement as qty_orders_agreement,
+	# 	sm.remaining_qty_agreement as remaining_qty_agreement,
+	# 	sm.upconsume_qty_agreement as upconsume_qty_agreement,
+	# 	sm.planned_price as planned_price
+	#
+    #             FROM stock_move sm inner join mrp_production mp on mp.id=sm.raw_material_production_id
+    #                 inner join product_product pp on pp.id=sm.product_id
+    #     where mp.is_costsheet=true
+    #     """
+    #
+    # @property
+    # def _table_query(self):
+    #     return self._query()

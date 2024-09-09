@@ -3,7 +3,7 @@
     <data>
         <record id="view_stock_move_report_search" model="ir.ui.view">
             <field name="name">stock_move_report.search</field>
-            <field name="model">stock.move.report</field>
+            <field name="model">stock.move.new.report</field>
             <field name="arch" type="xml">
                 <search string="Costsheet Analysis">
                     <field name="name"/>
@@ -21,7 +21,7 @@
         <!-- Inherit Form View to Modify it -->
         <record id="view_stock_move_report_form" model="ir.ui.view">
             <field name="name">stock_move_report.form</field>
-            <field name="model">stock.move.report</field>
+            <field name="model">stock.move.new.report</field>
             <field name="arch" type="xml">
                 <form string="Costsheet Analysis" create="0" default_order="id desc">
                     <group>
@@ -37,7 +37,7 @@
         <!-- Inherit Form View to Modify it -->
         <record id="view_stock_move_report_tree" model="ir.ui.view">
             <field name="name">stock_move_report.tree</field>
-            <field name="model">stock.move.report</field>
+            <field name="model">stock.move.new.report</field>
             <field name="arch" type="xml">
                 <tree string="Costsheet Analysis" create="0" default_order="id desc">
                     <field name="date_start"/>
@@ -49,7 +49,7 @@
         </record>
         <record id="view_stock_move_report_pivot" model="ir.ui.view">
             <field name="name">stock_move_report.pivot</field>
-            <field name="model">stock.move.report</field>
+            <field name="model">stock.move.new.report</field>
             <field name="arch" type="xml">
                 <pivot string="Costsheet Analysis" sample="1">
                     <field name="main_product_id" type="row"/>
@@ -61,7 +61,7 @@
 
         <record id="stock_move_report_action" model="ir.actions.act_window">
             <field name="name">Costsheet Analysis</field>
-            <field name="res_model">stock.move.report</field>
+            <field name="res_model">stock.move.new.report</field>
             <field name="view_id" ref="view_stock_move_report_tree"/>
             <field name="search_view_id" ref="view_stock_move_report_search"/>
                 <field name="context">{'search_default_updates_today': 1}</field>

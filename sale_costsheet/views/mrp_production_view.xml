@@ -43,6 +43,11 @@
                             invisible="requisition_count == 0">
                         <field name="requisition_count" widget="statinfo" string="Agreement"/>
                     </button>
+                     <button name="action_view_timesheet" type="object" class="oe_stat_button"
+                            icon="fa-calendar"
+                            invisible="timesheet_count == 0">
+                        <field name="timesheet_count" widget="timesheet_uom" string="Timesheet"/>
+                    </button>
                 </div>
                 <header position="inside">
                     <button name="action_create_suborder"
