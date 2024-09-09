@@ -21,6 +21,7 @@ class mrp_production(models.Model):
     sale_line_costsheet_id = fields.Many2one('sale.order.line')
     suborder_count = fields.Integer(compute="calc_suborder_count")
     requisition_count = fields.Integer(compute="calc_suborder_count")
+    timesheet_count = fields.Float(compute="calc_suborder_count")
     mrp_production_id = fields.Many2one('mrp.production')
     purchase_requisition_id = fields.Many2one('purchase.requisition', )
     @api.onchange('is_costsheet')
@@ -55,14 +56,45 @@ class mrp_production(models.Model):
             'domain': [('id', 'in', requisition)],
             # 'context': {'default_mrp_production_id': self.id}
         }
+    def action_view_timesheet(self):
+        account_analytic_line_employee_list = []
+        for record in self:
+            for components_obj  in record.move_raw_ids:
+                if components_obj.product_id and components_obj.product_id.is_fleet and components_obj.product_id.fleet_vehicle_id and components_obj.product_id.fleet_vehicle_id.is_employee and components_obj.product_id.fleet_vehicle_id.hr_employee_id:
+                    account_analytic_line_employee_list.append(components_obj.product_id.fleet_vehicle_id.hr_employee_id.id)
+                if components_obj.product_id and components_obj.product_id.is_equipment and components_obj.product_id.maintenance_equipment_id and components_obj.product_id.maintenance_equipment_id.is_employee and components_obj.product_id.maintenance_equipment_id.hr_employee_id:
+                    account_analytic_line_employee_list.append(components_obj.product_id.maintenance_equipment_id.hr_employee_id.id)
+        timesheet_objs = self.env['account.analytic.line'].sudo().search([('employee_id','in',account_analytic_line_employee_list), ('validated_status','=','validated')])
+        account_analytic_line_list=[]
+        if timesheet_objs:
+            account_analytic_line_list = timesheet_objs.ids
+        return {
+            'name': _('Timesheet'),
+            'view_mode': 'tree,form',
+            'res_model': 'account.analytic.line',
+            'type': 'ir.actions.act_window',
+            'target': 'current',
+            'domain': [('id', 'in', account_analytic_line_list)],
+            # 'context': {'default_mrp_production_id': self.id}
+        }
+
 
     def calc_suborder_count(self):
         for record in self:
+            account_analytic_line_employee_list = []
             record.suborder_count = self.search_count([('mrp_production_id','=',record.id)])
             record.requisition_count = self.env['purchase.requisition'].sudo().search_count([('mrp_production_id', '=', record.id)])
             requisition_objs = self.env['purchase.requisition'].sudo().search([('mrp_production_id', '=', record.id)])
             if requisition_objs and self.purchase_requisition_id and self.purchase_requisition_id.id not in requisition_objs.ids:
                 record.requisition_count = len(requisition_objs) + 1
+            for components_obj  in record.move_raw_ids:
+                if components_obj.product_id and components_obj.product_id.is_fleet and components_obj.product_id.fleet_vehicle_id and components_obj.product_id.fleet_vehicle_id.is_employee and components_obj.product_id.fleet_vehicle_id.hr_employee_id:
+                    account_analytic_line_employee_list.append(components_obj.product_id.fleet_vehicle_id.hr_employee_id.id)
+                if components_obj.product_id and components_obj.product_id.is_equipment and components_obj.product_id.maintenance_equipment_id and components_obj.product_id.maintenance_equipment_id.is_employee and components_obj.product_id.maintenance_equipment_id.hr_employee_id:
+                    account_analytic_line_employee_list.append(components_obj.product_id.maintenance_equipment_id.hr_employee_id.id)
+            timesheet_objs = self.env['account.analytic.line'].sudo().search(
+                [('employee_id', 'in', account_analytic_line_employee_list), ('validated_status', '=', 'validated')])
+            record.timesheet_count = sum(timesheet_obj.unit_amount for timesheet_obj in timesheet_objs)
 
     def action_create_suborder(self):
         self.ensure_one()
@@ -148,12 +180,6 @@ class mrp_production(models.Model):
                 ))
         return moves
 
-    # def action_confirm(self):
-    #     action_confirm_mrp = super(mrp_production, self).action_confirm()
-    #     if self.mrp_production_id:
-    #         for move_raw_obj in self.mrp_production_id.move_raw_ids:
-    #             move_raw_obj.product_uom_qty = move_raw_obj.remaining_qty
-    #     return action_confirm_mrp
 class stock_move(models.Model):
     _inherit = "stock.move"
 
