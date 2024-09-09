@@ -24,11 +24,12 @@ class mrp_production(models.Model):
     timesheet_count = fields.Float(compute="calc_suborder_count")
     mrp_production_id = fields.Many2one('mrp.production')
     purchase_requisition_id = fields.Many2one('purchase.requisition', )
+
     @api.onchange('is_costsheet')
     def check_onchange_is_costsheet(self):
         for record in self:
             if not record.is_costsheet:
-                return {'domain':{'product_id':[('type', 'in', ['product', 'consu'])]}}
+                return {'domain': {'product_id': [('type', 'in', ['product', 'consu'])]}}
 
     def action_view_suborder(self):
         return {
@@ -38,7 +39,7 @@ class mrp_production(models.Model):
             'type': 'ir.actions.act_window',
             'target': 'current',
             'domain': [('mrp_production_id', '=', self.id)],
-            'context':{'default_mrp_production_id': self.id}
+            'context': {'default_mrp_production_id': self.id}
         }
 
     def action_view_requisition(self):
@@ -56,16 +57,20 @@ class mrp_production(models.Model):
             'domain': [('id', 'in', requisition)],
             # 'context': {'default_mrp_production_id': self.id}
         }
+
     def action_view_timesheet(self):
         account_analytic_line_employee_list = []
         for record in self:
-            for components_obj  in record.move_raw_ids:
+            for components_obj in record.move_raw_ids:
                 if components_obj.product_id and components_obj.product_id.is_fleet and components_obj.product_id.fleet_vehicle_id and components_obj.product_id.fleet_vehicle_id.is_employee and components_obj.product_id.fleet_vehicle_id.hr_employee_id:
-                    account_analytic_line_employee_list.append(components_obj.product_id.fleet_vehicle_id.hr_employee_id.id)
+                    account_analytic_line_employee_list.append(
+                        components_obj.product_id.fleet_vehicle_id.hr_employee_id.id)
                 if components_obj.product_id and components_obj.product_id.is_equipment and components_obj.product_id.maintenance_equipment_id and components_obj.product_id.maintenance_equipment_id.is_employee and components_obj.product_id.maintenance_equipment_id.hr_employee_id:
-                    account_analytic_line_employee_list.append(components_obj.product_id.maintenance_equipment_id.hr_employee_id.id)
-        timesheet_objs = self.env['account.analytic.line'].sudo().search([('employee_id','in',account_analytic_line_employee_list), ('validated_status','=','validated')])
-        account_analytic_line_list=[]
+                    account_analytic_line_employee_list.append(
+                        components_obj.product_id.maintenance_equipment_id.hr_employee_id.id)
+        timesheet_objs = self.env['account.analytic.line'].sudo().search(
+            [('employee_id', 'in', account_analytic_line_employee_list), ('validated_status', '=', 'validated')])
+        account_analytic_line_list = []
         if timesheet_objs:
             account_analytic_line_list = timesheet_objs.ids
         return {
@@ -78,20 +83,22 @@ class mrp_production(models.Model):
             # 'context': {'default_mrp_production_id': self.id}
         }
 
-
     def calc_suborder_count(self):
         for record in self:
             account_analytic_line_employee_list = []
-            record.suborder_count = self.search_count([('mrp_production_id','=',record.id)])
-            record.requisition_count = self.env['purchase.requisition'].sudo().search_count([('mrp_production_id', '=', record.id)])
+            record.suborder_count = self.search_count([('mrp_production_id', '=', record.id)])
+            record.requisition_count = self.env['purchase.requisition'].sudo().search_count(
+                [('mrp_production_id', '=', record.id)])
             requisition_objs = self.env['purchase.requisition'].sudo().search([('mrp_production_id', '=', record.id)])
             if requisition_objs and self.purchase_requisition_id and self.purchase_requisition_id.id not in requisition_objs.ids:
                 record.requisition_count = len(requisition_objs) + 1
-            for components_obj  in record.move_raw_ids:
+            for components_obj in record.move_raw_ids:
                 if components_obj.product_id and components_obj.product_id.is_fleet and components_obj.product_id.fleet_vehicle_id and components_obj.product_id.fleet_vehicle_id.is_employee and components_obj.product_id.fleet_vehicle_id.hr_employee_id:
-                    account_analytic_line_employee_list.append(components_obj.product_id.fleet_vehicle_id.hr_employee_id.id)
+                    account_analytic_line_employee_list.append(
+                        components_obj.product_id.fleet_vehicle_id.hr_employee_id.id)
                 if components_obj.product_id and components_obj.product_id.is_equipment and components_obj.product_id.maintenance_equipment_id and components_obj.product_id.maintenance_equipment_id.is_employee and components_obj.product_id.maintenance_equipment_id.hr_employee_id:
-                    account_analytic_line_employee_list.append(components_obj.product_id.maintenance_equipment_id.hr_employee_id.id)
+                    account_analytic_line_employee_list.append(
+                        components_obj.product_id.maintenance_equipment_id.hr_employee_id.id)
             timesheet_objs = self.env['account.analytic.line'].sudo().search(
                 [('employee_id', 'in', account_analytic_line_employee_list), ('validated_status', '=', 'validated')])
             record.timesheet_count = sum(timesheet_obj.unit_amount for timesheet_obj in timesheet_objs)
@@ -127,7 +134,7 @@ class mrp_production(models.Model):
 
     def action_create_agreement(self):
         new_wizard = self.env['manufacture.agreement'].sudo().create({})
-        if len(self)>1:
+        if len(self) > 1:
             return {
                 'name': _('Agreement Order'),
                 'view_mode': 'form',
@@ -167,7 +174,7 @@ class mrp_production(models.Model):
             boms, lines = production.bom_id.explode(production.product_id, factor,
                                                     picking_type=production.bom_id.picking_type_id)
             for bom_line, line_data in lines:
-                if bom_line.child_bom_id and bom_line.child_bom_id.type == 'phantom' :
+                if bom_line.child_bom_id and bom_line.child_bom_id.type == 'phantom':
                     continue
                 operation = bom_line.operation_id.id or line_data['parent_line'] and line_data[
                     'parent_line'].operation_id.id
@@ -179,6 +186,7 @@ class mrp_production(models.Model):
                     bom_line
                 ))
         return moves
+
 
 class stock_move(models.Model):
     _inherit = "stock.move"
@@ -200,11 +208,14 @@ class stock_move(models.Model):
     upconsume_qty_agreement = fields.Float(compute="calc_qty_orders", string='Up C A', help="Up Consume Agreement", )
 
     qty_orders_agreement_cost = fields.Float(compute="calc_qty_orders", string='D A Cost', help="Delivery Agreement", )
-    remaining_qty_agreement_cost = fields.Float(compute="calc_qty_orders", string='R A Cost', help="Remaining Agreement", )
-    upconsume_qty_agreement_cost = fields.Float(compute="calc_qty_orders", string='Up C A Cost', help="Up Consume Agreement", )
+    remaining_qty_agreement_cost = fields.Float(compute="calc_qty_orders", string='R A Cost',
+                                                help="Remaining Agreement", )
+    upconsume_qty_agreement_cost = fields.Float(compute="calc_qty_orders", string='Up C A Cost',
+                                                help="Up Consume Agreement", )
 
     constru_standard_price = fields.Float('Cost Price', related="product_id.standard_price", store=True)
-    constru_unit_price = fields.Float(compute="calc_constru_unit_price", string='Unit Price' )
+    constru_unit_price = fields.Float(compute="calc_constru_unit_price", string='Unit Price')
+
     @api.model
     def create(self, vals):
         if 'product_uom_qty' in vals and vals.get('product_uom_qty') > 0.0:
@@ -217,13 +228,14 @@ class stock_move(models.Model):
             record.constru_unit_price = 0.0
             purchase_requisition_line_obj = self.env['purchase.requisition.line'].sudo().search(
                 [
-                    ('product_id','=',record.product_id.id),
-                    ('requisition_id.mrp_production_id','=',record.raw_material_production_id.id),
-                    ('requisition_id.state', 'not in', ['draft','cancel']),
+                    ('product_id', '=', record.product_id.id),
+                    ('requisition_id.mrp_production_id', '=', record.raw_material_production_id.id),
+                    ('requisition_id.state', 'not in', ['draft', 'cancel']),
                 ], limit=1
             )
-            if purchase_requisition_line_obj :
+            if purchase_requisition_line_obj:
                 record.constru_unit_price = purchase_requisition_line_obj.price_unit
+
     def calc_qty_orders(self):
         for record in self:
             qty_orders = 0.0
@@ -234,7 +246,8 @@ class stock_move(models.Model):
             record.remaining_qty_agreement = 0.0
             qty_orders_agreement = 0.0
             qty_agreement = 0.0
-            mrp_suborders_objs = self.env['mrp.production'].sudo().search([('mrp_production_id','=',record.raw_material_production_id.id)])
+            mrp_suborders_objs = self.env['mrp.production'].sudo().search(
+                [('mrp_production_id', '=', record.raw_material_production_id.id)])
             for mrp_suborders_obj in mrp_suborders_objs:
                 for move_raw_obj in mrp_suborders_obj.move_raw_ids:
                     if move_raw_obj.product_id == record.product_id:
@@ -252,8 +265,8 @@ class stock_move(models.Model):
             record.remaining_qty_cost = record.remaining_qty * record.constru_standard_price
             record.upconsume_qty_cost = record.upconsume_qty * record.constru_standard_price
 
-
-            purchase_requisition_objs = self.env['purchase.requisition'].sudo().search([('mrp_production_id', '=', record.raw_material_production_id.id)])
+            purchase_requisition_objs = self.env['purchase.requisition'].sudo().search(
+                [('mrp_production_id', '=', record.raw_material_production_id.id)])
             for purchase_requisition_obj in purchase_requisition_objs:
                 for move_raw_obj in purchase_requisition_obj.line_ids:
                     if move_raw_obj.product_id == record.product_id:
@@ -261,7 +274,6 @@ class stock_move(models.Model):
                         qty_agreement += move_raw_obj.product_qty
             record.qty_orders_agreement = qty_orders_agreement
             record.qty_agreement = qty_agreement
-
 
             if qty_orders_agreement > qty_agreement:
                 record.upconsume_qty_agreement = qty_orders_agreement - qty_agreement
@@ -271,3 +283,67 @@ class stock_move(models.Model):
             record.qty_orders_agreement_cost = record.qty_orders_agreement * record.constru_unit_price
             record.remaining_qty_agreement_cost = record.remaining_qty_agreement * record.constru_unit_price
             record.upconsume_qty_agreement_cost = record.upconsume_qty_agreement * record.constru_unit_price
+
+            stock_move_report_dict = {
+                'stock_move_id': record.id,
+                'name': record.name,
+                'write_date': record.write_date,
+                'date_start': record.raw_material_production_id.date_start,
+                'date_finished': record.raw_material_production_id.date_finished,
+                'main_product_id': record.raw_material_production_id.product_id.id,
+                'sub_product_id': record.product_id.id,
+                'standard_price': record.constru_standard_price,
+                'product_packaging_id': record.product_packaging_id.id,
+                'location_id':record.location_id.id,
+                'product_uom_qty': record.product_uom_qty,
+                'product_uom': record.product_uom.id,
+                'picked': record.picked,
+                'picking_type_id': record.picking_type_id.id,
+                'location_dest_id': record.location_dest_id.id,
+                'state': record.state,
+                'origin_qty': record.origin_qty,
+                'qty_orders': record.qty_orders,
+                'quantity': record.quantity,
+                'remaining_qty': record.remaining_qty,
+                'upconsume_qty': record.upconsume_qty,
+                'qty_orders_agreement': record.qty_orders_agreement,
+                'remaining_qty_agreement': record.remaining_qty_agreement,
+                'upconsume_qty_agreement': record.upconsume_qty_agreement,
+                'planned_price': record.planned_price,
+                'constru_unit_price': record.constru_unit_price,
+            }
+            stock_move_report_obj = self.env['stock.move.new.report'].sudo().search([('stock_move_id', '=', record.id)])
+            if stock_move_report_obj:
+                stock_move_report_obj.sudo().write(stock_move_report_dict)
+            else:
+                stock_move_report_obj.sudo().create(stock_move_report_dict)
+
+# class stock_move_report(models.Model):
+#     _name = "stock.move.report"
+#
+#     stock_move_id = fields.Many2one('stock.move', 'Move')
+#
+#     origin_qty = fields.Float('Origin Quantity')
+#     planned_price = fields.Float('Planned Price')
+#
+#     # quantity = fields.Float( string='Quantity', readonly=False, help="Quantity SubOrder", )
+#     qty_orders = fields.Float(string='D S', help="Delivery SubOrder", )
+#     remaining_qty = fields.Float(string='R S ', help="Remaining SubOrder", )
+#     upconsume_qty = fields.Float(string='Up C S ', help="Up Consume SubOrder", )
+#     qty_orders_cost = fields.Float(string='D S Cost', help="Delivery SubOrder", )
+#     remaining_qty_cost = fields.Float(string='R S Cost', help="Remaining SubOrder", )
+#     upconsume_qty_cost = fields.Float(string='Up C S Cost', help="Up Consume SubOrder", )
+#
+#     qty_agreement = fields.Float(string='Q A', help="Delivery Agreement", )
+#     qty_orders_agreement = fields.Float(string='D A', help="Delivery Agreement", )
+#     remaining_qty_agreement = fields.Float(string='R A ', help="Remaining Agreement", )
+#     upconsume_qty_agreement = fields.Float(string='Up C A', help="Up Consume Agreement", )
+#
+#     qty_orders_agreement_cost = fields.Float(string='D A Cost', help="Delivery Agreement", )
+#     remaining_qty_agreement_cost = fields.Float(string='R A Cost',
+#                                                 help="Remaining Agreement", )
+#     upconsume_qty_agreement_cost = fields.Float(string='Up C A Cost',
+#                                                 help="Up Consume Agreement", )
+#
+#     constru_standard_price = fields.Float('Cost Price', related="product_id.standard_price", store=True)
+#     constru_unit_price = fields.Float(compute="calc_constru_unit_price", string='Unit Price')
