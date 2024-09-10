@@ -46,6 +46,8 @@ class stock_move_new_report(models.Model):
     upconsume_qty_agreement = fields.Float(string='Up C A', help="Up Consume Agreement")
     planned_price = fields.Float(string='Planned Price')
     constru_unit_price = fields.Float(string='Unit Price', readonly=True)
+    total_up = fields.Float('Total Up', readonly=True)
+    total_up_cost = fields.Float('Total UP Cost', readonly=True)
 
     # def _query(self):
     #     return """
