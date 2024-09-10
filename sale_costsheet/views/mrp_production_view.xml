@@ -84,6 +84,9 @@
                     <field name="remaining_qty_agreement_cost" optional="hide"/>
                     <field name="upconsume_qty_agreement_cost" optional="hide"/>
 
+                    <field name="total_up" optional="hide"/>
+                    <field name="total_up_cost" optional="hide"/>
+
                     <field name="constru_unit_price" optional="hide"/>
                     <field name="constru_standard_price" optional="hide"/>
                     <!--                    <control>-->

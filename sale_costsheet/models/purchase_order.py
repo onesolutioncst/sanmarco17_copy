@@ -10,6 +10,35 @@ DATES_FORMAT = "%Y-%m-%d"
 class purchase_order(models.Model):
     _inherit = "purchase.order"
 
+    costsheet_inv_total_amount = fields.Float('Total Amount', compute="calc_costsheet_total_amount", precompute=True)
+    retention_ar_amount = fields.Float('Retention(AR) Amount', compute="calc_costsheet_total_amount", precompute=True)
+    advanced_ar_amount = fields.Float('Advanced(AR) Amount', compute="calc_costsheet_total_amount", precompute=True)
+    insurance_ar_amount = fields.Float('Insurance(AR) Amount', compute="calc_costsheet_total_amount", precompute=True)
+
+    def calc_costsheet_total_amount(self):
+        for record in self:
+            retention_ar_amount = 0.0
+            advanced_ar_amount = 0.0
+            insurance_ar_amount = 0.0
+            costsheet_inv_total_amount = 0.0
+            retention_ar_default_product_id = self.env.user.company_id.retention_ap_default_product_id
+            advanced_ar_default_product_id = self.env.user.company_id.advanced_ap_default_product_id
+            insurance_ar_default_product_id = self.env.user.company_id.insurance_ap_default_product_id
+            for purchase_order_obj in self:
+                for purchase_order_line_obj in purchase_order_obj.order_line:
+                    if purchase_order_line_obj.product_id == retention_ar_default_product_id:
+                        retention_ar_amount += purchase_order_line_obj.price_total
+                    elif purchase_order_line_obj.product_id == advanced_ar_default_product_id:
+                        advanced_ar_amount += purchase_order_line_obj.price_total
+                    elif purchase_order_line_obj.product_id == insurance_ar_default_product_id:
+                        insurance_ar_amount += purchase_order_line_obj.price_total
+                    else:
+                        costsheet_inv_total_amount += purchase_order_line_obj.price_total
+            record.retention_ar_amount = retention_ar_amount
+            record.advanced_ar_amount = advanced_ar_amount
+            record.insurance_ar_amount = insurance_ar_amount
+            record.costsheet_inv_total_amount = costsheet_inv_total_amount
+
     @api.model
     def create(self, vals):
         purchase_obj = super(purchase_order, self).create(vals)
@@ -159,7 +188,6 @@ class purchase_order(models.Model):
                     name=name, product_qty=product_qty, price_unit=price_unit,
                     taxes_ids=taxes_ids)
                 order_lines.append((0, 0, order_line_values))
-
         self.order_line = order_lines
 
     def button_confirm(self):
@@ -167,7 +195,10 @@ class purchase_order(models.Model):
         for record in self:
             for purchase_order_line_obj in record.order_line:
                 if purchase_order_line_obj.purchase_requisition_line_id and purchase_order_line_obj.purchase_requisition_line_id.mrp_manufacture_line_id:
-                    purchase_order_line_obj.purchase_requisition_line_id.mrp_manufacture_line_id.product_uom_qty = purchase_order_line_obj.purchase_requisition_line_id.mrp_manufacture_line_id.product_uom_qty - purchase_order_line_obj.product_qty
+                    if purchase_order_line_obj.purchase_requisition_line_id.mrp_manufacture_line_id.product_uom_qty > purchase_order_line_obj.product_qty:
+                        purchase_order_line_obj.purchase_requisition_line_id.mrp_manufacture_line_id.product_uom_qty = purchase_order_line_obj.purchase_requisition_line_id.mrp_manufacture_line_id.product_uom_qty - purchase_order_line_obj.product_qty
+                    else:
+                        purchase_order_line_obj.purchase_requisition_line_id.mrp_manufacture_line_id.total_up = purchase_order_line_obj.product_qty - purchase_order_line_obj.purchase_requisition_line_id.mrp_manufacture_line_id.product_uom_qty
         return res
 
 

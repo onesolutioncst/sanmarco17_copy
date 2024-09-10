@@ -215,6 +215,13 @@ class stock_move(models.Model):
 
     constru_standard_price = fields.Float('Cost Price', related="product_id.standard_price", store=True)
     constru_unit_price = fields.Float(compute="calc_constru_unit_price", string='Unit Price')
+    total_up = fields.Float('Total Up', readonly=True)
+    total_up_cost = fields.Float('Total UP Cost', compute="calc_total_up_cost")
+
+    @api.depends('total_up', 'constru_standard_price')
+    def calc_total_up_cost(self):
+        for record in self:
+            record.total_up_cost = record.total_up * record.constru_standard_price
 
     @api.model
     def create(self, vals):
@@ -283,40 +290,42 @@ class stock_move(models.Model):
             record.qty_orders_agreement_cost = record.qty_orders_agreement * record.constru_unit_price
             record.remaining_qty_agreement_cost = record.remaining_qty_agreement * record.constru_unit_price
             record.upconsume_qty_agreement_cost = record.upconsume_qty_agreement * record.constru_unit_price
-
-            stock_move_report_dict = {
-                'stock_move_id': record.id,
-                'name': record.name,
-                'write_date': record.write_date,
-                'date_start': record.raw_material_production_id.date_start,
-                'date_finished': record.raw_material_production_id.date_finished,
-                'main_product_id': record.raw_material_production_id.product_id.id,
-                'sub_product_id': record.product_id.id,
-                'standard_price': record.constru_standard_price,
-                'product_packaging_id': record.product_packaging_id.id,
-                'location_id':record.location_id.id,
-                'product_uom_qty': record.product_uom_qty,
-                'product_uom': record.product_uom.id,
-                'picked': record.picked,
-                'picking_type_id': record.picking_type_id.id,
-                'location_dest_id': record.location_dest_id.id,
-                'state': record.state,
-                'origin_qty': record.origin_qty,
-                'qty_orders': record.qty_orders,
-                'quantity': record.quantity,
-                'remaining_qty': record.remaining_qty,
-                'upconsume_qty': record.upconsume_qty,
-                'qty_orders_agreement': record.qty_orders_agreement,
-                'remaining_qty_agreement': record.remaining_qty_agreement,
-                'upconsume_qty_agreement': record.upconsume_qty_agreement,
-                'planned_price': record.planned_price,
-                'constru_unit_price': record.constru_unit_price,
-            }
-            stock_move_report_obj = self.env['stock.move.new.report'].sudo().search([('stock_move_id', '=', record.id)])
-            if stock_move_report_obj:
-                stock_move_report_obj.sudo().write(stock_move_report_dict)
-            else:
-                stock_move_report_obj.sudo().create(stock_move_report_dict)
+            if record.raw_material_production_id.is_costsheet:
+                stock_move_report_dict = {
+                    'stock_move_id': record.id,
+                    'name': record.name,
+                    'write_date': record.write_date,
+                    'date_start': record.raw_material_production_id.date_start,
+                    'date_finished': record.raw_material_production_id.date_finished,
+                    'main_product_id': record.raw_material_production_id.product_id.id,
+                    'sub_product_id': record.product_id.id,
+                    'standard_price': record.constru_standard_price,
+                    'product_packaging_id': record.product_packaging_id.id,
+                    'location_id':record.location_id.id,
+                    'product_uom_qty': record.product_uom_qty,
+                    'product_uom': record.product_uom.id,
+                    'picked': record.picked,
+                    'picking_type_id': record.picking_type_id.id,
+                    'location_dest_id': record.location_dest_id.id,
+                    'state': record.state,
+                    'origin_qty': record.origin_qty,
+                    'qty_orders': record.qty_orders,
+                    'quantity': record.quantity,
+                    'remaining_qty': record.remaining_qty,
+                    'upconsume_qty': record.upconsume_qty,
+                    'qty_orders_agreement': record.qty_orders_agreement,
+                    'remaining_qty_agreement': record.remaining_qty_agreement,
+                    'upconsume_qty_agreement': record.upconsume_qty_agreement,
+                    'planned_price': record.planned_price,
+                    'constru_unit_price': record.constru_unit_price,
+                    'total_up': record.total_up,
+                    'total_up_cost': record.total_up_cost,
+                }
+                stock_move_report_obj = self.env['stock.move.new.report'].sudo().search([('stock_move_id', '=', record.id)])
+                if stock_move_report_obj:
+                    stock_move_report_obj.sudo().write(stock_move_report_dict)
+                else:
+                    stock_move_report_obj.sudo().create(stock_move_report_dict)
 
 # class stock_move_report(models.Model):
 #     _name = "stock.move.report"

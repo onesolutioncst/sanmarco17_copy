@@ -19,9 +19,20 @@ class account_move(models.Model):
             advanced_ar_amount = 0.0
             insurance_ar_amount = 0.0
             costsheet_inv_total_amount = 0.0
-            retention_ar_default_product_id = self.env.user.company_id.retention_ar_default_product_id
-            advanced_ar_default_product_id = self.env.user.company_id.advanced_ar_default_product_id
-            insurance_ar_default_product_id = self.env.user.company_id.insurance_ar_default_product_id
+            purchase_source_orders = record.line_ids.purchase_line_id.order_id
+            sale_source_orders = self.line_ids.sale_line_ids.order_id
+            if purchase_source_orders:
+                retention_ar_default_product_id = self.env.user.company_id.retention_ap_default_product_id
+                advanced_ar_default_product_id = self.env.user.company_id.advanced_ap_default_product_id
+                insurance_ar_default_product_id = self.env.user.company_id.insurance_ap_default_product_id
+            elif sale_source_orders:
+                retention_ar_default_product_id = self.env.user.company_id.retention_ar_default_product_id
+                advanced_ar_default_product_id = self.env.user.company_id.advanced_ar_default_product_id
+                insurance_ar_default_product_id = self.env.user.company_id.insurance_ar_default_product_id
+            else:
+                retention_ar_default_product_id = ""
+                advanced_ar_default_product_id = ""
+                insurance_ar_default_product_id = ""
             for account_move_obj in self:
                 for invoice_line_obj in account_move_obj.invoice_line_ids:
                     if invoice_line_obj.product_id == retention_ar_default_product_id:
