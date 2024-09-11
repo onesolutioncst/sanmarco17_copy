@@ -10,6 +10,7 @@ class product_template(models.Model):
     is_discount = fields.Boolean('Is Discount')
     refundable = fields.Boolean('Is Refundable')
     subcontractor = fields.Boolean('Is Subcontractor')
+    additional = fields.Boolean('Is Additional')
     variation_Order = fields.Boolean('Is Variation Order')
     wages = fields.Boolean('Is Wages')
     supplier = fields.Boolean('Is Supplier')

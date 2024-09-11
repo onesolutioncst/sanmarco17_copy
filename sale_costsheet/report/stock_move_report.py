@@ -36,14 +36,22 @@ class stock_move_new_report(models.Model):
         readonly=True,)
 
     origin_qty = fields.Float('Origin Quantity')
+    origin_qty_cost = fields.Float('Origin Quantity Cost')
     qty_orders = fields.Float(string='D S', help="Delivery SubOrder")
     quantity = fields.Float( string='Quantity', readonly=False, help="Quantity SubOrder" )
     remaining_qty = fields.Float( string='R S ', help="Remaining SubOrder")
     upconsume_qty = fields.Float( string='Up C S ', help="Up Consume SubOrder")
+    qty_orders_cost = fields.Float( string='D S Cost', help="Delivery SubOrder", )
+    remaining_qty_cost = fields.Float(string='R S Cost', help="Remaining SubOrder", )
+    upconsume_qty_cost = fields.Float(string='Up C S Cost', help="Up Consume SubOrder", )
 
     qty_orders_agreement = fields.Float( string='D A', help="Delivery Agreement")
     remaining_qty_agreement = fields.Float( string='R A ', help="Remaining Agreement")
     upconsume_qty_agreement = fields.Float(string='Up C A', help="Up Consume Agreement")
+    qty_orders_agreement_cost = fields.Float(string='D A Cost', help="Delivery Agreement", )
+    remaining_qty_agreement_cost = fields.Float(string='R A Cost', help="Remaining Agreement", )
+    upconsume_qty_agreement_cost = fields.Float(string='Up C A Cost', help="Up Consume Agreement", )
+
     planned_price = fields.Float(string='Planned Price')
     constru_unit_price = fields.Float(string='Unit Price', readonly=True)
     total_up = fields.Float('Total Up', readonly=True)

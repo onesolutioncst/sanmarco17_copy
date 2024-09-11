@@ -18,6 +18,9 @@
                     </div>
                 </group>
             </group>
+             <xpath expr="//group[@name='active_group']/field[@name='user_id']" position="attributes">
+                <attribute name="domain">[]</attribute>
+            </xpath>
         </field>
     </record>
 

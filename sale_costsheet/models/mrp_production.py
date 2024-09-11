@@ -192,6 +192,7 @@ class stock_move(models.Model):
     _inherit = "stock.move"
 
     origin_qty = fields.Float('Origin Quantity')
+    origin_qty_cost = fields.Float(compute="calc_qty_orders", string="Origin Quantity Cost")
     planned_price = fields.Float('Planned Price')
 
     # quantity = fields.Float(compute="calc_qty_orders", string='Quantity', readonly=False, help="Quantity SubOrder", )
@@ -267,7 +268,7 @@ class stock_move(models.Model):
             # record.quantity = qty_orders
             # if not record.raw_material_production_id.mrp_production_id:
             #     record.product_uom_qty = record.product_uom_qty - record.qty_orders
-
+            record.origin_qty_cost = record.origin_qty * record.constru_standard_price
             record.qty_orders_cost = qty_orders * record.constru_standard_price
             record.remaining_qty_cost = record.remaining_qty * record.constru_standard_price
             record.upconsume_qty_cost = record.upconsume_qty * record.constru_standard_price
@@ -309,13 +310,22 @@ class stock_move(models.Model):
                     'location_dest_id': record.location_dest_id.id,
                     'state': record.state,
                     'origin_qty': record.origin_qty,
+                    'origin_qty_cost':record.origin_qty_cost,
                     'qty_orders': record.qty_orders,
                     'quantity': record.quantity,
                     'remaining_qty': record.remaining_qty,
                     'upconsume_qty': record.upconsume_qty,
+                    'qty_orders_cost': record.qty_orders_cost,
+                    'remaining_qty_cost': record.remaining_qty_cost,
+                    'upconsume_qty_cost': record.upconsume_qty_cost,
+
                     'qty_orders_agreement': record.qty_orders_agreement,
                     'remaining_qty_agreement': record.remaining_qty_agreement,
                     'upconsume_qty_agreement': record.upconsume_qty_agreement,
+                    'qty_orders_agreement_cost': record.qty_orders_agreement_cost,
+                    'remaining_qty_agreement_cost': record.remaining_qty_agreement_cost,
+                    'upconsume_qty_agreement_cost': record.upconsume_qty_agreement_cost,
+
                     'planned_price': record.planned_price,
                     'constru_unit_price': record.constru_unit_price,
                     'total_up': record.total_up,

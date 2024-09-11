@@ -17,6 +17,7 @@ class maintenance_equipment(models.Model):
     product_product_id = fields.Many2one('product.product', 'Product')
     is_employee = fields.Boolean('Is Timesheet')
     hr_employee_id= fields.Many2one('hr.employee', 'Employee')
+    equipment_user_id = fields.Many2one('res.users', 'Equipment User')
     has_timesheet = fields.Boolean(compute='_compute_has_timesheet')
     task_state = fields.Selection([
         ('01_in_progress', 'In Progress'),
@@ -79,14 +80,28 @@ class maintenance_equipment(models.Model):
 
         return True
     def create_equipment_employee(self):
+        companyname = self.env.user.company_id.name
+        if self.equipment_user_id:
+            self.equipment_user_id.write({
+                'name': self.name, 'login': self.name + "@" + companyname + ".com",
+                'email': self.name + "@" + companyname + ".com",
+                'groups_id': [(6, 0, [self.env.ref('base.group_portal').id])],
+            })
+        else:
+            equipment_user_obj = self.env['res.users'].sudo().create({
+                'name': self.name, 'login': self.name + "@" + companyname + ".com",
+                'email': self.name + "@" + companyname + ".com",
+                'groups_id': [(6, 0, [self.env.ref('base.group_portal').id])],
+            })
+            self.equipment_user_id = equipment_user_obj.id
         if self.hr_employee_id:
             self.hr_employee_id.write(
                 {'name': self.name, 'is_equipment': True, 'employee_equipment_id': self.id,
-                 'employee_type': 'equipment'})
+                 'employee_type': 'equipment', 'user_id': self.equipment_user_id.id})
         else:
             hr_employee_obj = self.env['hr.employee'].sudo().create(
                 {'name': self.name, 'is_equipment': True, 'employee_equipment_id': self.id,
-                 'employee_type': 'equipment'})
+                 'employee_type': 'equipment', 'user_id': self.equipment_user_id.id})
             self.hr_employee_id = hr_employee_obj.id
         return True
 

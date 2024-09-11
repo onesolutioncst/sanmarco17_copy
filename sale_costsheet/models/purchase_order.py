@@ -15,6 +15,60 @@ class purchase_order(models.Model):
     advanced_ar_amount = fields.Float('Advanced(AR) Amount', compute="calc_costsheet_total_amount", precompute=True)
     insurance_ar_amount = fields.Float('Insurance(AR) Amount', compute="calc_costsheet_total_amount", precompute=True)
 
+    product_amount_is_discount = fields.Float(string='Is Discount Amount', compute="calc_product_type_amount")
+    product_amount_refundable = fields.Float(string='Is Refundable Amount', compute="calc_product_type_amount")
+    product_amount_subcontractor = fields.Float(string='Is Subcontractor Amount', compute="calc_product_type_amount")
+    product_amount_additional = fields.Float(string='Is Additional Amount', compute="calc_product_type_amount")
+    product_amount_variation_Order = fields.Float(string='Is Variation Order Amount',
+                                                  compute="calc_product_type_amount")
+    product_amount_wages = fields.Float(string='Is Wages Amount', compute="calc_product_type_amount")
+    product_amount_supplier = fields.Float(string='Is Supplier Amount', compute="calc_product_type_amount")
+    product_amount_customer = fields.Float(string='Is Customer Amount', compute="calc_product_type_amount")
+    product_amount_costsheet = fields.Float(string='Is Costsheet Amount', compute="calc_product_type_amount")
+
+    @api.depends('order_line')
+    def calc_product_type_amount(self):
+        for record in self:
+            product_amount_dict = {
+                'product_amount_is_discount': 0.0,
+                'product_amount_refundable': 0.0,
+                'product_amount_subcontractor': 0.0,
+                'product_amount_additional': 0.0,
+                'product_amount_variation_Order': 0.0,
+                'product_amount_wages': 0.0,
+                'product_amount_supplier': 0.0,
+                'product_amount_customer': 0.0,
+                'product_amount_costsheet': 0.0,
+            }
+            for purchase_order_line_obj in record.order_line:
+                if purchase_order_line_obj.product_id and purchase_order_line_obj.product_id.is_discount:
+                    product_amount_dict['product_amount_is_discount'] += purchase_order_line_obj.price_total
+                elif purchase_order_line_obj.product_id and purchase_order_line_obj.product_id.refundable:
+                    product_amount_dict['product_amount_refundable'] += purchase_order_line_obj.price_total
+                elif purchase_order_line_obj.product_id and purchase_order_line_obj.product_id.subcontractor:
+                    product_amount_dict['product_amount_subcontractor'] += purchase_order_line_obj.price_total
+                elif purchase_order_line_obj.product_id and purchase_order_line_obj.product_id.additional:
+                    product_amount_dict['product_amount_additional'] += purchase_order_line_obj.price_total
+                elif purchase_order_line_obj.product_id and purchase_order_line_obj.product_id.variation_Order:
+                    product_amount_dict['product_amount_variation_Order'] += purchase_order_line_obj.price_total
+                elif purchase_order_line_obj.product_id and purchase_order_line_obj.product_id.wages:
+                    product_amount_dict['product_amount_wages'] += purchase_order_line_obj.price_total
+                elif purchase_order_line_obj.product_id and purchase_order_line_obj.product_id.supplier:
+                    product_amount_dict['product_amount_supplier'] += purchase_order_line_obj.price_total
+                elif purchase_order_line_obj.product_id and purchase_order_line_obj.product_id.customer:
+                    product_amount_dict['product_amount_customer'] += purchase_order_line_obj.price_total
+                elif purchase_order_line_obj.product_id and purchase_order_line_obj.product_id.costsheet:
+                    product_amount_dict['product_amount_costsheet'] += purchase_order_line_obj.price_total
+            record.product_amount_is_discount = product_amount_dict['product_amount_is_discount']
+            record.product_amount_refundable = product_amount_dict['product_amount_refundable']
+            record.product_amount_subcontractor = product_amount_dict['product_amount_subcontractor']
+            record.product_amount_additional = product_amount_dict['product_amount_additional']
+            record.product_amount_variation_Order = product_amount_dict['product_amount_variation_Order']
+            record.product_amount_wages = product_amount_dict['product_amount_wages']
+            record.product_amount_supplier = product_amount_dict['product_amount_supplier']
+            record.product_amount_customer = product_amount_dict['product_amount_customer']
+            record.product_amount_costsheet = product_amount_dict['product_amount_costsheet']
+
     def calc_costsheet_total_amount(self):
         for record in self:
             retention_ar_amount = 0.0
