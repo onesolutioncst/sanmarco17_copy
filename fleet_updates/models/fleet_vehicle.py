@@ -17,6 +17,7 @@ class fleet_vehicle(models.Model):
     product_product_id = fields.Many2one('product.product', 'Product')
     is_employee = fields.Boolean('Is Timesheet')
     hr_employee_id = fields.Many2one('hr.employee', 'Employee')
+    fleet_user_id = fields.Many2one('res.users', 'Fleet User')
     has_timesheet = fields.Boolean(compute='_compute_has_timesheet')
     en_num = fields.Char(string="Engine number", )
     license = fields.Char(string="License Number", )
@@ -27,15 +28,17 @@ class fleet_vehicle(models.Model):
         ('03_approved', 'Approved'),
         *CLOSED_STATES.items(),
         ('04_waiting_normal', 'Waiting'),
-    ], string='State',compute="get_task_state"
+    ], string='State', compute="get_task_state"
     )
+
     def get_task_state(self):
         for record in self:
             record.task_state = ''
             if record.is_employee and record.hr_employee_id and record.hr_employee_id.user_id:
-                project_task_objs = self.env['project.task'].sudo().search([('fleet_user_ids','=',record.hr_employee_id.user_id.id)], limit=1)
+                project_task_objs = self.env['project.task'].sudo().search(
+                    [('fleet_user_ids', '=', record.hr_employee_id.user_id.id)], limit=1)
                 if project_task_objs:
-                    record.task_state=project_task_objs.state
+                    record.task_state = project_task_objs.state
 
     def _compute_has_timesheet(self):
         self.env.cr.execute("""
@@ -51,22 +54,40 @@ class fleet_vehicle(models.Model):
 
     def create_fleet_product(self):
         if self.product_product_id:
-            self.product_product_id.write({'name': self.name, 'is_fleet': True, 'fleet_vehicle_id': self.id, 'detailed_type':'service', 'service_policy': 'delivered_timesheet'})
+            self.product_product_id.write(
+                {'name': self.name, 'is_fleet': True, 'fleet_vehicle_id': self.id, 'detailed_type': 'service',
+                 'service_policy': 'delivered_timesheet'})
         else:
             product_product_obj = self.env['product.product'].sudo().create(
-                {'name': self.name, 'is_fleet': True, 'fleet_vehicle_id': self.id, 'detailed_type':'service', 'service_policy': 'delivered_timesheet'})
+                {'name': self.name, 'is_fleet': True, 'fleet_vehicle_id': self.id, 'detailed_type': 'service',
+                 'service_policy': 'delivered_timesheet'})
             self.product_product_id = product_product_obj.id
         return True
 
     def create_fleet_employee(self):
+        # create user portal
+        companyname = self.env.user.company_id.name
+        if self.fleet_user_id:
+            self.fleet_user_id.write({
+                'name': self.name, 'login': self.name + "@" + companyname + ".com",
+                'email': self.name + "@" + companyname + ".com",
+                'groups_id': [(6, 0, [self.env.ref('base.group_portal').id])],
+            })
+        else:
+            fleet_user_obj = self.env['res.users'].sudo().create({
+                'name': self.name, 'login': self.name + "@" + companyname + ".com",
+                'email': self.name + "@" + companyname + ".com",
+                'groups_id': [(6, 0, [self.env.ref('base.group_portal').id])],
+            })
+            self.fleet_user_id = fleet_user_obj.id
         if self.hr_employee_id:
             self.hr_employee_id.write(
                 {'name': self.name, 'is_fleet': True, 'employee_fleet_id': self.id,
-                 'employee_type': 'fleet'})
+                 'employee_type': 'fleet', 'user_id': self.fleet_user_id.id})
         else:
             hr_employee_obj = self.env['hr.employee'].sudo().create(
                 {'name': self.name, 'is_fleet': True, 'employee_fleet_id': self.id,
-                 'employee_type': 'fleet'})
+                 'employee_type': 'fleet', 'user_id': self.fleet_user_id.id})
             self.hr_employee_id = hr_employee_obj.id
         return True
 

@@ -15,6 +15,7 @@
                             <field name="is_discount"/>
                             <field name="refundable"/>
                             <field name="subcontractor"/>
+                            <field name="additional"/>
                             <field name="variation_Order"/>
                             <field name="wages"/>
                             <field name="supplier"/>
@@ -37,6 +38,7 @@
                             <field name="is_discount"/>
                             <field name="refundable"/>
                             <field name="subcontractor"/>
+                            <field name="additional"/>
                             <field name="variation_Order"/>
                             <field name="wages"/>
                             <field name="supplier"/>

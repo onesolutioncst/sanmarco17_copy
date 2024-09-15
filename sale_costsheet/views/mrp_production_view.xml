@@ -64,28 +64,29 @@
                             string="Create Agreement"/>
                 </header>
                 <xpath expr="//field[@name='move_raw_ids']//tree/field[@name='product_uom_qty']" position="after">
+                    <field name="total_up" optional="hide"/>
+                    <field name="total_up_cost" optional="hide"/>
                     <field name="planned_price" optional="hide" readonly="parent.state != 'draft'"/>
                     <field name="origin_qty" optional="hide" readonly="parent.state != 'draft'"/>
+                    <field name="qty_orders_cost" optional="hide" readonly="parent.state != 'draft'"/>
                 </xpath>
 
                 <xpath expr="//field[@name='move_raw_ids']//tree" position="inside">
                     <field name="qty_orders" optional="hide"/>
-                    <field name="remaining_qty" optional="hide"/>
-                    <field name="upconsume_qty" optional="hide"/>
                     <field name="qty_orders_cost" optional="hide"/>
+                    <field name="remaining_qty" optional="hide"/>
                     <field name="remaining_qty_cost" optional="hide"/>
+                    <field name="upconsume_qty" optional="hide"/>
                     <field name="upconsume_qty_cost" optional="hide"/>
 
                     <field name="qty_agreement" optional="hide"/>
                     <field name="qty_orders_agreement" optional="hide"/>
-                    <field name="remaining_qty_agreement" optional="hide"/>
-                    <field name="upconsume_qty_agreement" optional="hide"/>
                     <field name="qty_orders_agreement_cost" optional="hide"/>
+                    <field name="remaining_qty_agreement" optional="hide"/>
                     <field name="remaining_qty_agreement_cost" optional="hide"/>
+                    <field name="upconsume_qty_agreement" optional="hide"/>
                     <field name="upconsume_qty_agreement_cost" optional="hide"/>
 
-                    <field name="total_up" optional="hide"/>
-                    <field name="total_up_cost" optional="hide"/>
 
                     <field name="constru_unit_price" optional="hide"/>
                     <field name="constru_standard_price" optional="hide"/>
