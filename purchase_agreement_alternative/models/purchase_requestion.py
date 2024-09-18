@@ -29,6 +29,18 @@ class PurchaseRequisition(models.Model):
             'context': ctx,
         }
 
+    def action_link_alternative(self):
+        ctx = dict(**self.env.context, default_origin_po_id=self.id)
+        return {
+            'name': _('Link Agreement Alternative'),
+            'type': 'ir.actions.act_window',
+            'view_mode': 'form',
+            'res_model': 'purchase.agreement.link.alternative',
+            'view_id': self.env.ref('purchase_agreement_alternative.purchase_agreement_link_alternative_form').id,
+            'target': 'new',
+            'context': ctx,
+        }
+
     def action_compare_alternative_lines(self):
         ctx = dict(
             self.env.context,
@@ -54,3 +66,33 @@ class PurchaseRequisitionline(models.Model):
     currency_id = fields.Many2one(string='res.currency', related="requisition_id.currency_id")
     state = fields.Selection('State', related="requisition_id.state")
     vendor_id = fields.Many2one('res.partner', related="requisition_id.vendor_id")
+
+
+    def action_clear_quantities(self):
+        zeroed_lines = self.filtered(lambda l: l.state not in ['cancel', 'open', 'done'])
+        zeroed_lines.write({'product_qty': 0})
+        if len(self) > len(zeroed_lines):
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'title': _("Some not cleared"),
+                    'message': _("Some quantities were not cleared because their status is not a RFQ status."),
+                    'sticky': False,
+                }
+            }
+        return False
+    def action_choose(self):
+        order_lines = (self.requisition_id | self.requisition_id.alternative_pr_ids).mapped('line_ids')
+        order_lines = order_lines.filtered(lambda l: l.product_qty and l.product_id.id in self.product_id.ids and l.id not in self.ids)
+        if order_lines:
+            return order_lines.action_clear_quantities()
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': _("Nothing to clear"),
+                'message': _("There are no quantities to clear."),
+                'sticky': False,
+            }
+        }

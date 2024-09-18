@@ -36,6 +36,7 @@
         'security/ir.model.access.csv',
         'views/purchase_requestion_view.xml',
         'wizard/agreement_alternative_view.xml',
+        'wizard/agreement_link_alternative_view.xml',
     ],
     'images': [],
     'license': 'AGPL-3',

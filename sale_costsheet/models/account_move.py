@@ -23,6 +23,7 @@ class account_move(models.Model):
     product_amount_supplier = fields.Float(string='Is Supplier Amount', compute="calc_product_type_amount")
     product_amount_customer = fields.Float(string='Is Customer Amount', compute="calc_product_type_amount")
     product_amount_costsheet = fields.Float(string='Is Costsheet Amount', compute="calc_product_type_amount")
+    crm_lead_id = fields.Many2one('crm.lead', 'LEAD/Opportunity')
 
     @api.depends('invoice_line_ids')
     def calc_product_type_amount(self):
@@ -160,6 +161,6 @@ class account_move(models.Model):
                         'analytic_distribution': {account_move_obj.cons_sale_id.analytic_account_id.id: 100},
                     }
                 )
-
-
+        if account_move_obj.crm_lead_id:
+            account_move_obj.crm_lead_id.account_move_id = account_move_obj.id
         return account_move_obj
