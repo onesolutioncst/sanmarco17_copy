@@ -11,6 +11,57 @@
                         <field name="is_costsheet"/>
                         <button name="create_sale_costsheet" string="Create/Update Costsheet" type="object"
                                 class="oe_highlight" invisible="is_costsheet == False"/>
+                        <field name="can_see_contract_terms" invisible="1"/>
+                    </div>
+                    <label for="is_retention_ar" invisible="not can_see_contract_terms" class="oe_inline"/>
+                    <div invisible="not can_see_contract_terms">
+                        <field name="is_retention_ar" readonly="state != 'draft'"/>
+                        <label for="rentention_dis_type" string="" class="oe_inline"
+                               invisible="is_retention_ar == False" readonly="state != 'draft'"/>
+                        <div class="oe_inline" invisible="is_retention_ar == False">
+                            <field name="rentention_dis_type" invisible="is_retention_ar == False"
+                                   readonly="state != 'draft'"
+                                   required="is_retention_ar == True" class="oe_inline"/>
+                            <field name="rentention_amount" invisible="rentention_dis_type == 'percentage'"
+                                   readonly="state != 'draft'"
+                                   required="is_retention_ar == True" class="oe_inline"/>
+                            <field name="rentention_amount" invisible="rentention_dis_type == 'fixed'"
+                                   readonly="state != 'draft'"
+                                   widget="percentage" required="is_retention_ar == True" class="oe_inline"/>
+                        </div>
+                    </div>
+
+                    <label for="is_advanced_ar" class="oe_inline" invisible="not can_see_contract_terms"/>
+                    <div invisible="not can_see_contract_terms">
+                        <field name="is_advanced_ar" readonly="state != 'draft'"/>
+                        <label for="advanced_dis_type" string="" class="oe_inline" invisible="is_advanced_ar == False"/>
+                        <div class="oe_inline" invisible="is_advanced_ar == False">
+                            <field name="advanced_dis_type" required="is_advanced_ar == True" class="oe_inline"
+                                   readonly="state != 'draft'"/>
+                            <field name="advanced_amount" invisible="advanced_dis_type == 'percentage'"
+                                   readonly="state != 'draft'"
+                                   required="is_advanced_ar == True" class="oe_inline"/>
+                            <field name="advanced_amount" invisible="advanced_dis_type == 'fixed'" widget="percentage"
+                                   readonly="state != 'draft'"
+                                   required="is_advanced_ar == True" class="oe_inline"/>
+                        </div>
+                    </div>
+
+                    <label for="is_insurance_ar" class="oe_inline" invisible="not can_see_contract_terms"/>
+                    <div invisible="not can_see_contract_terms">
+                        <field name="is_insurance_ar" readonly="state != 'draft'"/>
+                        <label for="insurance_dis_type" string="" class="oe_inline"
+                               invisible="is_insurance_ar == False"/>
+                        <div class="oe_inline" invisible="is_insurance_ar == False">
+                            <field name="insurance_dis_type" required="is_insurance_ar == True" class="oe_inline"
+                                   readonly="state != 'draft'"/>
+                            <field name="insurance_amount" invisible="insurance_dis_type == 'percentage'"
+                                   readonly="state != 'draft'"
+                                   required="is_insurance_ar == True" class="oe_inline"/>
+                            <field name="insurance_amount" invisible="insurance_dis_type == 'fixed'" widget="percentage"
+                                   readonly="state != 'draft'"
+                                   required="is_insurance_ar == True" class="oe_inline"/>
+                        </div>
                     </div>
                 </field>
                 <div name="button_box" position="inside">
@@ -18,9 +69,114 @@
                             invisible="costsheet_count == 0">
                         <field name="costsheet_count" widget="statinfo" string="Costsheet"/>
                     </button>
+                    <button name="action_view_requisition" type="object" class="oe_stat_button" icon="fa-pencil-square-o"
+                            invisible="requisition_count == 0">
+                        <field name="requisition_count" widget="statinfo" string="Agreement"/>
+                    </button>
+                    <button name="action_view_suborder" type="object" class="oe_stat_button" icon="fa-pencil-square-o"
+                            invisible="suborder_count == 0">
+                        <field name="suborder_count" widget="statinfo" string="Suborders"/>
+                    </button>
                 </div>
+                <group name="note_group" position="inside">
+                    <group name="amounts" string="Amounts" >
+                        <field name="retention_ar_amount" widget='monetary'
+                               invisible="retention_ar_amount == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="advanced_ar_amount" widget='monetary'
+                               invisible="advanced_ar_amount == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="insurance_ar_amount" widget='monetary'
+                               invisible="insurance_ar_amount == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="costsheet_inv_total_amount" widget='monetary'
+                               invisible="costsheet_inv_total_amount == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="product_amount_is_discount" widget='monetary'
+                               invisible="product_amount_is_discount == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="product_amount_refundable" widget='monetary'
+                               invisible="product_amount_refundable == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="product_amount_subcontractor" widget='monetary'
+                               invisible="product_amount_subcontractor == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="product_amount_additional" widget='monetary'
+                               invisible="product_amount_additional == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="product_amount_variation_Order" widget='monetary'
+                               invisible="product_amount_variation_Order == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="product_amount_wages" widget='monetary'
+                               invisible="product_amount_wages == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="product_amount_supplier" widget='monetary'
+                               invisible="product_amount_supplier == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="product_amount_customer" widget='monetary'
+                               invisible="product_amount_customer == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="product_amount_costsheet" widget='monetary'
+                               invisible="product_amount_costsheet == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                    </group>
+                </group>
+<!--                <xpath expr="//field[@name='note']" position="after">-->
+<!--                    <field name="retention_ar_amount" widget='monetary'-->
+<!--                           options="{'currency_field': 'currency_id'}"-->
+<!--                           readonly="True"/>-->
+<!--                    <field name="advanced_ar_amount" widget='monetary'-->
+<!--                           options="{'currency_field': 'currency_id'}"-->
+<!--                           readonly="True"/>-->
+<!--                    <field name="insurance_ar_amount" widget='monetary'-->
+<!--                           options="{'currency_field': 'currency_id'}"-->
+<!--                           readonly="True"/>-->
+<!--                    <field name="costsheet_inv_total_amount" widget='monetary'-->
+<!--                           options="{'currency_field': 'currency_id'}"-->
+<!--                           readonly="True"/>-->
+<!--                </xpath>-->
             </field>
         </record>
 
+        <record id="view_order_form_inherit_sale_stock_iswarehouse" model="ir.ui.view">
+            <field name="name">sale.order.form.sale.stock</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale_stock.view_order_form_inherit_sale_stock"/>
+            <field name="arch" type="xml">
+                <field name="warehouse_id" position="before">
+                    <field name="is_warehouse" readonly="state != 'draft'"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="view_order_form_inherit_sale_project_projectstartend" model="ir.ui.view">
+            <field name='name'>sale.order.form.projectstartend</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale_project.view_order_form_inherit_sale_project"/>
+            <field name="arch" type="xml">
+                <field name="project_id" position="after">
+                    <field name="project_startdate" string="Planned Date" widget="daterange"
+                           options='{"end_date_field": "project_enddate", "always_range": "1"}'
+                           required="project_startdate or project_enddate"/>
+                    <field name="project_enddate" invisible="1" required="project_startdate"/>
+                    <field name="project_task_type_ids" widget="many2many_tags"
+                           options="{'no_open': True, 'no_quick_create': True, 'no_create': True}"/>
+                </field>
+
+            </field>
+        </record>
     </data>
 </odoo>

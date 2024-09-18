@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="view_product_product_from_api_updates" model="ir.ui.view">
+        <field name="name">product.product.inherit</field>
+        <field name="model">product.product</field>
+        <field name="inherit_id" ref="product.product_normal_form_view"/>
+        <field name="arch" type="xml">
+            <field name="name" position="after">
+                <field name="arabic_name" placeholder="Product Arabic Name"/>
+            </field>
+            <notebook position="inside">
+                <page string="Images">
+                    <field name="product_images_ids">
+                        <tree editable="top">
+                            <field name="image_link" widget="url" required="1"/>
+                        </tree>
+                    </field>
+                </page>
+            </notebook>
+        </field>
+    </record>
+</odoo>

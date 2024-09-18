@@ -1,3 +1,7 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_mrp_suborders_user,mrp_suborders_user,model_mrp_suborders,,1,1,1,0
 access_mrp_suborders_details_user,mrp_suborders_details_user,model_mrp_suborders_details,,1,1,0,0
+access_manufacture_agreement_user,manufacture_agreement_user,model_manufacture_agreement,,1,1,1,0
+access_purchase_requisition_milestone,purchase_requisition_milestone,model_purchase_requisition_milestone,,1,1,1,0
+access_stock_move_report,stock_move_report,model_stock_move_new_report,,1,1,1,1
+

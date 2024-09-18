@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record model="ir.ui.view" id="manufacture_agreement_wizard">
+        <field name="name">manufacture.agreement wizard</field>
+        <field name="model">manufacture.agreement</field>
+        <field name="arch" type="xml">
+            <form string="Create agreement from Manufacture Costsheet" delete="0" create="0">
+                <group>
+                    <field name="partner_id" required="1" options='{"no_open": True, "no_create": True}'/>
+                </group>
+                <footer>
+                    <button name="create_manufacture_aggreement" string="Create Agreement" type="object" class="btn-primary"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>

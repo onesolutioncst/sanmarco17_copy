@@ -20,7 +20,7 @@
 #
 ###################################################################################
 {
-    'name': 'Costsheet from sale order',
+    'name': 'Costsheet Customization',
     'version': '17.0',
     'summary': 'sale, mrp',
     'description': """
@@ -31,13 +31,25 @@
     'company': 'Onsolutionc LLC.',
     'maintainer': 'Onesolutionc Development Team',
     'website': "https://www.onesolutionc.com",
-    'depends': ['sale','mrp_account'],
+    'depends': ['sale_stock', 'mrp_account', 'purchase_requisition', 'fleet', 'account', 'sale_project'],
     'data': [
+        'data/server_action.xml',
         'security/delivery_security.xml',
         'security/ir.model.access.csv',
+        'wizard/manufacture_agreement_views.xml',
         'views/mrp_production_view.xml',
         'views/sale_order_view.xml',
         'wizard/mrp_suborders_view.xml',
+        'views/product_template_view.xml',
+        'views/purchase_requisition_view.xml',
+        'views/requisition_milestone_view.xml',
+        'views/purchase_order_view.xml',
+        'views/requisition_milestone_view.xml',
+        'views/res_config_setting_view.xml',
+        'views/account_move_view.xml',
+        'views/crm_lead_view.xml',
+        'report/stock_move_report_view.xml',
+
     ],
     'images': [],
     'license': 'AGPL-3',

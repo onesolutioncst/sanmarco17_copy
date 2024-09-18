@@ -6,22 +6,98 @@
             <field name="model">mrp.production</field>
             <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
             <field name="arch" type="xml">
+
+                <button name="button_mark_done" position="attributes">
+                    <attribute name="invisible">is_costsheet</attribute>
+                </button>
+                <button name="button_mark_done" position="attributes">
+                    <attribute name="invisible">is_costsheet</attribute>
+                </button>
+                <button name="button_mark_done" position="attributes">
+                    <attribute name="invisible">is_costsheet</attribute>
+                </button>
+                <button name="button_mark_done" position="attributes">
+                    <attribute name="invisible">is_costsheet</attribute>
+                </button>
+                <button name="button_scrap" position="attributes">
+                    <attribute name="invisible">is_costsheet</attribute>
+                </button>
                 <field name="product_id" position="after">
                     <field name="is_costsheet" invisible="1"/>
+                    <field name="mrp_production_id" invisible="1"/>
                 </field>
                 <field name="product_id" position="replace">
-                    <field name="product_id" domain="[('type', 'in', ['product', 'consu'])]" context="{'default_detailed_type': 'product'}" invisible="is_costsheet == True" readonly="state != 'draft'" default_focus="1" placeholder="Product to build..."/>
-                    <field name="product_id" context="{'default_detailed_type': 'product'}" readonly="state != 'draft'" invisible="is_costsheet == False" default_focus="1" placeholder="Product to build..."/>
+                    <field name="product_id" domain="[('type', 'in', ['product', 'consu'])]"
+                           context="{'default_detailed_type': 'product'}" invisible="is_costsheet == True"
+                           readonly="state != 'draft'" default_focus="1" placeholder="Product to build..."/>
+                    <field name="product_id" context="{'default_detailed_type': 'product'}" readonly="state != 'draft'"
+                           invisible="is_costsheet == False" default_focus="1" placeholder="Product to build..."/>
                 </field>
                 <div name="button_box" position="inside">
                     <button name="action_view_suborder" type="object" class="oe_stat_button" icon="fa-pencil-square-o"
                             invisible="suborder_count == 0">
                         <field name="suborder_count" widget="statinfo" string="Sub Orders"/>
                     </button>
+                    <button name="action_view_requisition" type="object" class="oe_stat_button"
+                            icon="fa-pencil-square-o"
+                            invisible="requisition_count == 0">
+                        <field name="requisition_count" widget="statinfo" string="Agreement"/>
+                    </button>
+                     <button name="action_view_timesheet" type="object" class="oe_stat_button"
+                            icon="fa-calendar"
+                            invisible="timesheet_count == 0">
+                        <field name="timesheet_count" widget="timesheet_uom" string="Timesheet"/>
+                    </button>
                 </div>
                 <header position="inside">
-                    <button name="action_create_suborder" invisible="state != 'confirmed'" type="object" string="Create Sub Orders" />
+                    <button name="action_create_suborder"
+                            invisible="state in ['draft','done','cancel'] or mrp_production_id" type="object"
+                            string="Create Sub Orders"/>
+                    <button name="action_create_suborder" invisible="not mrp_production_id" type="object"
+                            groups="sale_costsheet.group_create_sub_order_agreement"
+                            string="Create Sub Orders"/>
+                    <button name="action_create_agreement"
+                            invisible="state in ['draft','done','cancel'] or mrp_production_id" type="object"
+                            string="Create Agreement"/>
+                    <button name="action_create_agreement" invisible="not mrp_production_id" type="object"
+                            groups="sale_costsheet.group_create_sub_order_agreement"
+                            string="Create Agreement"/>
                 </header>
+                <xpath expr="//field[@name='move_raw_ids']//tree/field[@name='product_uom_qty']" position="after">
+                    <field name="total_up" optional="hide"/>
+                    <field name="total_up_cost" optional="hide"/>
+                    <field name="planned_price" optional="hide" readonly="parent.state != 'draft'"/>
+                    <field name="origin_qty" optional="hide" readonly="parent.state != 'draft'"/>
+                    <field name="qty_orders_cost" optional="hide" readonly="parent.state != 'draft'"/>
+                </xpath>
+
+                <xpath expr="//field[@name='move_raw_ids']//tree" position="inside">
+                    <field name="qty_orders" optional="hide"/>
+                    <field name="qty_orders_cost" optional="hide"/>
+                    <field name="remaining_qty" optional="hide"/>
+                    <field name="remaining_qty_cost" optional="hide"/>
+                    <field name="upconsume_qty" optional="hide"/>
+                    <field name="upconsume_qty_cost" optional="hide"/>
+
+                    <field name="qty_agreement" optional="hide"/>
+                    <field name="qty_orders_agreement" optional="hide"/>
+                    <field name="qty_orders_agreement_cost" optional="hide"/>
+                    <field name="remaining_qty_agreement" optional="hide"/>
+                    <field name="remaining_qty_agreement_cost" optional="hide"/>
+                    <field name="upconsume_qty_agreement" optional="hide"/>
+                    <field name="upconsume_qty_agreement_cost" optional="hide"/>
+
+
+                    <field name="constru_unit_price" optional="hide"/>
+                    <field name="constru_standard_price" optional="hide"/>
+                    <!--                    <control>-->
+                    <!--                        <button name="action_add_from_catalog" string="Catalog" type="object" class="px-4 btn-link"-->
+                    <!--                                context="{'order_id': parent.id}"/>-->
+                    <!--                    </control>-->
+                </xpath>
+                <!--                <xpath expr="//field[@name='move_raw_ids']//tree/field[@name='product_id']" position="attributes">-->
+                <!--                    <attribute name="domain">[('raw_material_production_id.is_costsheet','=',True), ('costsheet','=',True)]</attribute>-->
+                <!--                </xpath>-->
             </field>
         </record>
 
@@ -51,15 +127,22 @@
                   parent="mrp.menu_mrp_manufacturing"
                   sequence="2"/>
 
-        <record id="mrp_production_form_inherit2" model="ir.ui.view">
-            <field name="name">mrp_production_form_inherit</field>
-            <field name="model">mrp.production</field>
-            <field name="inherit_id" ref="mrp.mrp_production_form_view"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='move_raw_ids']//tree" position="inside">
-                    <field name="qty_orders" optional="hide"/>
-                    <field name="remaining_qty" optional="hide"/>
-                </xpath>
+        <record id="mrp.mrp_production_action" model="ir.actions.act_window">
+            <field name="name">Manufacturing Orders</field>
+            <field name="res_model">mrp.production</field>
+            <field name="view_mode">tree,kanban,form,calendar,pivot,graph,activity</field>
+            <field name="view_id" eval="False"/>
+            <field name="search_view_id" ref="mrp.view_mrp_production_filter"/>
+            <field name="context">{'search_default_todo': True, 'default_company_id': allowed_company_ids[0]}</field>
+            <field name="domain">[('picking_type_id.active', '=', True),('is_costsheet', '=', False)]</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    No manufacturing order found. Let's create one.
+                </p>
+                <p>
+                    Use Manufacturing Orders (MO) to build finished products while consuming components: i.e. 1 Table =
+                    4 Table Legs + 1 Table Top
+                </p>
             </field>
         </record>
 

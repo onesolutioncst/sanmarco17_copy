@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<odoo>
+
+    <record id="action_report_sale_payment" model="ir.actions.report">
+        <field name="name">Payments</field>
+        <field name="model">sale.order</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">sale_payment_report.report_sale_payment_new</field>
+        <field name="report_file">sale_payment_report.report_sale_payment_new</field>
+        <field name="print_report_name">'Sale Payment - %s - %s' % (object.partner_id.name or '', object.name)</field>
+        <field name="binding_model_id" ref="sale.model_sale_order"/>
+        <field name="binding_type">report</field>
+    </record>
+
+    <template id="report_sale_payment">
+        <t t-call="web.html_container">
+
+            <t t-call="web.external_layout">
+                <t t-set="doc" t-value="doc.with_context(lang=doc.partner_id.lang)"/>
+                <t t-set="forced_vat"
+                   t-value="doc.fiscal_position_id.foreign_vat"/> <!-- So that it appears in the footer of the report instead of the company VAT if it's set -->
+                <t t-set="address">
+                    <div t-field="doc.partner_id"
+                         t-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": True}'/>
+                    <p t-if="doc.partner_id.vat">
+                        <t t-if="doc.company_id.account_fiscal_country_id.vat_label"
+                           t-out="doc.company_id.account_fiscal_country_id.vat_label"/>
+                        <t t-else="">Tax ID</t>:
+                        <span t-field="doc.partner_id.vat"/>
+                    </p>
+                </t>
+                <t t-if="doc.partner_shipping_id == doc.partner_invoice_id
+                             and doc.partner_invoice_id != doc.partner_id
+                             or doc.partner_shipping_id != doc.partner_invoice_id">
+                    <t t-set="information_block">
+                        <strong>
+                            <t t-if="doc.partner_shipping_id == doc.partner_invoice_id">
+                                Invoicing and Shipping Address:
+                            </t>
+                            <t t-else="">
+                                Invoicing Address:
+                            </t>
+                        </strong>
+                        <div t-field="doc.partner_invoice_id"
+                             t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'/>
+                        <t t-if="doc.partner_shipping_id != doc.partner_invoice_id">
+                            <strong>Shipping Address:</strong>
+                            <div t-field="doc.partner_shipping_id"
+                                 t-options='{"widget": "contact", "fields": ["address", "name", "phone"], "no_marker": True, "phone_icons": True}'/>
+                        </t>
+                    </t>
+                </t>
+                <div class="page">
+                    <div class="oe_structure"/>
+
+                    <h2 class="mt-4">
+                        <span t-if="env.context.get('proforma', False) or is_pro_forma">Pro-Forma Invoice #</span>
+                        <span t-elif="doc.state in ['draft','sent']">Quotation #</span>
+                        <span t-else="">Order #</span>
+                        <span t-field="doc.name">SO0000</span>
+                    </h2>
+
+                    <div class="row mt-4 mb-2" id="informations">
+                        <div t-if="doc.client_order_ref" class="col-auto col-3 mw-100 mb-2"
+                             name="informations_reference">
+                            <strong>Your Reference:</strong>
+                            <br/>
+                            <span class="m-0" t-field="doc.client_order_ref">SO0000</span>
+                        </div>
+                        <div t-if="doc.date_order" class="col-auto col-3 mw-100 mb-2" name="informations_date">
+                            <strong t-if="doc.state in ['draft', 'sent']">Quotation Date:</strong>
+                            <strong t-else="">Order Date:</strong>
+                            <br/>
+                            <span class="m-0" t-field="doc.date_order" t-options='{"widget": "date"}'>2023-12-31</span>
+                        </div>
+                        <div t-if="doc.validity_date and doc.state in ['draft', 'sent']"
+                             class="col-auto col-3 mw-100 mb-2"
+                             name="expiration_date">
+                            <strong>Expiration:</strong>
+                            <br/>
+                            <span class="m-0" t-field="doc.validity_date">2023-12-31</span>
+                        </div>
+                        <div t-if="doc.user_id.name" class="col-auto col-3 mw-100 mb-2">
+                            <strong>Salesperson:</strong>
+                            <br/>
+                            <span class="m-0" t-field="doc.user_id">Mitchell Admin</span>
+                        </div>
+                    </div>
+
+                    <!-- Is there a discount on at least one line? -->
+                    <t t-set="lines_to_report" t-value="doc._get_order_lines_to_report()"/>
+                    <t t-set="display_discount" t-value="any(l.discount for l in lines_to_report)"/>
+
+                    <div class="oe_structure"></div>
+                    <table class="table table-sm">
+                        <!-- Header Row -->
+                        <thead>
+                            <tr>
+                                <th name="th_date" class="text-start">Date</th>
+                                <th name="th_serial" class="text-end">Serial</th>
+                                <th name="th_ref" class="text-end">Description</th>
+                                <th name="th_debit" class="text-end">Debit</th>
+                                <th name="th_credit" class="text-end">Credit</th>
+                                <th name="th_total" class="text-end">Balance</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <t t-foreach="doc.get_sales_payment()" t-as="payment">
+                                <tr>
+                                    <td name="td_date">
+                                        <span t-esc="payment['date_order']">Payment Date</span>
+                                    </td>
+                                    <td name="td_serial" class="text-end">
+                                        <span t-esc="payment['name']">Payment Serial</span>
+                                    </td>
+                                    <td name="td_ref" class="text-end">
+                                        <span t-esc="payment['client_order_ref']">Payment Reference</span>
+                                    </td>
+                                    <td name="td_debit" class="text-end">
+                                        <span t-esc="payment['debit']">Payment Amount</span>
+                                    </td>
+                                    <td name="td_debit" class="text-end">
+                                        <span t-esc="payment['credit']">Payment Amount</span>
+                                    </td>
+                                    <td name="td_total" class="text-end">
+                                        <span t-esc="payment['balance']">Payment Amount</span>
+                                    </td>
+                                </tr>
+                            </t>
+                        </tbody>
+                    </table>
+                    <br/>
+                    <br/>
+                    <table width="100%" cellpadding="0" cellspacing="0" class="table table-borderless">
+                        <col width="128*"/>
+
+                        <col width="128*"/>
+
+                        <tr valign="top">
+                            <td width="50%" style="border: none; padding: 0in">
+                                <p align="center">
+                                    <font face="Lohit Devanagari">
+                                        <span lang="hi-IN">توقيــع
+                                            المـديــر
+                                        </span>
+                                    </font>
+                                </p>
+                            </td>
+                            <td width="50%" style="border: none; padding: 0in">
+                                <p align="center">
+                                    <font face="Lohit Devanagari">
+                                        <span lang="hi-IN">توقيـــع
+                                            المحاسب
+                                        </span>
+                                    </font>
+                                </p>
+                            </td>
+                        </tr>
+                    </table>
+
+                </div>
+            </t>
+        </t>
+    </template>
+
+    <template id="report_sale_payment_new">
+        <t t-foreach="docs" t-as="doc">
+            <t t-call="sale_payment_report.report_sale_payment" t-lang="doc.partner_id.lang"/>
+        </t>
+    </template>
+
+
+</odoo>

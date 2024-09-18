@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="project_project_view_form_simplified_equipment_timesheet" model="ir.ui.view">
+            <field name="name">project.project.view.form.simplified.inherit.timesheet</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="hr_timesheet.project_project_view_form_simplified_inherit_timesheet"/>
+            <field name="priority">24</field>
+            <field name="arch" type="xml">
+                <field name="allow_timesheets" position="after">
+                    <field name="allow_equipment_timesheets"/>
+                </field>
+            </field>
+        </record>
+
+        <record id="project_invoice_form_equipment" model="ir.ui.view">
+            <field name="name">Inherit project form : Invoicing Data</field>
+            <field name="model">project.project</field>
+            <field name="inherit_id" ref="hr_timesheet.project_invoice_form"/>
+            <field name="arch" type="xml">
+                <setting id="timesheet_settings" position="after">
+                    <setting id="equipment_timesheet_settings" string="Equipment Timesheets" help="Log time on Equipment">
+                        <field name="allow_equipment_timesheets"/>
+                    </setting>
+                </setting>
+            </field>
+        </record>
+    </data>
+</odoo>

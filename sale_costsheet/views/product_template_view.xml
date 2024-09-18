@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="product_template_only_form_view_inherit" model="ir.ui.view">
+            <field name="name">product.template.form</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="product.product_template_only_form_view"/>
+            <field name="arch" type="xml">
+                <field name="categ_id" position="before">
+                    <field name="project_age"/>
+                </field>
+                <notebook position="inside">
+                    <page string="Options">
+                        <group col="4" name="options">
+                            <field name="is_discount"/>
+                            <field name="refundable"/>
+                            <field name="subcontractor"/>
+                            <field name="additional"/>
+                            <field name="variation_Order"/>
+                            <field name="wages"/>
+                            <field name="supplier"/>
+                            <field name="customer"/>
+                            <field name="costsheet"/>
+                        </group>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+
+        <record id="product_normal_form_view_inherit" model="ir.ui.view">
+            <field name="name">product.product.form</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page string="Options" name="options_page">
+                        <group col="4" name="options">
+                            <field name="is_discount"/>
+                            <field name="refundable"/>
+                            <field name="subcontractor"/>
+                            <field name="additional"/>
+                            <field name="variation_Order"/>
+                            <field name="wages"/>
+                            <field name="supplier"/>
+                            <field name="customer"/>
+                            <field name="costsheet"/>
+                        </group>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+        <record id="product_template_form_view_bom_button_boqall" model="ir.ui.view">
+            <field name="name">product.template.boq.all</field>
+            <field name="model">product.template</field>
+            <field name="inherit_id" ref="mrp.product_template_form_view_bom_button"/>
+            <field name="arch" type="xml">
+                <button name="%(mrp.template_open_bom)d" position="attributes">
+                    <attribute name="invisible">0</attribute>
+                </button>
+            </field>
+        </record>
+
+    </data>
+</odoo>

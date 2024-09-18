@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <!-- Employee -->
+    <record id="view_employee_form_construction" model="ir.ui.view">
+        <field name="name">hr.employee.form.inherit.hr.construction</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="priority" eval="60"/>
+        <field name="arch" type="xml">
+            <group name="payroll_group" position="after">
+                <group name="fleet" string="Fleet" invisible="employee_type != 'fleet'">
+                    <label for="is_fleet" class="oe_inline"/>
+                    <div>
+                        <field name="is_fleet"/>
+                        <field name="employee_fleet_id" invisible="is_fleet == False" readonly="1"/>
+                        <button name="create_fleet" string="Create/Update Fleet" type="object"
+                                class="oe_highlight" invisible="is_fleet == False"/>
+                    </div>
+                </group>
+            </group>
+            <xpath expr="//group[@name='active_group']/field[@name='user_id']" position="attributes">
+                <attribute name="domain">[]</attribute>
+            </xpath>
+        </field>
+    </record>
+
+</odoo>

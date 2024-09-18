@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<odoo>
+    <odoo>
+        <record id='equipment_vehicle_log_contract_view_form' model='ir.ui.view'>
+            <field name="name">equipment.vehicle.log.contract.form</field>
+            <field name="model">equipment.vehicle.log.contract</field>
+            <field name="arch" type="xml">
+                <form string="Contract logs">
+                    <field name="company_id" invisible="1"/>
+                    <header>
+                        <button name="run" type="object" string="Set Running" invisible="state != 'new'"/>
+                        <button name="done" type="object" string="Done" invisible="state != 'running'"/>
+                        <button name="cancel" type="object" string="Cancel" invisible="state not in ['running','new']"/>
+                        <button name="reset_to_draft" type="object" string="Reset To Draft"
+                                invisible="state not in ['done','cancelled']"/>
+                        <button name="create_order" type="object" string="Create Order"
+                                invisible="type not in ['sale','purchase'] or purchase_id or sale_id"/>
+                        <button name="create_invoice" type="object" string="Create Invoice"
+                                invisible="type not in ['vendor_bill','customer_invoice'] or invoice_id"/>
+                        <field name="state" widget="statusbar"/>
+                    </header>
+                    <sheet>
+                        <field name="active" invisible="1"/>
+                        <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
+                        <field name="currency_id" invisible="1"/>
+                        <div class="oe_title">
+                            <h1>
+                                <field name="name" readonly="state in ['done','cancelled'] or sale_id or purchase_id or invoice_id"/>
+                            </h1>
+                        </div>
+                        <group string="Information" col="2">
+                            <group col="1">
+                                <field name="ins_ref" readonly="state in ['done','cancelled'] or sale_id or purchase_id or invoice_id"/>
+                                <field name="cost_subtype_id" readonly="state in ['done','cancelled'] or sale_id or purchase_id or invoice_id"/>
+                                <field name="type" readonly="state in ['done','cancelled'] or sale_id or purchase_id or invoice_id"/>
+                                <field name="insurer_id" widget="many2one_avatar"
+                                       invisible="type not in ['purchase','vendor_bill']"
+                                       required="type in ['purchase','vendor_bill']"
+                                       readonly="state in ['done','cancelled'] or sale_id or purchase_id or invoice_id"/>
+                                <field name="customer_id"
+                                       invisible="type not in ['sale','customer_invoice','repair']"
+                                       required="type in ['sale','customer_invoice','repair']"
+                                       readonly="state in ['done','cancelled'] or sale_id or purchase_id or invoice_id"/>
+
+                                <field name="company_id" groups="base.group_multi_company"/>
+                            </group>
+                            <group col="2">
+                                <field name="maintenance_equipment_id" readonly="state in ['done','cancelled'] or sale_id or purchase_id or invoice_id"/>
+                                <field name="start_date" readonly="state in ['done','cancelled'] or sale_id or purchase_id or invoice_id"/>
+                                <field name="expiration_date" readonly="state in ['done','cancelled'] or sale_id or purchase_id or invoice_id"/>
+                                <field name="user_id" widget="many2one_avatar_user" readonly="state in ['done','cancelled'] or sale_id or purchase_id or invoice_id"/>
+                            </group>
+                        </group>
+                        <group string="Cost" col="2">
+                            <group>
+                                <field name="sale_car_value" readonly="state in ['done','cancelled'] or sale_id or purchase_id or invoice_id"/>
+                                <field name="net_car_value" readonly="state in ['done','cancelled'] or sale_id or purchase_id or invoice_id"/>
+                            </group>
+                            <group>
+                                <field name="date" readonly="state in ['done','cancelled'] or sale_id or purchase_id or invoice_id"/>
+                                <field name="sale_id" invisible="type !='sale'" readonly="1"/>
+                                <field name="purchase_id" invisible="type !='purchase'" readonly="1"/>
+                                <field name="invoice_id" string="Vendor Bill" readonly="1" force_save="1"
+                                       invisible="type !='vendor_bill'"/>
+                                <field name="invoice_id" string="Customer Invoice" readonly="1" force_save="1"
+                                       invisible="type !='customer_invoice'"/>
+                            </group>
+                        </group>
+                        <separator string="Terms and Conditions"/>
+                        <field name="notes" nolabel="1"
+                               readonly="state in ['done','cancelled'] or sale_id or purchase_id or invoice_id"
+                               placeholder="Write here all other information relative to this contract"/>
+                        <field name="lines_ids" readonly="state in ['done','cancelled'] or sale_id or purchase_id or invoice_id">
+                            <tree editable="bottom">
+                                <field name="type" readonly="parent.type != 'repair'"
+                                       column_invisible="parent.type != 'repair'"/>
+                                <field name="product_id"/>
+                                <field name="name" required="1"/>
+                                <field name="qty" required="1"/>
+                                <field name="price_unit" required="1"/>
+                                <field name="taxes_id" widget="many2many_tags"/>
+                            </tree>
+                        </field>
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids"/>
+                    </div>
+                </form>
+            </field>
+        </record>
+
+
+        <record id='equipment_vehicle_log_contract_view_tree' model='ir.ui.view'>
+            <field name="name">equipment.vehicle.log.contract.tree</field>
+            <field name="model">equipment.vehicle.log.contract</field>
+            <field name="arch" type="xml">
+                <tree string="Contract logs">
+
+                </tree>
+            </field>
+        </record>
+        <record id='equipment_log_contract_action' model='ir.actions.act_window'>
+            <field name="name">Contracts</field>
+            <field name="res_model">equipment.vehicle.log.contract</field>
+            <field name="view_mode">tree,kanban,form,graph,pivot,activity</field>
+            <field name="context">{'search_default_groupby_service_type_id': 1}</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">
+                    Create a new service entry
+                </p>
+                <p>
+                    Track all the services done on your vehicle.
+                    Services can be of many types: occasional repair, fixed maintenance, etc.
+                </p>
+            </field>
+        </record>
+
+        <record id='equipment_vehicle_log_contract_view_tree' model='ir.ui.view'>
+            <field name="name">equipment.vehicle.log.contract.tree</field>
+            <field name="model">equipment.vehicle.log.contract</field>
+            <field name="arch" type="xml">
+                <tree string="Contract logs">
+                    <field name="maintenance_equipment_id"/>
+                    <field name="cost_subtype_id"/>
+                    <field name="amount"/>
+                    <field name="date"/>
+                    <field name="name"/>
+                </tree>
+            </field>
+        </record>
+    </odoo>
+</odoo>

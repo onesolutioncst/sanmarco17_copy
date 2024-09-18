@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="model_fleet_product_view_form">
+            <field name="name">model_fleet_product</field>
+            <field name="model">model.fleet.product</field>
+            <field name="arch" type="xml">
+                <form string="Select Fleet Models">
+                    <group>
+                        <field name="model_id" required="1"
+                               options="{'no_open':True,'no_create':True}"/>
+                        <field name="product_id" required="1" invisible="1"
+                               options="{'no_open':True,'no_create':True}"/>
+                    </group>
+                    <footer>
+                        <button name="create_product_fleet" string="Create Fleet" type="object" class="oe_highlight"/>
+                        or
+                        <button string="Cancel" class="oe_link" special="cancel"/>
+                    </footer>
+                </form>
+            </field>
+        </record>
+         <record id="action_model_fleet_product_view_form" model="ir.actions.act_window">
+            <field name="name">Select Fleet Models</field>
+            <field name="res_model">model.fleet.product</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="model_fleet_product_view_form"/>
+            <field name="target">new</field>
+        </record>
+    </data>
+</odoo>
+
+

@@ -1,0 +1,19 @@
+<odoo>
+    <data>
+
+        <!-- Inherit Form View to Modify it -->
+        <record id="crm_lead_view_form_button" model="ir.ui.view">
+            <field name="name">crm_lead_view_form_inheirt</field>
+            <field name="model">crm.lead</field>
+            <field name="inherit_id" ref="crm.crm_lead_view_form"/>
+            <field name="arch" type="xml">
+                <header position="inside">
+                    <button name="open_rfq_crmlead" string="New RFQ" type="object" class="oe_highlight"
+                            data-hotkey="w" />
+                    <button name="open_vendor_bill_crmlead" string="New Vendor Bill" type="object" class="oe_highlight"
+                            data-hotkey="w" />
+                </header>
+            </field>
+        </record>
+    </data>
+</odoo>

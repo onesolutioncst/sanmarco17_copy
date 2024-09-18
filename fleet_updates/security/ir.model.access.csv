@@ -1,0 +1,6 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_fleet_vehicle_log_services_lines,Full access on fleet.vehicle.log.services.lines,model_fleet_vehicle_log_services_lines,,1,1,1,1
+access_fleet_contract_template_wizard,fleet_contract_template_wizard,model_fleet_contract_template_wizard,,1,1,1,1
+access_fleet_contract_template,fleet_contract_template,model_fleet_contract_template,,1,1,1,1
+access_binary_downloads,binary_downloads,model_binary_downloads,,1,1,1,1
+access_model_fleet_product,model_fleet_product,model_model_fleet_product,,1,1,1,1

@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_purchase_requisition_form_inherit_construction" model="ir.ui.view">
+            <field name="name">purchase.requisition.form.construction</field>
+            <field name="model">purchase.requisition</field>
+            <field name="inherit_id" ref="purchase_requisition.view_purchase_requisition_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='line_ids']//tree" position="inside">
+                    <field name="remaining_qty" optional="hide"/>
+                    <field name="upconsume_qty" optional="hide"/>
+                    <field name="milestone_qty" optional="hide"/>
+                    <field name="remaining_milestone_qty" optional="hide"/>
+                </xpath>
+                <div name="button_box" position="inside">
+                    <button name="action_view_milestone" type="object" class="oe_stat_button" icon="fa-list-alt"
+                            invisible="state == 'draft'" context="{'default_purchase_requisition_id': active_id}">
+                        <field name="milestone_count" widget="statinfo" string="Milestones"/>
+                    </button>
+                </div>
+                <field name="picking_type_id" position="after">
+                    <label for="is_retention_ar" class="oe_inline"/>
+                    <div>
+                        <field name="is_retention_ar"/>
+                        <label for="rentention_dis_type" string="" class="oe_inline"
+                               invisible="is_retention_ar == False"/>
+                        <div class="oe_inline" invisible="is_retention_ar == False">
+                            <field name="rentention_dis_type" invisible="is_retention_ar == False"
+                                   required="is_retention_ar == True" class="oe_inline"/>
+                            <field name="rentention_amount" invisible="rentention_dis_type == 'percentage'"
+                                   required="is_retention_ar == True" class="oe_inline"/>
+                            <field name="rentention_amount" invisible="rentention_dis_type == 'fixed'"
+                                   widget="percentage" required="is_retention_ar == True" class="oe_inline"/>
+                        </div>
+                    </div>
+
+                    <label for="is_advanced_ar" class="oe_inline"/>
+                    <div>
+                        <field name="is_advanced_ar"/>
+                        <label for="advanced_dis_type" string="" class="oe_inline" invisible="is_advanced_ar == False"/>
+                        <div class="oe_inline" invisible="is_advanced_ar == False">
+                            <field name="advanced_dis_type" required="is_advanced_ar == True" class="oe_inline"/>
+                            <field name="advanced_amount" invisible="advanced_dis_type == 'percentage'"
+                                   required="is_advanced_ar == True" class="oe_inline"/>
+                            <field name="advanced_amount" invisible="advanced_dis_type == 'fixed'" widget="percentage"
+                                   required="is_advanced_ar == True" class="oe_inline"/>
+                        </div>
+                    </div>
+
+                    <label for="is_insurance_ar" class="oe_inline"/>
+                    <div>
+                        <field name="is_insurance_ar"/>
+                        <label for="insurance_dis_type" string="" class="oe_inline"
+                               invisible="is_insurance_ar == False"/>
+                        <div class="oe_inline" invisible="is_insurance_ar == False">
+                            <field name="insurance_dis_type" required="is_insurance_ar == True" class="oe_inline"/>
+                            <field name="insurance_amount" invisible="insurance_dis_type == 'percentage'"
+                                   required="is_insurance_ar == True" class="oe_inline"/>
+                            <field name="insurance_amount" invisible="insurance_dis_type == 'fixed'" widget="percentage"
+                                   required="is_insurance_ar == True" class="oe_inline"/>
+                        </div>
+                    </div>
+                </field>
+
+                <xpath expr="//field[@name='line_ids']" position="after">
+                    <group name="amounts" string="Amounts" >
+                        <field name="retention_ar_amount" widget='monetary'
+                               invisible="retention_ar_amount == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="advanced_ar_amount" widget='monetary'
+                               invisible="advanced_ar_amount == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="insurance_ar_amount" widget='monetary'
+                               invisible="insurance_ar_amount == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="costsheet_inv_total_amount" widget='monetary'
+                               invisible="costsheet_inv_total_amount == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="product_amount_is_discount" widget='monetary'
+                               invisible="product_amount_is_discount == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="product_amount_refundable" widget='monetary'
+                               invisible="product_amount_refundable == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="product_amount_subcontractor" widget='monetary'
+                               invisible="product_amount_subcontractor == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="product_amount_additional" widget='monetary'
+                               invisible="product_amount_additional == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="product_amount_variation_Order" widget='monetary'
+                               invisible="product_amount_variation_Order == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="product_amount_wages" widget='monetary'
+                               invisible="product_amount_wages == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="product_amount_supplier" widget='monetary'
+                               invisible="product_amount_supplier == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="product_amount_customer" widget='monetary'
+                               invisible="product_amount_customer == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="product_amount_costsheet" widget='monetary'
+                               invisible="product_amount_costsheet == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                    </group>
+<!--                    <group>-->
+<!--                        <group>-->
+<!--                            <field name="retention_ar_amount" widget='monetary' options="{'currency_field': 'currency_id'}"-->
+<!--                                   readonly="True"/>-->
+<!--                            <field name="advanced_ar_amount" widget='monetary' options="{'currency_field': 'currency_id'}"-->
+<!--                                   readonly="True"/>-->
+<!--                            <field name="insurance_ar_amount" widget='monetary' options="{'currency_field': 'currency_id'}"-->
+<!--                                   readonly="True"/>-->
+<!--                            <field name="costsheet_inv_total_amount" widget='monetary' options="{'currency_field': 'currency_id'}"-->
+<!--                                   readonly="True"/>-->
+<!--                        </group>-->
+
+<!--                    </group>-->
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

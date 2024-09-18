@@ -5,50 +5,60 @@ from odoo import api, fields, models, _
 
 
 class SaleOrderUpdate(models.Model):
-	_inherit = 'sale.order'
+    _inherit = 'sale.order'
 
-	invoiced_amount = fields.Float(String = 'Invoiced Amount' ,compute ='_compute_invoice_amount',compute_sudo=True)
-	amount_due = fields.Float(String ='Amount Due',compute ='_compute_amount_due',compute_sudo=True)
-	paid_amount = fields.Float(String ='Paid Amount',compute ='_compute_amount_paid',compute_sudo=True)
-	amount_paid_percent = fields.Float(compute = 'action_amount_paid',compute_sudo=True)
-	currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.user.company_id.currency_id)
-	
+    invoiced_amount = fields.Float(string = 'Invoiced Amount' ,compute ='_compute_invoice_amount',compute_sudo=True)
+    amount_due = fields.Float(string ='Amount Due',compute ='_compute_amount_due',compute_sudo=True)
+    paid_amount = fields.Float(string ='Paid Amount',compute ='_compute_paid_amount',compute_sudo=True ,default=0.0)
+    amount_paid_percent = fields.Float(compute = 'action_amount_paid',compute_sudo=True)
+    currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.user.company_id.currency_id)
+    
 
-	def _compute_invoice_amount(self):
-		for record in self:
-			invoice_id = self.env['account.move'].search(['&',('invoice_origin','=', record.name),'|',('state','=','draft'),('state','=','posted'),('payment_state', 'not in', ['reversed', 'invoicing_legacy'])])
-			total = 0
+    def _compute_invoice_amount(self):
+        for record in self:
+            invoice_id = self.env['account.move'].search(['&',('invoice_origin','=', record.name),'|',('state','=','draft'),('state','=','posted'),
+                                                          ('payment_state', 'not in', ['reversed', 'invoicing_legacy'])])
+            total = 0
 
-			if invoice_id:
-				for invoice in invoice_id:
-					total += invoice.amount_total
-					record.invoiced_amount = total
-			else:
-				record.invoiced_amount = total
-
-
-	@api.depends('paid_amount','invoiced_amount', 'amount_due')
-	def _compute_amount_due(self):
-		for record in self:
-			invoice_ids = self.env['account.move'].search(['&',('invoice_origin','=', record.name),'|',('state','=','draft'),('state','=','posted'),('payment_state', 'not in', ['reversed', 'invoicing_legacy'])])
-			amount = 0
-
-			if invoice_ids:
-				for inv in invoice_ids:
-					amount  += inv.amount_residual   
-					record.amount_due = amount
-			else:
-				record.amount_due = amount
+            if invoice_id:
+                for invoice in invoice_id:
+                    total += invoice.amount_total
+                    record.invoiced_amount = total
+            else:
+                record.invoiced_amount = total
 
 
+    @api.depends('paid_amount','invoiced_amount', 'amount_due')
+    def _compute_amount_due(self):
+        for record in self:
+            invoice_ids = self.env['account.move'].search(['&',('invoice_origin','=', record.name),'|',('state','=','draft'),('state','=','posted'),('payment_state', 'not in', ['reversed', 'invoicing_legacy'])])
+            amount = 0
+            if invoice_ids:
+                for inv in invoice_ids:
+                    amount  += inv.amount_residual   
+                    record.amount_due = amount
+            else:
+                record.amount_due = amount
 
-	@api.onchange('invoiced_amount','amount_due')
-	def _compute_amount_paid(self):
-		self.paid_amount = float(self.invoiced_amount) - float(self.amount_due)		
+
+    @api.onchange('invoiced_amount', 'amount_due')
+    def _compute_paid_amount(self):
+        for record in self:
+            amount = record.invoiced_amount - record.amount_due
+            if amount:
+                record.paid_amount = amount
+            else:
+                record.paid_amount = 0.0
 
 
-	@api.depends('paid_amount','invoiced_amount')
-	def action_amount_paid(self):
-		if self.invoiced_amount :
-			self.amount_paid_percent = round(100 * self.paid_amount / self.invoiced_amount, 3)
-		return self.amount_paid_percent
+    @api.depends('paid_amount', 'invoiced_amount')
+    def action_amount_paid(self):
+        for record in self:
+            try:
+                if record.invoiced_amount:
+                    record.amount_paid_percent = round(100 * record.paid_amount / record.invoiced_amount, 3)
+                else:
+                    record.amount_paid_percent = 0.0
+            except Exception as e:
+                _logger.error(f"Error in action_amount_paid: {e}")
+                record.amount_paid_percent = 0.0

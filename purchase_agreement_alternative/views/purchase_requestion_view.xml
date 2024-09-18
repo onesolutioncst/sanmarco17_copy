@@ -1,0 +1,110 @@
+<?xml version="1.0"?>
+<odoo>
+    <data>
+        <record id="view_purchase_requisition_form_alternative" model="ir.ui.view">
+            <field name="name">purchase.requisition.form.alternative</field>
+            <field name="model">purchase.requisition</field>
+            <field name="inherit_id" ref="purchase_requisition.view_purchase_requisition_form"/>
+            <field name="arch" type="xml">
+                <notebook position="inside">
+                    <page string="Alternative">
+                        <group>
+                            <group>
+                                <p colspan="2">Create a call for tender by adding alternative requests for quotation to
+                                    different vendors.
+                                    Make your choice by selecting the best combination of lead time, OTD and/or total
+                                    amount.
+                                    By comparing product lines you can also decide to order some products from one
+                                    vendor and others from another vendor.
+                                </p>
+                            </group>
+                            <group>
+                                <p colspan="2">
+                                    <button name="action_create_alternative" type="object" class="btn-link d-block"
+                                            string="Create Alternative" icon="fa-copy"/>
+                                    <button name="action_link_alternative" type="object" class="btn-link d-block"
+                                            string="Link To Exist Alternative" icon="fa-copy"/>
+                                    <button name="action_compare_alternative_lines" type="object"
+                                            class="btn-link d-block" string="Compare Product Lines" icon="fa-bar-chart"
+                                    />
+                                </p>
+                            </group>
+                        </group>
+                        <field name="alternative_pr_ids" readonly="1">
+                            <tree string="Alternative Purchase Agreement"
+                                  decoration-muted="state in ['cancel', 'open', 'done']"
+                                  decoration-bf="id == parent.id">
+                                <field name="name" decoration-bf="1"/>
+                                <field name="vendor_id"/>
+                                <field name="user_id" optional="show" widget="many2one_avatar_user"/>
+                                <field name="company_id" groups="base.group_multi_company" options="{'no_create': True}"
+                                       optional="show"/>
+                                <field name="ordering_date" optional="show"/>
+                                <field name="schedule_date" optional="hide"/>
+                                <field name="date_end" optional="show" widget="remaining_days"
+                                       decoration-danger="date_end and date_end&lt;current_date"
+                                       invisible="state in ('done', 'cancel')"/>
+                                <field name="origin" optional="show"/>
+                                <field name="state" optional="show" widget="badge" decoration-success="state == 'done'"
+                                       decoration-info="state not in ('done', 'cancel')"/>
+                            </tree>
+                        </field>
+                    </page>
+                </notebook>
+            </field>
+        </record>
+
+        <record id="purchase_requestion_order_line_compare_tree" model="ir.ui.view">
+            <field name="name">purchase.requestion.line.compare.tree</field>
+            <field name="model">purchase.requisition.line</field>
+            <field name="priority">1000</field>
+            <field name="arch" type="xml">
+                <tree string="Purchase Requisition Lines"
+                      decoration-muted="state in ['cancel', 'open', 'done']"
+                      create="0" delete="0" edit="0" expand="1"
+                      js_class="purchase_order_line_compare">
+                    <header>
+                        <button name="action_clear_quantities" string="Clear Selected" type="object"
+                                class="o_clear_qty_buttons"/>
+                    </header>
+                    <field name="product_id" readonly="1"/>
+                    <field name="vendor_id" string="Vendor"/>
+                    <field name="requisition_id" string="Reference" readonly="1"/>
+                    <field name="state"/>
+                    <field name="display_name" readonly="1"/>
+                    <field name="product_qty"/>
+                    <field name="product_uom_id" groups="uom.group_uom"/>
+                    <field name="price_unit"/>
+                    <field name="currency_id"/>
+                    <button name="action_choose" string="Choose" type="object"
+                            class="o_clear_qty_buttons" icon="fa-bullseye"
+                            invisible="product_qty &lt;= 0.0"/>
+                    <button name="action_clear_quantities" string="Clear" type="object" class="o_clear_qty_buttons"
+                            icon="fa-times"
+                            invisible="product_qty &lt;= 0.0 or state in ['cancel', 'open', 'done']"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="purchaserequisitionline_search" model="ir.ui.view">
+            <field name="name">purchase.requisition.line.search</field>
+            <field name="model">purchase.requisition.line</field>
+            <field name="arch" type="xml">
+                <search string="Search Purchase Requisition">
+                    <field name="requisition_id"/>
+                    <field name="product_id"/>
+                    <field name="vendor_id" string="Vendor"/>
+                    <group expand="0" string="Group By">
+                        <filter name="groupby_supplier" string="Vendor" domain="[]"
+                                context="{'group_by' : 'vendor_id'}"/>
+                        <filter name="groupby_product" string="Product" domain="[]"
+                                context="{'group_by' : 'product_id'}"/>
+                        <filter string="Order Reference" name="order_reference" domain="[]"
+                                context="{'group_by' :'requisition_id'}"/>
+                        <filter string="Status" name="status" domain="[]" context="{'group_by' : 'state'}"/>
+                    </group>
+                </search>
+            </field>
+        </record>
+    </data>
+</odoo>

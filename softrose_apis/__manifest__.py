@@ -3,7 +3,7 @@
 #    A part of OneSolutionc Apps
 #
 #    Onesolutionc Technologies Pvt. Ltd.
-#    Copyright (C) 2024-TODAY Onesolutionc Technologies (<https://www.onesolutionc.com>).
+#    Copyright (C) 2022-TODAY Onesolutionc Technologies (<https://www.onesolutionc.com>).
 #
 #    This program is free software: you can modify
 #    it under the terms of the GNU Affero General Public License (AGPL) as
@@ -20,20 +20,23 @@
 #
 ###################################################################################
 {
-    'name': 'Set Equipment as Employee',
-    'version': '17.0',
-    'summary': 'hr_maintenance',
+    'name': 'Softrose Mobile Integration Apis',
+    'version': '17.0.1.0.0',
+    'summary': 'apis',
     'description': """
-        This module link Equipment to employee
+        This module contains Softrose mobile apis
         """,
-    'category': 'hr, hr_maintenance, maintenance, mrp_maintenance ...',
-    'author': "Onesolutionc ",
-    'company': 'Onsolutionc LLC.',
-    'maintainer': 'Onesolutionc Development Team',
-    'website': "https://www.onesolutionc.com",
-    'depends': ['hr_maintenance'],
+    'category': 'website, apis ...',
+    'author': "Softrose,Mtloob, Ezz",
+    'company': 'Softrose Technologies Pvt. Ltd',
+    'maintainer': 'Softrose Development Team',
+    'website': "https://www.Softrose.com",
+    'depends': ['sale_margin','rest_api_integration','sale','base_geolocalize','stock','account','crm_salesperson_planner','hr_expense'],
     'data': [
-
+        'views/res_partner_view.xml',
+        'views/res_user_view.xml',
+        'views/stock_location_view.xml',
+        'views/crm_salesperson_planner_visit_view.xml',
     ],
     'images': [],
     'license': 'AGPL-3',

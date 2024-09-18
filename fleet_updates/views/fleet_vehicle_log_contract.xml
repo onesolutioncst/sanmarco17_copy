@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="fleet_vehicle_log_contract_view_form_inherit" model="ir.ui.view">
+            <field name="name">fleet_vehicle_log_contract_view_form_inherit</field>
+            <field name="model">fleet.vehicle.log.contract</field>
+            <field name="inherit_id" ref="fleet.fleet_vehicle_log_contract_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//header" position="inside">
+                    <button name="run" type="object" string="Set Running" invisible="state != 'new'" />
+                    <button name="done" type="object" string="Done" invisible="state != 'running'"/>
+                    <button name="cancel" type="object" string="Cancel" invisible="state not in ['new','running']"/>
+                    <button name="reset_to_draft" type="object" string="Reset To Draft" invisible="state not in ['done,cancelled']" />
+                    <button name="create_order" type="object" string="Create Order"
+                            invisible="type not in ['sale','purchase'] or purchase_id or sale_id" />
+                    <button name="create_invoice" type="object" string="Create Invoice"
+                            invisible="type not in ['vendor_bill','customer_invoice'] or invoice_id" />
+                    <button name="%(fleet_updates.action_fleet_contract_template_view_form)d"
+                            type="action" string="Print" class="oe_highlight"
+                    context="{'default_type': type}"/>
+                </xpath>
+                <field name="start_date" position="attributes">
+                    <attribute name="required">True</attribute>
+                </field>
+                <field name="expiration_date" position="attributes">
+                    <attribute name="required">True</attribute>
+                </field>
+                <field name="start_date" position="after">
+                    <field name="day_name"/>
+                </field>
+                <xpath expr="//group" position="after">
+                    <group string="Contract Details">
+                        <field name="en_num"/>
+                        <field name="factory"/>
+                        <field name="license"/>
+                        <field name="license_i" required="1"/>
+                        <field name="down_payment" required="1"/>
+                        <field name="rem_payment" required="1"/>
+                        <field name="buyer" required="1"/>
+                        <field name="day_name_sale"/>
+                        <field name="time_sale"/>
+                    </group>
+                </xpath>
+                <!--                <field name="service_ids" position="after">-->
+                <!--                    <group>-->
+                <!--                        <group string="Contract Details">-->
+                <!--                            <field name="en_num"/>-->
+                <!--                            <field name="factory"/>-->
+                <!--                            <field name="license"/>-->
+                <!--                            <field name="license_i"/>-->
+                <!--                            <field name="down_payment"/>-->
+                <!--                            <field name="rem_payment"/>-->
+                <!--                            <field name="buyer"/>-->
+                <!--                            <field name="day_name_sale"/>-->
+                <!--                            <field name="time_sale"/>-->
+                <!--                        </group>-->
+                <!--                        <group/>-->
+                <!--                    </group>-->
+                <!--                </field>-->
+                <field name="insurer_id" position="after">
+                    <field name="customer_id"
+                           invisible="type not in ['sale','customer_invoice']"
+                           required="type in ['sale','customer_invoice']"
+                           readonly="state in ['done','cancelled']" />
+                    <field name="sale_id" invisible="type != 'sale'" readonly="1"/>
+                    <field name="purchase_id" invisible="type != 'purchase'" readonly="1"/>
+                    <field name="invoice_id" string="Vendor Bill" readonly="1" force_save="1"
+                           invisible="type != 'vendor_bill'" />
+                    <field name="invoice_id" string="Customer Invoice" readonly="1" force_save="1"
+                           invisible="type != 'customer_invoice'" />
+                </field>
+                <field name="insurer_id" position="attributes">
+                    <attribute name="invisible">type not in ['purchase','vendor_bill']</attribute>
+                    <attribute name="required">type in ['purchase','vendor_bill']</attribute>
+                    <attribute name="readonly">state in ['done','cancelled']</attribute>
+                </field>
+                <field name="cost_subtype_id" position="attributes">
+                    <attribute name="domain">[('category','=','contract')]</attribute>
+                    <attribute name="required">True</attribute>
+                </field>
+                <field name="cost_subtype_id" position="after">
+                    <field name="fleet_owner" required="1" options="{'no_create': True, 'no_create_edit':True}"/>
+                    <field name="type" required="1"/>
+                </field>
+                <field name="amount" position="after">
+                    <field name="net_car_value" readonly="1"/>
+                    <field name="sale_car_value" readonly="1"/>
+                </field>
+                <xpath expr="//field[@name='user_id']" position="before">
+                    <field name="can_edit_resp"/>
+                </xpath>
+                <xpath expr="//field[@name='user_id']" position="attributes">
+                    <attribute name="readonly">not can_edit_resp</attribute>
+                </xpath>
+
+            </field>
+        </record>
+        <record id='fleet.fleet_vehicle_log_contract_view_kanban' model='ir.ui.view'>
+            <field name="name">fleet.vehicle.log.contract.kanban</field>
+            <field name="model">fleet.vehicle.log.contract</field>
+            <field name="arch" type="xml">
+                <kanban class="o_kanban_mobile" sample="1">
+                    <field name="activity_state"/>
+                    <progressbar field="activity_state"
+                                 colors='{"planned": "success", "today": "warning", "overdue": "danger"}'/>
+                    <templates>
+                        <t t-name="kanban-box">
+                            <div t-attf-class="oe_kanban_global_click">
+                                <div>
+                                    <strong>
+                                        <field name="vehicle_id" widget="res_partner_many2one"/>
+                                        <span class="float-end badge text-bg-secondary">
+                                            <field name="state"/>
+                                        </span>
+                                    </strong>
+                                </div>
+                                <div>
+                                    <t t-if="luxon.DateTime.fromISO(record.expiration_date.raw_value) &lt; luxon.DateTime.local()"
+                                       t-set="expiration_class" t-value="'oe_kanban_text_red'"/>
+                                    <span t-att-class="expiration_class">
+                                        <field name="start_date"/>
+                                        -
+                                        <field name="expiration_date"/>
+                                    </span>
+                                </div>
+                                <div>
+                                    <field name="insurer_id" widget="res_partner_many2one"/>
+                                </div>
+                                <div>
+                                    Sale Value:
+                                    <field name="amount"/>
+                                </div>
+                                <div>
+                                    Purchase Value:
+                                    <field name="net_car_value"/>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+            </field>
+        </record>
+
+    </data>
+</odoo>
