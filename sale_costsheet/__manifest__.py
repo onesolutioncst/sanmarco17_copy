@@ -31,7 +31,7 @@
     'company': 'Onsolutionc LLC.',
     'maintainer': 'Onesolutionc Development Team',
     'website': "https://www.onesolutionc.com",
-    'depends': ['sale_stock','mrp_account','purchase_requisition', 'fleet','account','sale_project'],
+    'depends': ['sale_stock', 'mrp_account', 'purchase_requisition', 'fleet', 'account', 'sale_project'],
     'data': [
         'data/server_action.xml',
         'security/delivery_security.xml',
@@ -47,7 +47,9 @@
         'views/requisition_milestone_view.xml',
         'views/res_config_setting_view.xml',
         'views/account_move_view.xml',
+        'views/crm_lead_view.xml',
         'report/stock_move_report_view.xml',
+
     ],
     'images': [],
     'license': 'AGPL-3',

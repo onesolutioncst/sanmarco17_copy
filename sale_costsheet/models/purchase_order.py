@@ -26,6 +26,7 @@ class purchase_order(models.Model):
     product_amount_customer = fields.Float(string='Is Customer Amount', compute="calc_product_type_amount")
     product_amount_costsheet = fields.Float(string='Is Costsheet Amount', compute="calc_product_type_amount")
 
+    crm_lead_id = fields.Many2one('crm.lead', 'LEAD/Opportunity')
     @api.depends('order_line')
     def calc_product_type_amount(self):
         for record in self:
@@ -154,6 +155,8 @@ class purchase_order(models.Model):
                     purchase_line_dic.update(
                         {'analytic_distribution': purchase_obj.requisition_id.mrp_production_id.analytic_distribution})
                 self.env['purchase.order.line'].sudo().create(purchase_line_dic)
+        if purchase_obj.crm_lead_id:
+            purchase_obj.crm_lead_id.purchase_order_id = purchase_obj.id
         return purchase_obj
 
     def check_see_rfq(self, requisition_id):
