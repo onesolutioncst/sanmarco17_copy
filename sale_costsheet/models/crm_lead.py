@@ -4,6 +4,13 @@ class crm_lead(models.Model):
     _inherit = 'crm.lead'
     purchase_order_id = fields.Many2one('purchase.order', 'Purchase Order')
     account_move_id = fields.Many2one('account.move', 'Vendor Bill')
+    rfq_count = fields.Integer('RFQ CO', compute="calc_rfq_count")
+    account_move_count = fields.Integer('Bill CO', compute="calc_rfq_count")
+    def calc_rfq_count(self):
+        for record in self:
+            record.rfq_count = self.env['purchase.order'].sudo().search([('crm_lead_id','=',record.id)])
+            record.account_move_count = self.env['account.move'].sudo().search([('crm_lead_id', '=', record.id)])
+
     def open_rfq_crmlead(self):
         rfq_action =  {
             'name': 'New RFQ',
