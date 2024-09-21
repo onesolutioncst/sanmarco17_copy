@@ -89,7 +89,7 @@ class purchase_requisition(models.Model):
             advanced_ar_default_product_id = self.env.user.company_id.advanced_ar_default_product_id
             insurance_ar_default_product_id = self.env.user.company_id.insurance_ar_default_product_id
             purchase_order_objs = self.env['purchase.order'].sudo().search(
-                [('state', '=', ['draft', 'posted']), ('requisition_id', '=', record.id)])
+                [('state', 'in', ['draft', 'posted']), ('requisition_id', '=', record.id)])
             for purchase_order_obj in purchase_order_objs:
                 for order_line_obj in purchase_order_obj.order_line:
                     if order_line_obj.product_id == retention_ar_default_product_id:

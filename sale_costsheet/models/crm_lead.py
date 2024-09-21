@@ -8,8 +8,8 @@ class crm_lead(models.Model):
     account_move_count = fields.Integer('Bill CO', compute="calc_rfq_count")
     def calc_rfq_count(self):
         for record in self:
-            record.rfq_count = self.env['purchase.order'].sudo().search([('crm_lead_id','=',record.id)])
-            record.account_move_count = self.env['account.move'].sudo().search([('crm_lead_id', '=', record.id)])
+            record.rfq_count = self.env['purchase.order'].sudo().search_count([('crm_lead_id','=',record.id)])
+            record.account_move_count = self.env['account.move'].sudo().search_count([('crm_lead_id', '=', record.id)])
 
     def open_rfq_crmlead(self):
         rfq_action =  {
