@@ -102,7 +102,7 @@ class sale_order(models.Model):
             advanced_ar_default_product_id = self.env.user.company_id.advanced_ar_default_product_id
             insurance_ar_default_product_id = self.env.user.company_id.insurance_ar_default_product_id
             account_move_objs = self.env['account.move'].sudo().search(
-                [('state', '=', ['draft', 'posted']), '|', ('cons_sale_id', '=', record.id),
+                [('state', 'in', ['draft', 'posted']), '|', ('cons_sale_id', '=', record.id),
                  ('invoice_origin', '=', record.name)])
             for account_move_obj in account_move_objs:
                 for invoice_line_obj in account_move_obj.invoice_line_ids:

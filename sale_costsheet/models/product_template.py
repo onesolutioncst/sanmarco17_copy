@@ -17,7 +17,10 @@ class product_template(models.Model):
     customer = fields.Boolean('Is Customer')
     costsheet = fields.Boolean('Is Costsheet')
     project_age = fields.Integer('Product Age')
-
+    is_fleet = fields.Boolean('Is Fleet')
+    fleet_vehicle_id = fields.Many2one('fleet.vehicle', 'Fleet')
+    is_equipment = fields.Boolean('Is Equipment')
+    maintenance_equipment_id = fields.Many2one('maintenance.equipment', 'Equipment')
 
 # class product_product(models.Model):
 #     _inherit = "product.product"
