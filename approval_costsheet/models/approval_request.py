@@ -40,6 +40,24 @@ class approval_request(models.Model):
         default=lambda self: self.env['decimal.precision'].precision_get("Percentage Analytic"),
     )
 
+    @api.onchange('mrp_production_id', 'from_mrp')
+    def check_from_mrp_production_id(self):
+        for record in self:
+            if record.mrp_production_id and not record.from_mrp:
+                product_line_vals=[]
+                for mrp_production_line_obj in record.mrp_production_id.move_raw_ids:
+                    product_line_vals.append((0, 0, {
+                        'product_id': mrp_production_line_obj.product_id,
+                        'quantity': mrp_production_line_obj.remaining_qty
+                    }))
+                record.product_id = record.mrp_production_id.product_id.id
+                record.product_qty = record.mrp_production_id.product_qty
+                record.analytic_distribution  = record.mrp_production_id.analytic_distribution
+                record.picking_type_id = record.mrp_production_id.picking_type_id.id
+                record.location_src_id = record.mrp_production_id.location_src_id.id
+                record.location_dest_id = record.mrp_production_id.location_dest_id.id
+                record.product_line_ids = product_line_vals
+
 
     @api.depends_context('company')
     @api.depends('analytic_distribution_text')

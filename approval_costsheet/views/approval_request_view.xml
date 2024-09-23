@@ -17,6 +17,7 @@
             </xpath>
             <group name="request_details" position="after">
                 <group name="request_costsheet_details">
+                    <field name="mrp_production_id" invisible="from_mrp"/>
                     <field name="product_id" invisible="has_product_id in ['no',False] or from_mrp"
                            readonly="request_status != 'new'"
                            required="has_product_id == 'required'"/>
