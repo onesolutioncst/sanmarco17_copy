@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record model="ir.ui.view" id="approval_costsheet_wizard_form">
+        <field name="name">approval_costsheet_wizard</field>
+        <field name="model">approval.costsheet.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Create Approval from Manufacture Costsheet" delete="0" create="0">
+                <group>
+                    <field name="approval_type" required="1" options='{"no_open": True, "no_create": True}'/>
+                    <field name="vendor_id" required="approval_type == 'costsheet_agreement'"
+                           invisible="approval_type != 'costsheet_agreement'"
+                           options='{"no_open": True, "no_create": True}'/>
+                </group>
+                <footer>
+                    <button name="create_costsheet_approval" string="Create Approval" type="object"
+                            class="btn-primary"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
