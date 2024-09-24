@@ -1,0 +1,27 @@
+<odoo>
+    <data>
+        <record id="approval_category_view_form_costsheet" model="ir.ui.view">
+            <field name="name">approval_category_view_form_costsheet</field>
+            <field name="model">approval.category</field>
+            <field name="inherit_id" ref="approvals.approval_category_view_form"/>
+            <field name="arch" type="xml">
+                <xpath expr="//group[@name='option_settings']//field[@name='has_location']" position="after">
+                    <field name="has_product_id" widget="radio"
+                           options="{'horizontal': true}" />
+                    <field name="has_product_qty" widget="radio"
+                           options="{'horizontal': true}" />
+                    <field name="has_analytic_distribution" widget="radio"
+                           options="{'horizontal': true}" />
+                    <field name="has_picking_type_id" widget="radio"
+                           options="{'horizontal': true}" />
+                    <field name="has_location_src_id" widget="radio"
+                           options="{'horizontal': true}" />
+                    <field name="has_location_dest_id" widget="radio"
+                           options="{'horizontal': true}" />
+                    <field name="has_vendor_id" widget="radio"
+                           options="{'horizontal': true}" />
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>
