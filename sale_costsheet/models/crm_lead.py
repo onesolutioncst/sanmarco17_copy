@@ -1,4 +1,7 @@
 from odoo import api, fields, models, _, Command
+from odoo.fields import Datetime
+
+
 class crm_lead(models.Model):
     """ Defines bills of material for a product or a product template """
     _inherit = 'crm.lead'
@@ -6,6 +9,12 @@ class crm_lead(models.Model):
     account_move_id = fields.Many2one('account.move', 'Vendor Bill')
     rfq_count = fields.Integer('RFQ CO', compute="calc_rfq_count")
     account_move_count = fields.Integer('Bill CO', compute="calc_rfq_count")
+    last_write_date = fields.Datetime('Last Update')
+
+    def write(self, vals):
+        vals['last_write_date'] = Datetime.now()
+        return super(crm_lead, self).write(vals)
+
     def calc_rfq_count(self):
         for record in self:
             record.rfq_count = self.env['purchase.order'].sudo().search_count([('crm_lead_id','=',record.id)])
