@@ -1,5 +1,5 @@
 {
-    'name': "Approval Transfer",
+    'name': "Approval Transfer Customization",
     'version': '17.0',
     'category': "",
     'summary': """""",

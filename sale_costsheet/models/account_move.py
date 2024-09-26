@@ -8,10 +8,10 @@ DATES_FORMAT = "%Y-%m-%d"
 class account_move(models.Model):
     _inherit = "account.move"
     cons_sale_id = fields.Many2one('sale.order')
-    costsheet_inv_total_amount = fields.Float('Total Amount', compute="calc_costsheet_total_amount", store=True, precompute=True)
-    retention_ar_amount = fields.Float('Retention(AR) Amount', compute="calc_costsheet_total_amount", store=True, precompute=True)
-    advanced_ar_amount = fields.Float('Advanced(AR) Amount', compute="calc_costsheet_total_amount", store=True, precompute=True)
-    insurance_ar_amount = fields.Float('Insurance(AR) Amount', compute="calc_costsheet_total_amount", store=True, precompute=True)
+    costsheet_inv_total_amount = fields.Float('Total Amount', compute="calc_costsheet_total_amount", precompute=True)
+    retention_ar_amount = fields.Float('Retention(AR) Amount', compute="calc_costsheet_total_amount", precompute=True)
+    advanced_ar_amount = fields.Float('Advanced(AR) Amount', compute="calc_costsheet_total_amount", precompute=True)
+    insurance_ar_amount = fields.Float('Insurance(AR) Amount', compute="calc_costsheet_total_amount", precompute=True)
 
     product_amount_is_discount = fields.Float(string='Is Discount Amount', compute="calc_product_type_amount")
     product_amount_refundable = fields.Float(string='Is Refundable Amount', compute="calc_product_type_amount")
