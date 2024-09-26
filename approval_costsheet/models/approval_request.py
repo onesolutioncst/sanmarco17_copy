@@ -2,6 +2,7 @@ from odoo import api, fields, models, _, SUPERUSER_ID, tools
 import logging, json
 
 from odoo.addons.test_convert.tests.test_env import record
+from odoo.exceptions import ValidationError
 
 _logger = logging.getLogger(__name__)
 DATES_FORMAT = "%Y-%m-%d"
@@ -10,8 +11,13 @@ DATES_FORMAT = "%Y-%m-%d"
 class approval_request(models.Model):
     _inherit = "approval.request"
     # _inherit = ['approval.request', 'analytic.mixin']
-
+    has_analytic_account = fields.Selection(related="category_id.has_analytic_account")
+    has_costsheet_order= fields.Selection(related="category_id.has_costsheet_order")
+    has_multi_costsheet_order = fields.Selection(related="category_id.has_multi_costsheet_order")
+    analytic_account_id = fields.Many2one('account.analytic.account', string="Analytic Account", copy=False, )
     mrp_production_id = fields.Many2one('mrp.production')
+    mrp_production_ids = fields.Many2many('mrp.production', string='Multi Orders')
+
     suborder_production_id = fields.Many2one('mrp.production')
     agreement_production_id = fields.Many2one('purchase.requisition')
     from_mrp = fields.Boolean()
@@ -40,6 +46,8 @@ class approval_request(models.Model):
         default=lambda self: self.env['decimal.precision'].precision_get("Percentage Analytic"),
     )
 
+
+
     @api.onchange('mrp_production_id', 'from_mrp')
     def check_from_mrp_production_id(self):
         for record in self:
@@ -48,7 +56,9 @@ class approval_request(models.Model):
                 for mrp_production_line_obj in record.mrp_production_id.move_raw_ids:
                     product_line_vals.append((0, 0, {
                         'product_id': mrp_production_line_obj.product_id,
-                        'quantity': mrp_production_line_obj.remaining_qty
+                        'mrp_demond_qty': mrp_production_line_obj.remaining_qty,
+                        'quantity': 0.0,
+                        'mrp_manufacture_id': record.mrp_production_id.id
                     }))
                 record.product_id = record.mrp_production_id.product_id.id
                 record.product_qty = record.mrp_production_id.product_qty
@@ -58,6 +68,40 @@ class approval_request(models.Model):
                 record.location_dest_id = record.mrp_production_id.location_dest_id.id
                 record.product_line_ids = product_line_vals
 
+    def get_mrp_lines(self):
+        for record in self:
+            record.product_line_ids.unlink()
+            if record.mrp_production_ids and not record.from_mrp:
+                product_line_list = []
+                for mrp_production_obj in record.mrp_production_ids:
+                    for mrp_production_line_obj in mrp_production_obj.move_raw_ids:
+                        product_line_list.append((0, 0, {
+                            'product_id': mrp_production_line_obj.product_id.id,
+                            'mrp_demond_qty': mrp_production_line_obj.remaining_qty,
+                            'quantity': 0.0,
+                            'mrp_manufacture_line_id': mrp_production_line_obj.id,
+                            'mrp_manufacture_id': mrp_production_obj.id
+                        }))
+                record.product_line_ids = product_line_list
+
+    # @api.onchange('mrp_production_ids', 'from_mrp')
+    # def check_mrp_production_ids(self):
+    #     product_list=[]
+    #
+    #     for record in self:
+    #         record.product_line_ids = []
+    #         if record.mrp_production_ids and not record.from_mrp:
+    #             product_line_list = []
+    #             for mrp_production_obj in record.mrp_production_ids:
+    #                 for mrp_production_line_obj in mrp_production_obj.move_raw_ids:
+    #                     product_line_list.append((0, 0, {
+    #                         'product_id': mrp_production_line_obj.product_id.id,
+    #                         'mrp_demond_qty': mrp_production_line_obj.remaining_qty,
+    #                         'quantity': 0.0,
+    #                         'mrp_manufacture_line_id': mrp_production_line_obj.id,
+    #                         'mrp_manufacture_id': mrp_production_obj.id
+    #                     }))
+    #             record.product_line_ids = product_line_list
 
     @api.depends_context('company')
     @api.depends('analytic_distribution_text')
@@ -80,47 +124,52 @@ class approval_request(models.Model):
             ).exists()
 
     def action_create_costsheet_suborder(self):
-        manufacutre_lines = []
-        for product_line_obj in self.product_line_ids:
-            if product_line_obj.quantity > 0.0:
-                manufacutre_lines.append((0, 0, {
-                    'product_id': product_line_obj.product_id.id,
-                    'product_uom_qty': product_line_obj.quantity
-                }))
-        if manufacutre_lines:
-            if self.mrp_production_id:
-                next_seq = self.env['mrp.production'].sudo().search_count(
-                    [('mrp_production_id', '=', self.mrp_production_id.id)])
-                name = self.mrp_production_id._get_name_backorder(self.mrp_production_id.name, next_seq + 1)
-                origin = self.mrp_production_id.name +"/"+ str(self.name)
-                mrp_production_id = self.mrp_production_id.id or ''
-                product_id = self.mrp_production_id.product_id.id
-                product_qty = self.mrp_production_id.product_uom_qty
-            else:
-                name = self.picking_type_id.sequence_id.next_by_id()
-                origin = str(self.name)
-                mrp_production_id = ''
-                product_id = self.product_id.id
-                product_qty = self.product_qty
-            manufacutre_vals = {
-                'name': name,
-                'origin': origin,
-                'mrp_production_id': mrp_production_id,
-                'product_id': product_id,
-                'product_qty': product_qty,
-                'analytic_distribution': self.analytic_distribution,
-                'picking_type_id': self.picking_type_id.id,
-                'location_src_id': self.location_src_id.id,
-                'location_dest_id': self.location_dest_id.id,
-                'move_raw_ids': manufacutre_lines
-            }
-            mrp_production_obj = self.env['mrp.production'].sudo().create(manufacutre_vals)
-            self.suborder_production_id = mrp_production_obj.id
-            mrp_production_obj.message_post_with_source(
-                'mail.message_origin_link',
-                render_values={'self': mrp_production_obj, 'origin': self, 'edit': True},
-                subtype_xmlid='mail.mt_note',
-            )
+        if self.approval_type == 'costsheet_suborder':
+            manufacutre_lines = []
+            for product_line_obj in self.product_line_ids:
+                if product_line_obj.quantity > 0.0:
+                    manufacutre_lines.append((0, 0, {
+                        'product_id': product_line_obj.product_id.id,
+                        'product_uom_qty': product_line_obj.quantity
+                    }))
+            if manufacutre_lines:
+                if self.mrp_production_id:
+                    next_seq = self.env['mrp.production'].sudo().search_count(
+                        [('mrp_production_id', '=', self.mrp_production_id.id)])
+                    name = self.mrp_production_id._get_name_backorder(self.mrp_production_id.name, next_seq + 1)
+                    origin = self.mrp_production_id.name +"/"+ str(self.name)
+                    mrp_production_id = self.mrp_production_id.id or ''
+                    product_id = self.mrp_production_id.product_id.id
+                    product_qty = self.mrp_production_id.product_uom_qty
+                else:
+                    name = self.picking_type_id.sequence_id.next_by_id()
+                    origin = str(self.name)
+                    mrp_production_id = ''
+                    if not self.product_id:
+                        raise ValidationError(_("Sorry you must select product "))
+                    product_id = self.product_id.id
+                    if self.product_qty <= 0.0:
+                        raise ValidationError(_("Sorry you must select quantity greater than zero "))
+                    product_qty = self.product_qty
+                manufacutre_vals = {
+                    'name': name,
+                    'origin': origin,
+                    'mrp_production_id': mrp_production_id,
+                    'product_id': product_id,
+                    'product_qty': product_qty,
+                    'analytic_distribution': self.analytic_distribution,
+                    'picking_type_id': self.picking_type_id.id,
+                    'location_src_id': self.location_src_id.id,
+                    'location_dest_id': self.location_dest_id.id,
+                    'move_raw_ids': manufacutre_lines
+                }
+                mrp_production_obj = self.env['mrp.production'].sudo().create(manufacutre_vals)
+                self.suborder_production_id = mrp_production_obj.id
+                mrp_production_obj.message_post_with_source(
+                    'mail.message_origin_link',
+                    render_values={'self': mrp_production_obj, 'origin': self, 'edit': True},
+                    subtype_xmlid='mail.mt_note',
+                )
 
     def action_create_costsheet_agreement(self):
         purchase_requisition = []
@@ -156,9 +205,54 @@ class approval_request(models.Model):
                 subtype_xmlid='mail.mt_note',
             )
         return True
+    def action_create_costsheet_multi_suborder(self):
+        mrp_per_order = []
+        mrp_per_order_dic = {}
+        for product_line_obj in self.product_line_ids:
+            if product_line_obj.mrp_manufacture_id not in mrp_per_order_dic:
+                mrp_per_order_dic[product_line_obj.mrp_manufacture_id] = []
+            if product_line_obj.quantity > 0.0:
+                mrp_per_order_dic[product_line_obj.mrp_manufacture_id].append((0, 0, {
+                    'product_id': product_line_obj.product_id.id,
+                    'product_uom_qty': product_line_obj.quantity
+                }))
+        for mrp_key, mrp_lines in mrp_per_order_dic.items():
+            next_seq = self.env['mrp.production'].sudo().search_count([('mrp_production_id', '=', mrp_key.id)])
+            name = mrp_key._get_name_backorder(mrp_key.name, next_seq + 1)
+            origin = mrp_key.name + "/" + str(self.name)
+            mrp_production_id = mrp_key.id or ''
+            product_id = mrp_key.product_id.id
+            product_qty = mrp_key.product_uom_qty
+            manufacutre_vals = {
+                'name': name,
+                'origin': origin,
+                'mrp_production_id': mrp_production_id,
+                'product_id': product_id,
+                'product_qty': product_qty,
+                'analytic_distribution': mrp_key.analytic_distribution,
+                'picking_type_id': mrp_key.picking_type_id.id,
+                'location_src_id': mrp_key.location_src_id.id,
+                'location_dest_id': mrp_key.location_dest_id.id,
+                'move_raw_ids': mrp_lines
+            }
+            mrp_production_obj = self.env['mrp.production'].sudo().create(manufacutre_vals)
+            # self.suborder_production_id = mrp_production_obj.id
+            mrp_production_obj.message_post_with_source(
+                'mail.message_origin_link',
+                render_values={'self': mrp_production_obj, 'origin': self, 'edit': True},
+                subtype_xmlid='mail.mt_note',
+            )
 
 
 class approval_product_line(models.Model):
     _inherit = "approval.product.line"
 
     mrp_manufacture_line_id = fields.Many2one('stock.move', 'Components')
+    mrp_manufacture_id = fields.Many2one('mrp.production', 'Costsheet')
+    mrp_demond_qty = fields.Float('Demond QTY')
+    remainig_qty = fields.Float(compute="calc_remainig_qty")
+
+    def calc_remainig_qty(self):
+        for record in self:
+            record.remainig_qty = record.mrp_demond_qty - record.quantity
+

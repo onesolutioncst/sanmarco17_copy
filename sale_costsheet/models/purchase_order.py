@@ -10,10 +10,24 @@ DATES_FORMAT = "%Y-%m-%d"
 class purchase_order(models.Model):
     _inherit = "purchase.order"
 
+    is_retention_ar = fields.Boolean('Is Retention')
+    rentention_dis_type = fields.Selection([('fixed', 'Fixed'), ('percentage', 'Percentage')], 'Type')
+    rentention_amount = fields.Float('Amount')
+    is_advanced_ar = fields.Boolean('Is Advanced')
+    advanced_dis_type = fields.Selection([('fixed', 'Fixed'), ('percentage', 'Percentage')], 'Type')
+    advanced_amount = fields.Float('Amount')
+    is_insurance_ar = fields.Boolean('Is Insurance')
+    insurance_dis_type = fields.Selection([('fixed', 'Fixed'), ('percentage', 'Percentage')], 'Type')
+    insurance_amount = fields.Float('Amount')
+    can_see_contract_terms = fields.Boolean('Can See Contract Terms', compute="calc_can_see_contract_terms")
+
     costsheet_inv_total_amount = fields.Float('Total Amount', compute="calc_costsheet_total_amount", precompute=True)
     retention_ar_amount = fields.Float('Retention(AR) Amount', compute="calc_costsheet_total_amount", precompute=True)
     advanced_ar_amount = fields.Float('Advanced(AR) Amount', compute="calc_costsheet_total_amount", precompute=True)
     insurance_ar_amount = fields.Float('Insurance(AR) Amount', compute="calc_costsheet_total_amount", precompute=True)
+
+
+
 
     product_amount_is_discount = fields.Float(string='Is Discount Amount', compute="calc_product_type_amount")
     product_amount_refundable = fields.Float(string='Is Refundable Amount', compute="calc_product_type_amount")
@@ -27,6 +41,13 @@ class purchase_order(models.Model):
     product_amount_costsheet = fields.Float(string='Is Costsheet Amount', compute="calc_product_type_amount")
 
     crm_lead_id = fields.Many2one('crm.lead', 'LEAD/Opportunity')
+
+    def calc_can_see_contract_terms(self):
+        for record in self:
+            record.can_see_contract_terms = False
+            if self.user_has_groups('sale_costsheet.group_costsheet_contract_terms'):
+                record.can_see_contract_terms=True
+
     @api.depends('order_line')
     def calc_product_type_amount(self):
         for record in self:
@@ -117,6 +138,10 @@ class purchase_order(models.Model):
                     purchase_line_dic.update(
                         {'analytic_distribution': purchase_obj.requisition_id.mrp_production_id.analytic_distribution})
                 self.env['purchase.order.line'].sudo().create(purchase_line_dic)
+            purchase_obj.is_retention_ar = purchase_obj.requisition_id.is_retention_ar
+            purchase_obj.rentention_dis_type = purchase_obj.requisition_id.rentention_dis_type
+            purchase_obj.rentention_amount = purchase_obj.requisition_id.rentention_amount
+
         if purchase_obj.requisition_id and purchase_obj.requisition_id.is_advanced_ar and self.env.user.company_id.advanced_ap_default_product_id:
             if purchase_obj.requisition_id.advanced_dis_type and purchase_obj.requisition_id.advanced_dis_type == 'fixed':
                 advanced_amount = purchase_obj.requisition_id.advanced_amount
@@ -136,6 +161,10 @@ class purchase_order(models.Model):
                     purchase_line_dic.update(
                         {'analytic_distribution': purchase_obj.requisition_id.mrp_production_id.analytic_distribution})
                 self.env['purchase.order.line'].sudo().create(purchase_line_dic)
+            purchase_obj.is_advanced_ar = purchase_obj.requisition_id.is_advanced_ar
+            purchase_obj.advanced_dis_type = purchase_obj.requisition_id.advanced_dis_type
+            purchase_obj.advanced_amount = purchase_obj.requisition_id.advanced_amount
+
         if purchase_obj.requisition_id and purchase_obj.requisition_id.is_insurance_ar and self.env.user.company_id.insurance_ap_default_product_id:
             if purchase_obj.requisition_id.insurance_dis_type and purchase_obj.requisition_id.insurance_dis_type == 'fixed':
                 insurance_amount = purchase_obj.requisition_id.insurance_amount
@@ -155,8 +184,15 @@ class purchase_order(models.Model):
                     purchase_line_dic.update(
                         {'analytic_distribution': purchase_obj.requisition_id.mrp_production_id.analytic_distribution})
                 self.env['purchase.order.line'].sudo().create(purchase_line_dic)
+            purchase_obj.is_insurance_ar = purchase_obj.requisition_id.is_insurance_ar
+            purchase_obj.insurance_dis_type = purchase_obj.requisition_id.insurance_dis_type
+            purchase_obj.insurance_amount = purchase_obj.requisition_id.insurance_amount
+
         if purchase_obj.crm_lead_id:
             purchase_obj.crm_lead_id.purchase_order_id = purchase_obj.id
+
+
+
         return purchase_obj
 
     def check_see_rfq(self, requisition_id):
