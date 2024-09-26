@@ -11,7 +11,9 @@ class approval_costsheet_wizard(models.TransientModel):
 
     mrp_manufacture_id = fields.Many2one('mrp.production', 'Costsheet')
     approval_type = fields.Selection(
-        [('costsheet_suborder', 'CostSheet (Suborder)'), ('costsheet_agreement', 'Costsheet (Agreement)')], )
+        [('costsheet_suborder', 'CostSheet (Suborder)'),
+         ('costsheet_agreement', 'Costsheet (Agreement)')])
+    # ('costsheet_multi_suborder', 'CostSheet (Suborder)'),
     vendor_id = fields.Many2one('res.partner', 'Vendor ')
 
     def create_costsheet_approval(self):
@@ -20,7 +22,8 @@ class approval_costsheet_wizard(models.TransientModel):
             for mrp_suborders_details_obj in self.mrp_manufacture_id.move_raw_ids:
                 product_line_list.append((0, 0, {
                     'product_id': mrp_suborders_details_obj.product_id.id,
-                    'quantity': mrp_suborders_details_obj.remaining_qty,
+                    'quantity': 0.0,
+                    'mrp_demond_qty': mrp_suborders_details_obj.remaining_qty,
                     'mrp_manufacture_line_id': mrp_suborders_details_obj.id,
                 }))
             approval_request_dict = {

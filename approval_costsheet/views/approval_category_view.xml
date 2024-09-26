@@ -20,6 +20,12 @@
                            options="{'horizontal': true}" />
                     <field name="has_vendor_id" widget="radio"
                            options="{'horizontal': true}" />
+                    <field name="has_analytic_account" widget="radio"
+                           options="{'horizontal': true}" />
+                    <field name="has_costsheet_order" widget="radio"
+                           options="{'horizontal': true}" />
+                    <field name="has_multi_costsheet_order" widget="radio"
+                           options="{'horizontal': true}" />
                 </xpath>
             </field>
         </record>

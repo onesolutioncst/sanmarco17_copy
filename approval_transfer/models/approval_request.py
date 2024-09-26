@@ -4,6 +4,9 @@ class ApprovalRequest(models.Model):
     _inherit = 'approval.request'
 
     approval_type = fields.Selection(related="category_id.approval_type")
+    has_operation_type = fields.Selection(related="category_id.has_operation_type")
+    has_analytic_account = fields.Selection(related="category_id.has_analytic_account")
+
     picking_type_id = fields.Many2one('stock.picking.type', 'Operation Type')
     analytic_account_id = fields.Many2one('account.analytic.account', string="Analytic Account", copy=False,)
 

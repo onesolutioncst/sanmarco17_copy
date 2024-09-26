@@ -13,35 +13,34 @@
                 <field name="has_vendor_id" invisible="1"/>
                 <field name="has_product_id" invisible="1"/>
                 <field name="has_product_qty" invisible="1"/>
+                <field name="has_analytic_account" invisible="1"/>
+                <field name="has_costsheet_order" invisible="1"/>
+                <field name="has_multi_costsheet_order" invisible="1"/>
                 <field name="from_mrp" invisible="1"/>
             </xpath>
             <group name="request_details" position="after">
                 <group name="request_costsheet_details">
-                    <field name="mrp_production_id" invisible="from_mrp"/>
-                    <field name="product_id" invisible="has_product_id in ['no',False] or from_mrp"
+                    <field name="vendor_id" invisible="has_vendor_id in ['no',False] or from_mrp"
                            readonly="request_status != 'new'"
-                           required="has_product_id == 'required'"/>
-                    <field name="product_qty" invisible="has_product_qty in ['no',False] or from_mrp"
+                           required="has_vendor_id == 'required'"/>
+                    <field name="analytic_account_id" invisible="has_analytic_account in ['no',False] or from_mrp"
                            readonly="request_status != 'new'"
-                           required="has_product_qty == 'required'"/>
-                    <field
-                            name="analytic_distribution"
-                            widget="analytic_distribution"
-                            groups="analytic.group_analytic_accounting"
-                            options="{'product_field': 'product_id', 'business_domain': 'purchase_order'}"
-                            invisible="has_analytic_distribution in ['no',False] or from_mrp"
-                            readonly="request_status != 'new'"
-                            required="has_analytic_distribution == 'required'"
-                    />
-                    <field name="picking_type_id" invisible="has_picking_type_id in ['no',False] or from_mrp"
+                           required="has_analytic_account == 'required'"/>
+                    <field name="mrp_production_id" options="{'no_open': True, 'no_create': True}"
+                           invisible="has_costsheet_order in ['no',False] or from_mrp"
                            readonly="request_status != 'new'"
-                           required="has_picking_type_id == 'required'"/>
-                    <field name="location_src_id" invisible="has_location_src_id in ['no',False] or from_mrp"
-                           readonly="request_status != 'new'"
-                           required="has_location_src_id == 'required'"/>
-                    <field name="location_dest_id" invisible="has_location_dest_id in ['no',False] or from_mrp"
-                           readonly="request_status != 'new'"
-                           required="has_location_dest_id == 'required'"/>
+                           required="has_costsheet_order == 'required'"
+                           domain="[('sale_costsheet_id.analytic_account_id','=',analytic_account_id)]"/>
+                    <label for="mrp_production_ids" invisible="has_multi_costsheet_order in ['no',False] or from_mrp" class="oe_inline"/>
+                    <div invisible="has_multi_costsheet_order in ['no',False] or from_mrp" >
+                        <field name="mrp_production_ids" widget="many2many_tags"
+                               options="{'no_open': True, 'no_create': True}"
+                               invisible="has_multi_costsheet_order in ['no',False] or from_mrp"
+                               readonly="request_status != 'new'"
+                               required="has_multi_costsheet_order == 'required'"
+                               domain="[('sale_costsheet_id.analytic_account_id','=',analytic_account_id)]"/>
+                        <button name="get_mrp_lines" string="Get lines" type="object"/>
+                    </div>
                     <field name="vendor_id" invisible="has_vendor_id in ['no',False] or from_mrp"
                            readonly="request_status != 'new'"
                            required="has_vendor_id == 'required'"/>
@@ -56,12 +55,33 @@
                         string="Create Costsheet(Suborder)" class="btn-primary"
                         data-hotkey="g"
                         invisible="approval_type != 'costsheet_suborder' or request_status != 'approved' or suborder_production_id"/>
+                <button name="action_create_costsheet_multi_suborder" type="object"
+                        string="Create Costsheet(Multi Suborder)" class="btn-primary"
+                        data-hotkey="g"
+                        invisible="approval_type != 'costsheet_multi_suborder' or request_status != 'approved'"/>
+
                 <button name="action_create_costsheet_agreement" type="object"
                         string="Create Costsheet(Agreement)" class="btn-primary"
                         data-hotkey="g"
                         invisible="approval_type != 'costsheet_agreement' or request_status != 'approved' or agreement_production_id"/>
 
             </xpath>
+        </field>
+    </record>
+
+    <record id="approval_product_line_view_tree_remainingqty" model="ir.ui.view">
+        <field name="name">approval.product.line.view.tree</field>
+        <field name="model">approval.product.line</field>
+        <field name="inherit_id" ref="approvals.approval_product_line_view_tree"/>
+        <field name="arch" type="xml">
+            <field name="quantity" position="attributes">
+                <attribute name="sum">Total</attribute>
+            </field>
+            <field name="quantity" position="after">
+                <field name="mrp_demond_qty" readonly="1" force_save="1" sum="total"/>
+                <field name="remainig_qty" optional="hide" sum="total"/>
+                <field name="mrp_manufacture_id" optional="hide"/>
+            </field>
         </field>
     </record>
 </odoo>

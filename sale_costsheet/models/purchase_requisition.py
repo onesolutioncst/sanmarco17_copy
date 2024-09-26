@@ -125,7 +125,7 @@ class purchase_requisition(models.Model):
                     'purchase_requisition_id': self.id,
                     'name': line_obj.product_description_variants,
                     'purchase_requisition_line_id': line_obj.id,
-                    'quantity_percentage': 1,
+                    'quantity_percentage': 0.0,
                     'product_uom_qty': line_obj.product_qty,
                     'is_reached': True,
                 }
