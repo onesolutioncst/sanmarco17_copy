@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+        <record id="approval_category_data_suborder" model="approval.category">
+            <field name="name">Costsheet(Suborders)</field>
+            <field name="description">Costsheet Suborders</field>
+            <field name="approval_type">costsheet_suborder</field>
+            <field name="sequence">10</field>
+            <field name="has_date">optional</field>
+            <field name="has_period">optional</field>
+            <field name="has_product">required</field>
+            <field name="has_quantity">optional</field>
+            <field name="has_amount">no</field>
+            <field name="has_reference">no</field>
+            <field name="has_partner">no</field>
+            <field name="has_payment_method">no</field>
+            <field name="has_location">required</field>
+            <field name="requirer_document">optional</field>
+            <field name="approval_minimum">1</field>
+            <field name="manager_approval">approver</field>
+        </record>
+        <record id="approval_category_data_agreement" model="approval.category">
+            <field name="name">Costsheet(Agreement)</field>
+            <field name="description">Costsheet Agreement</field>
+            <field name="approval_type">costsheet_agreement</field>
+            <field name="sequence">11</field>
+            <field name="has_date">optional</field>
+            <field name="has_period">optional</field>
+            <field name="has_product">required</field>
+            <field name="has_quantity">optional</field>
+            <field name="has_amount">no</field>
+            <field name="has_reference">no</field>
+            <field name="has_partner">no</field>
+            <field name="has_payment_method">no</field>
+            <field name="has_location">required</field>
+            <field name="requirer_document">optional</field>
+            <field name="approval_minimum">1</field>
+            <field name="manager_approval">approver</field>
+        </record>
+
+    </data>
+</odoo>

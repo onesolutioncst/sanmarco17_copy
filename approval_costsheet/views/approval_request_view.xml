@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record id="approval_request_view_form_costsheet" model="ir.ui.view">
+        <field name="name">approval_request_view_form costsheet</field>
+        <field name="model">approval.request</field>
+        <field name="inherit_id" ref="approvals.approval_request_view_form"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='location']" position="before">
+                <field name="has_analytic_distribution" invisible="1"/>
+                <field name="has_picking_type_id" invisible="1"/>
+                <field name="has_location_src_id" invisible="1"/>
+                <field name="has_location_dest_id" invisible="1"/>
+                <field name="has_vendor_id" invisible="1"/>
+                <field name="has_product_id" invisible="1"/>
+                <field name="has_product_qty" invisible="1"/>
+                <field name="from_mrp" invisible="1"/>
+            </xpath>
+            <group name="request_details" position="after">
+                <group name="request_costsheet_details">
+                    <field name="mrp_production_id" invisible="from_mrp"/>
+                    <field name="product_id" invisible="has_product_id in ['no',False] or from_mrp"
+                           readonly="request_status != 'new'"
+                           required="has_product_id == 'required'"/>
+                    <field name="product_qty" invisible="has_product_qty in ['no',False] or from_mrp"
+                           readonly="request_status != 'new'"
+                           required="has_product_qty == 'required'"/>
+                    <field
+                            name="analytic_distribution"
+                            widget="analytic_distribution"
+                            groups="analytic.group_analytic_accounting"
+                            options="{'product_field': 'product_id', 'business_domain': 'purchase_order'}"
+                            invisible="has_analytic_distribution in ['no',False] or from_mrp"
+                            readonly="request_status != 'new'"
+                            required="has_analytic_distribution == 'required'"
+                    />
+                    <field name="picking_type_id" invisible="has_picking_type_id in ['no',False] or from_mrp"
+                           readonly="request_status != 'new'"
+                           required="has_picking_type_id == 'required'"/>
+                    <field name="location_src_id" invisible="has_location_src_id in ['no',False] or from_mrp"
+                           readonly="request_status != 'new'"
+                           required="has_location_src_id == 'required'"/>
+                    <field name="location_dest_id" invisible="has_location_dest_id in ['no',False] or from_mrp"
+                           readonly="request_status != 'new'"
+                           required="has_location_dest_id == 'required'"/>
+                    <field name="vendor_id" invisible="has_vendor_id in ['no',False] or from_mrp"
+                           readonly="request_status != 'new'"
+                           required="has_vendor_id == 'required'"/>
+                    <field name="suborder_production_id" readonly="1"
+                           invisible="approval_type != 'costsheet_suborder'"/>
+                    <field name="agreement_production_id" readonly="1"
+                           invisible="approval_type != 'costsheet_agreement'"/>
+                </group>
+            </group>
+            <xpath expr="//button[@name='action_confirm']" position="after">
+                <button name="action_create_costsheet_suborder" type="object"
+                        string="Create Costsheet(Suborder)" class="btn-primary"
+                        data-hotkey="g"
+                        invisible="approval_type != 'costsheet_suborder' or request_status != 'approved' or suborder_production_id"/>
+                <button name="action_create_costsheet_agreement" type="object"
+                        string="Create Costsheet(Agreement)" class="btn-primary"
+                        data-hotkey="g"
+                        invisible="approval_type != 'costsheet_agreement' or request_status != 'approved' or agreement_production_id"/>
+
+            </xpath>
+        </field>
+    </record>
+</odoo>
