@@ -11,6 +11,8 @@
                     <field name="upconsume_qty" optional="hide" sum="Total"/>
                     <field name="milestone_qty" optional="hide" sum="Total"/>
                     <field name="remaining_milestone_qty" optional="hide" sum="Total"/>
+                    <field name="mrp_manufacture_line_id" optional="hide"/>
+                    <field name="mrp_production_id" optional="hide"/>
                 </xpath>
                 <div name="button_box" position="inside">
                     <button name="action_view_milestone" type="object" class="oe_stat_button" icon="fa-list-alt"
@@ -117,19 +119,6 @@
                                options="{'currency_field': 'currency_id'}"
                                readonly="True"/>
                     </group>
-<!--                    <group>-->
-<!--                        <group>-->
-<!--                            <field name="retention_ar_amount" widget='monetary' options="{'currency_field': 'currency_id'}"-->
-<!--                                   readonly="True"/>-->
-<!--                            <field name="advanced_ar_amount" widget='monetary' options="{'currency_field': 'currency_id'}"-->
-<!--                                   readonly="True"/>-->
-<!--                            <field name="insurance_ar_amount" widget='monetary' options="{'currency_field': 'currency_id'}"-->
-<!--                                   readonly="True"/>-->
-<!--                            <field name="costsheet_inv_total_amount" widget='monetary' options="{'currency_field': 'currency_id'}"-->
-<!--                                   readonly="True"/>-->
-<!--                        </group>-->
-
-<!--                    </group>-->
                 </xpath>
             </field>
         </record>

@@ -22,7 +22,7 @@ class sale_order(models.Model):
     insurance_dis_type = fields.Selection([('fixed', 'Fixed'), ('percentage', 'Percentage')], 'Type')
     insurance_amount = fields.Float('Amount')
 
-    costsheet_inv_total_amount = fields.Float('Total Amount', compute="calc_costsheet_total_amount", store=True, precompute=True)
+    costsheet_inv_total_amount = fields.Float('Total Invoiced Amount', compute="calc_costsheet_total_amount", store=True, precompute=True)
     retention_ar_amount = fields.Float('Retention(AR) Amount', compute="calc_costsheet_total_amount", store=True, precompute=True)
     advanced_ar_amount = fields.Float('Advanced(AR) Amount', compute="calc_costsheet_total_amount", store=True, precompute=True)
     insurance_ar_amount = fields.Float('Insurance(AR) Amount', compute="calc_costsheet_total_amount", store=True, precompute=True)
@@ -33,15 +33,15 @@ class sale_order(models.Model):
     project_task_type_ids = fields.Many2many('project.task.type', string="Project Stages")
     can_see_contract_terms = fields.Boolean('Can See Contract Terms', compute="calc_can_see_contract_terms")
 
-    product_amount_is_discount = fields.Float(string= 'Is Discount Amount', compute="calc_product_type_amount")
-    product_amount_refundable = fields.Float(string= 'Is Refundable Amount', compute="calc_product_type_amount")
-    product_amount_subcontractor = fields.Float(string= 'Is Subcontractor Amount', compute="calc_product_type_amount")
-    product_amount_additional = fields.Float(string= 'Is Additional Amount', compute="calc_product_type_amount")
-    product_amount_variation_Order = fields.Float(string= 'Is Variation Order Amount', compute="calc_product_type_amount")
-    product_amount_wages = fields.Float(string= 'Is Wages Amount', compute="calc_product_type_amount")
-    product_amount_supplier = fields.Float(string= 'Is Supplier Amount', compute="calc_product_type_amount")
-    product_amount_customer = fields.Float(string= 'Is Customer Amount', compute="calc_product_type_amount")
-    product_amount_costsheet = fields.Float(string= 'Is Costsheet Amount', compute="calc_product_type_amount")
+    product_amount_is_discount = fields.Float(string= 'Is Discount Amount', compute="calc_product_type_amount", store=True)
+    product_amount_refundable = fields.Float(string= 'Is Refundable Amount', compute="calc_product_type_amount", store=True)
+    product_amount_subcontractor = fields.Float(string= 'Is Subcontractor Amount', compute="calc_product_type_amount", store=True)
+    product_amount_additional = fields.Float(string= 'Is Additional Amount', compute="calc_product_type_amount", store=True)
+    product_amount_variation_Order = fields.Float(string= 'Is Variation Order Amount', compute="calc_product_type_amount", store=True)
+    product_amount_wages = fields.Float(string= 'Is Wages Amount', compute="calc_product_type_amount", store=True)
+    product_amount_supplier = fields.Float(string= 'Is Supplier Amount', compute="calc_product_type_amount", store=True)
+    product_amount_customer = fields.Float(string= 'Is Customer Amount', compute="calc_product_type_amount", store=True)
+    product_amount_costsheet = fields.Float(string= 'Is Costsheet Amount', compute="calc_product_type_amount", store=True)
 
     @api.depends('order_line')
     def calc_product_type_amount(self):
@@ -92,6 +92,7 @@ class sale_order(models.Model):
             if self.user_has_groups('sale_costsheet.group_costsheet_contract_terms'):
                 record.can_see_contract_terms=True
 
+    @api.depends('invoice_count', 'invoice_ids', 'invoice_status', 'last_invoice_date', '')
     def calc_costsheet_total_amount(self):
         for record in self:
             retention_ar_amount = 0.0
@@ -200,7 +201,7 @@ class sale_order(models.Model):
 class sale_order_line(models.Model):
     _inherit = "sale.order.line"
 
-    mrp_production_costsheet_id = fields.Many2one('mrp.production')
+    mrp_production_costsheet_id = fields.Many2one('mrp.production', copy=False)
 
     def _timesheet_create_project(self):
         project = super(sale_order_line, self)._timesheet_create_project()
@@ -222,3 +223,8 @@ class sale_order_line(models.Model):
         if self.order_id and self.order_id.project_startdate and self.product_id.project_age:
             res.update({'planned_date_begin': self.order_id.project_startdate ,'date_deadline': self.order_id.project_startdate + timedelta(days=self.product_id.project_age)})
         return res
+
+    # def copy(self, default=None):
+    #     default = dict(default or {})
+    #     default['mrp_production_costsheet_id'] = ''
+    #     return super(sale_order_line, self).copy(default)
