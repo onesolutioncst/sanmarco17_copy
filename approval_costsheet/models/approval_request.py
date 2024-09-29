@@ -2,7 +2,7 @@ from odoo import api, fields, models, _, SUPERUSER_ID, tools
 import logging, json
 
 from odoo.addons.test_convert.tests.test_env import record
-from odoo.exceptions import ValidationError
+from odoo.exceptions import ValidationError, UserError
 
 _logger = logging.getLogger(__name__)
 DATES_FORMAT = "%Y-%m-%d"
@@ -205,6 +205,7 @@ class approval_request(models.Model):
                 subtype_xmlid='mail.mt_note',
             )
         return True
+
     def action_create_costsheet_multi_suborder(self):
         mrp_per_order = []
         mrp_per_order_dic = {}
