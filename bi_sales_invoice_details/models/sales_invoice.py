@@ -2,18 +2,19 @@
 # Part of BrowseInfo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models, _
-
+import logging
+_logger = logging.getLogger(__name__)
 
 class SaleOrderUpdate(models.Model):
     _inherit = 'sale.order'
 
-    invoiced_amount = fields.Float(string = 'Invoiced Amount' ,compute ='_compute_invoice_amount',compute_sudo=True)
-    amount_due = fields.Float(string ='Amount Due',compute ='_compute_amount_due',compute_sudo=True)
-    paid_amount = fields.Float(string ='Paid Amount',compute ='_compute_paid_amount',compute_sudo=True ,default=0.0)
-    amount_paid_percent = fields.Float(compute = 'action_amount_paid',compute_sudo=True)
+    invoiced_amount = fields.Float(string = 'Invoiced Amount' ,compute ='_compute_invoice_amount',compute_sudo=True, store=True)
+    amount_due = fields.Float(string ='Amount Due',compute ='_compute_amount_due',compute_sudo=True, store=True)
+    paid_amount = fields.Float(string ='Paid Amount',compute ='_compute_paid_amount',compute_sudo=True ,default=0.0, store=True)
+    amount_paid_percent = fields.Float(compute = 'action_amount_paid',compute_sudo=True, store=True)
     currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.user.company_id.currency_id)
-    
 
+    @api.depends('invoice_count', 'invoice_ids', 'invoice_status', 'last_invoice_date')
     def _compute_invoice_amount(self):
         for record in self:
             invoice_id = self.env['account.move'].search(['&',('invoice_origin','=', record.name),'|',('state','=','draft'),('state','=','posted'),
