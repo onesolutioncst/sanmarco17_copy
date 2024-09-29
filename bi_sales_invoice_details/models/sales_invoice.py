@@ -14,7 +14,7 @@ class SaleOrderUpdate(models.Model):
     amount_paid_percent = fields.Float(compute = 'action_amount_paid',compute_sudo=True, store=True)
     currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.user.company_id.currency_id)
 
-    @api.depends('invoice_count', 'invoice_ids', 'invoice_status', 'last_invoice_date')
+    @api.depends('invoice_count', 'invoice_ids', 'invoice_status')
     def _compute_invoice_amount(self):
         for record in self:
             invoice_id = self.env['account.move'].search(['&',('invoice_origin','=', record.name),'|',('state','=','draft'),('state','=','posted'),
