@@ -7,6 +7,59 @@
             <field name="model">account.move</field>
             <field name="inherit_id" ref="account.view_move_form"/>
             <field name="arch" type="xml">
+                <div name="journal_div" position="after">
+                    <field name="can_see_contract_terms" invisible="1"/>
+                    <label for="is_retention_ar" invisible="not can_see_contract_terms" class="oe_inline"/>
+                    <div invisible="not can_see_contract_terms">
+                        <field name="is_retention_ar" readonly="state != 'draft'"/>
+                        <label for="rentention_dis_type" string="" class="oe_inline"
+                               invisible="is_retention_ar == False" readonly="state != 'draft'"/>
+                        <div class="oe_inline" invisible="is_retention_ar == False">
+                            <field name="rentention_dis_type" invisible="is_retention_ar == False"
+                                   readonly="state != 'draft'"
+                                   required="is_retention_ar == True" class="oe_inline"/>
+                            <field name="rentention_amount" invisible="rentention_dis_type == 'percentage'"
+                                   readonly="state != 'draft'"
+                                   required="is_retention_ar == True" class="oe_inline"/>
+                            <field name="rentention_amount" invisible="rentention_dis_type == 'fixed'"
+                                   readonly="state != 'draft'"
+                                   widget="percentage" required="is_retention_ar == True" class="oe_inline"/>
+                        </div>
+                    </div>
+
+                    <label for="is_advanced_ar" class="oe_inline" invisible="not can_see_contract_terms"/>
+                    <div invisible="not can_see_contract_terms">
+                        <field name="is_advanced_ar" readonly="state != 'draft'"/>
+                        <label for="advanced_dis_type" string="" class="oe_inline" invisible="is_advanced_ar == False"/>
+                        <div class="oe_inline" invisible="is_advanced_ar == False">
+                            <field name="advanced_dis_type" required="is_advanced_ar == True" class="oe_inline"
+                                   readonly="state != 'draft'"/>
+                            <field name="advanced_amount" invisible="advanced_dis_type == 'percentage'"
+                                   readonly="state != 'draft'"
+                                   required="is_advanced_ar == True" class="oe_inline"/>
+                            <field name="advanced_amount" invisible="advanced_dis_type == 'fixed'" widget="percentage"
+                                   readonly="state != 'draft'"
+                                   required="is_advanced_ar == True" class="oe_inline"/>
+                        </div>
+                    </div>
+
+                    <label for="is_insurance_ar" class="oe_inline" invisible="not can_see_contract_terms"/>
+                    <div invisible="not can_see_contract_terms">
+                        <field name="is_insurance_ar" readonly="state != 'draft'"/>
+                        <label for="insurance_dis_type" string="" class="oe_inline"
+                               invisible="is_insurance_ar == False"/>
+                        <div class="oe_inline" invisible="is_insurance_ar == False">
+                            <field name="insurance_dis_type" required="is_insurance_ar == True" class="oe_inline"
+                                   readonly="state != 'draft'"/>
+                            <field name="insurance_amount" invisible="insurance_dis_type == 'percentage'"
+                                   readonly="state != 'draft'"
+                                   required="is_insurance_ar == True" class="oe_inline"/>
+                            <field name="insurance_amount" invisible="insurance_dis_type == 'fixed'" widget="percentage"
+                                   readonly="state != 'draft'"
+                                   required="is_insurance_ar == True" class="oe_inline"/>
+                        </div>
+                    </div>
+                </div>
                 <xpath expr="//field[@name='narration']" position="after">
                    <group name="amounts" string="Amounts" >
                         <field name="retention_ar_amount" widget='monetary'

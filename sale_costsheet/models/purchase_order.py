@@ -294,6 +294,19 @@ class purchase_order(models.Model):
                         purchase_order_line_obj.purchase_requisition_line_id.mrp_manufacture_line_id.total_up = purchase_order_line_obj.product_qty - purchase_order_line_obj.purchase_requisition_line_id.mrp_manufacture_line_id.product_uom_qty
         return res
 
+    def _prepare_invoice(self):
+        invoice_vals = super(purchase_order, self)._prepare_invoice()
+        invoice_vals['cons_purchase_id'] = self.id
+        invoice_vals['is_retention_ar'] = self.is_retention_ar
+        invoice_vals['rentention_dis_type'] = self.rentention_dis_type
+        invoice_vals['rentention_amount'] = self.rentention_amount
+        invoice_vals['is_advanced_ar'] = self.is_advanced_ar
+        invoice_vals['advanced_dis_type'] = self.advanced_dis_type
+        invoice_vals['advanced_amount'] = self.advanced_amount
+        invoice_vals['is_insurance_ar'] = self.is_insurance_ar
+        invoice_vals['insurance_dis_type'] = self.insurance_dis_type
+        invoice_vals['insurance_amount'] = self.insurance_amount
+        return invoice_vals
 
 class purchase_order_line(models.Model):
     _inherit = "purchase.order.line"
