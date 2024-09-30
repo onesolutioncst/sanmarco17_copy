@@ -5,8 +5,31 @@ from datetime import datetime, time
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
 
+class PurchaseRequisitionGroup(models.Model):
+    _name = 'purchase.requisition.group'
+    _description = "Technical model to group PO for call to tenders"
+
+    order_ids = fields.One2many('purchase.requisition', 'purchase_requisition_group_id')
+
+    def write(self, vals):
+        res = super().write(vals)
+        # when len(POs) == 1, only linking PO to itself at this point => self implode (delete) group
+        self.filtered(lambda g: len(g.order_ids) <= 1).unlink()
+        return res
+
+
 class PurchaseRequisition(models.Model):
     _inherit = "purchase.requisition"
+
+    purchase_requisition_group_id = fields.Many2one('purchase.requisition.group')
+    alternative_pr_ids2 = fields.One2many(
+        'purchase.requisition', related='purchase_requisition_group_id.order_ids',
+        string="Alternative PR", check_company=True,
+        help="Other potential purchase agreement for requestion products")
+
+
+
+
 
     alternative_pr_ids = fields.One2many(
         'purchase.requisition', 'purchase_requisition_id',
@@ -54,7 +77,7 @@ class PurchaseRequisition(models.Model):
             'view_mode': 'list',
             'res_model': 'purchase.requisition.line',
             'views': [(view_id, "list")],
-            'domain': [('requisition_id', 'in', (self | self.alternative_pr_ids).ids)],
+            'domain': [('requisition_id', 'in', (self | self.alternative_pr_ids2).ids)],
             'context': ctx,
         }
 

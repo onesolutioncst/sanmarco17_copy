@@ -19,13 +19,19 @@ class purchaseagreementcreatealternative(models.TransientModel):
         help="If this is checked, the product quantities of the original PO will be copied")
 
     def action_create_alternative(self):
-        # if self.env.user.has_group('purchase.group_warning_purchase') and self.creation_blocked:
-        #     raise UserError(
-        #         _('The vendor you have selected or at least one of the products you are copying from the original '
-        #           'order has a blocking warning on it and cannot be selected to create an alternative.')
-        #     )
+        requisition_group_list = [(4, self.origin_po_id.id)]
         vals = self._get_alternative_values()
-        alt_po = self.env['purchase.requisition'].with_context(origin_po_id=self.origin_po_id.id, default_requisition_id=False).create(vals)
+        alt_po = self.env['purchase.requisition'].with_context(origin_po_id=self.origin_po_id.id,
+                                                               default_requisition_id=False).create(vals)
+        requisition_group_list.append((4, alt_po.id))
+        for requisition_group_obj in self.origin_po_id.alternative_pr_ids2:
+            requisition_group_list.append((4, requisition_group_obj.id))
+        alt_pr = self.env['purchase.requisition.group'].create({
+            'order_ids': requisition_group_list
+        })
+
+        # vals = self._get_alternative_values()
+        # alt_po = self.env['purchase.requisition'].with_context(origin_po_id=self.origin_po_id.id, default_requisition_id=False).create(vals)
         # alt_po.order_line._compute_tax_id()
         return {
             'type': 'ir.actions.act_window',
