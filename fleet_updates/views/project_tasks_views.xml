@@ -7,7 +7,7 @@
             <field name="inherit_id" ref="hr_timesheet.view_task_form2_inherited"/>
             <field name="arch" type="xml">
                 <xpath expr="//page[@name='page_timesheets']//field[@name='timesheet_ids']//field[@name='employee_id']" position="after">
-                    <field name="fleet_equipment_existing_employee_id" />
+                    <field name="fleet_equipment_existing_employee_id" invisible="1"/>
                 </xpath>
 
                 <xpath expr="//page[@name='page_timesheets']//field[@name='timesheet_ids']//field[@name='employee_id']"
