@@ -5,10 +5,8 @@
         <field name="model">fleet.vehicle</field>
         <field name="inherit_id" ref="fleet.fleet_vehicle_view_form"/>
         <field name="arch" type="xml">
-            <header position="inside">
-                <field name="task_state" widget="statusbar" options="{'clickable': '1', 'fold_field': 'fold'}"/>
-            </header>
             <xpath expr="//field[@name='location']" position="after">
+                <field name="task_state" />
                 <label for="is_product" class="oe_inline"/>
                 <div>
                     <field name="is_product"/>
