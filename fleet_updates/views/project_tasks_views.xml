@@ -1,7 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+        <record model="ir.ui.view" id="task_form_view_employeedomain">
+            <field name="name">project.task.leave.form.view</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="hr_timesheet.view_task_form2_inherited"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='page_timesheets']//field[@name='timesheet_ids']//field[@name='employee_id']" position="after">
+                    <field name="fleet_equipment_existing_employee_id" />
+                </xpath>
 
+                <xpath expr="//page[@name='page_timesheets']//field[@name='timesheet_ids']//field[@name='employee_id']"
+                       position="attributes">
+                    <attribute name="domain">[('id','not in',fleet_equipment_existing_employee_id)]</attribute>
+                </xpath>
+
+            </field>
+        </record>
         <record id="view_task_form2_fleetusers" model="ir.ui.view">
             <field name="name">project.task.view.fleetuser</field>
             <field name="model">project.task</field>
@@ -10,12 +25,14 @@
             <field name="arch" type="xml">
                 <field name="user_ids" position="after">
                     <field name="fleet_user_ids" class="o_task_user_field"
-                           options="{'no_open': True, 'no_quick_create': True, 'no_create':True}" widget="many2many_avatar_user"/>
+                           options="{'no_open': True, 'no_quick_create': True, 'no_create':True}"
+                           widget="many2many_avatar_user"/>
                     <field name="fleet_existing_id" invisible="1"/>
                     <field name="equipment_fleet_existing_id" invisible="1"/>
                 </field>
                 <field name="user_ids" position="attributes">
-                    <attribute name="domain">[('active', '=', True), ('id', 'not in', equipment_fleet_existing_id)]</attribute>
+                    <attribute name="domain">[('active', '=', True), ('id', 'not in', equipment_fleet_existing_id)]
+                    </attribute>
                 </field>
                 <xpath expr="//notebook/page[@name='description_page']" position="after">
                     <field name="allow_fleet_timesheets" invisible="1"/>

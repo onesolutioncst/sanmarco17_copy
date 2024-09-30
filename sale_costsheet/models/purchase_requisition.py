@@ -125,9 +125,9 @@ class purchase_requisition(models.Model):
                     'purchase_requisition_id': self.id,
                     'name': line_obj.product_description_variants,
                     'purchase_requisition_line_id': line_obj.id,
-                    'quantity_percentage': 0.0,
+                    'quantity_percentage': 1,
                     'product_uom_qty': line_obj.product_qty,
-                    'is_reached': True,
+                    'is_reached': False,
                 }
             )
             line_obj.purchase_requisition_milestone_id = purchase_requisition_milestone_obj.id

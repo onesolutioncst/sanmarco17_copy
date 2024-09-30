@@ -8,30 +8,30 @@ DATES_FORMAT = "%Y-%m-%d"
 class sale_order(models.Model):
     _inherit = "sale.order"
 
-    is_costsheet = fields.Boolean('Costsheet')
+    is_costsheet = fields.Boolean('Costsheet', copy=False)
     costsheet_count = fields.Integer( compute="calc_costsheet_count")
     requisition_count= fields.Integer( compute="calc_costsheet_count")
     suborder_count = fields.Integer(compute="calc_costsheet_count")
-    is_retention_ar = fields.Boolean('Is Retention')
-    rentention_dis_type = fields.Selection([('fixed', 'Fixed'), ('percentage', 'Percentage')], 'Type')
-    rentention_amount = fields.Float('Amount')
-    is_advanced_ar = fields.Boolean('Is Advanced')
-    advanced_dis_type = fields.Selection([('fixed', 'Fixed'), ('percentage', 'Percentage')], 'Type')
-    advanced_amount = fields.Float('Amount')
-    is_insurance_ar = fields.Boolean('Is Insurance')
-    insurance_dis_type = fields.Selection([('fixed', 'Fixed'), ('percentage', 'Percentage')], 'Type')
-    insurance_amount = fields.Float('Amount')
+    is_retention_ar = fields.Boolean('Is Retention', copy=False)
+    rentention_dis_type = fields.Selection([('fixed', 'Fixed'), ('percentage', 'Percentage')], 'Type', copy=False)
+    rentention_amount = fields.Float('Amount', copy=False)
+    is_advanced_ar = fields.Boolean('Is Advanced', copy=False)
+    advanced_dis_type = fields.Selection([('fixed', 'Fixed'), ('percentage', 'Percentage')], 'Type', copy=False)
+    advanced_amount = fields.Float('Amount', copy=False)
+    is_insurance_ar = fields.Boolean('Is Insurance', copy=False)
+    insurance_dis_type = fields.Selection([('fixed', 'Fixed'), ('percentage', 'Percentage')], 'Type', copy=False)
+    insurance_amount = fields.Float('Amount', copy=False)
 
     costsheet_inv_total_amount = fields.Float('Total Invoiced Amount', compute="calc_costsheet_total_amount", store=True, precompute=True)
     retention_ar_amount = fields.Float('Retention(AR) Amount', compute="calc_costsheet_total_amount", store=True, precompute=True)
     advanced_ar_amount = fields.Float('Advanced(AR) Amount', compute="calc_costsheet_total_amount", store=True, precompute=True)
     insurance_ar_amount = fields.Float('Insurance(AR) Amount', compute="calc_costsheet_total_amount", store=True, precompute=True)
 
-    project_startdate = fields.Date('Project Start Date', trace=True)
-    project_enddate = fields.Date('Project Start Date', trace=True)
+    project_startdate = fields.Date('Project Start Date', trace=True, copy=False)
+    project_enddate = fields.Date('Project Start Date', trace=True, copy=False)
     is_warehouse = fields.Boolean('IS Warehouse')
-    project_task_type_ids = fields.Many2many('project.task.type', string="Project Stages")
-    can_see_contract_terms = fields.Boolean('Can See Contract Terms', compute="calc_can_see_contract_terms")
+    project_task_type_ids = fields.Many2many('project.task.type', string="Project Stages", copy=False)
+    can_see_contract_terms = fields.Boolean('Can See Contract Terms', compute="calc_can_see_contract_terms", copy=False)
 
     product_amount_is_discount = fields.Float(string= 'Is Discount Amount', compute="calc_product_type_amount", store=True)
     product_amount_refundable = fields.Float(string= 'Is Refundable Amount', compute="calc_product_type_amount", store=True)
@@ -184,6 +184,15 @@ class sale_order(models.Model):
     def _prepare_invoice(self):
         invoice_vals = super(sale_order, self)._prepare_invoice()
         invoice_vals['cons_sale_id'] = self.id
+        invoice_vals['is_retention_ar'] = self.is_retention_ar
+        invoice_vals['rentention_dis_type'] = self.rentention_dis_type
+        invoice_vals['rentention_amount'] = self.rentention_amount
+        invoice_vals['is_advanced_ar'] = self.is_advanced_ar
+        invoice_vals['advanced_dis_type'] = self.advanced_dis_type
+        invoice_vals['advanced_amount'] = self.advanced_amount
+        invoice_vals['is_insurance_ar'] = self.is_insurance_ar
+        invoice_vals['insurance_dis_type'] = self.insurance_dis_type
+        invoice_vals['insurance_amount'] = self.insurance_amount
         return invoice_vals
 
     def action_confirm(self):

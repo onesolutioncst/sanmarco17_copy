@@ -8,11 +8,22 @@ class account_analytic_line(models.Model):
     _inherit = "account.analytic.line"
 
     equipment_existing_employee_id = fields.Many2many('hr.employee', compute='_compute_equipment_existing_employee_ids')
-
     def _compute_equipment_existing_employee_ids(self):
         for record in self:
             hr_employee_objs = self.env['hr.employee'].sudo().search([('is_equipment', '=', True), ('employee_type', '=', 'equipment')])
             record.equipment_existing_employee_id = hr_employee_objs.ids
+
+    equipment_fleet_existing_employee_id = fields.Many2many('hr.employee',
+                                                            compute='_compute_equipment_fleet_existing_employee_ids')
+    @api.onchange('date')
+    def _compute_equipment_fleet_existing_employee_ids(self):
+        for record in self:
+            domain = [('is_equipment', '=', True), ('employee_type', '=', 'equipment')]
+            if 'is_fleet' in self.env['hr.employee'].sudo()._fields:
+                domain = ['|', '|', ('is_fleet', '=', True), ('is_equipment', '=', True),
+                          ('employee_type', 'in', ['fleet', 'equipment'])]
+            hr_employee_objs = self.env['hr.employee'].sudo().search(domain)
+            record.equipment_fleet_existing_employee_id = hr_employee_objs.ids
 
     @api.model
     def default_get(self, field_list):
