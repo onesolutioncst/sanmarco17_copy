@@ -15,7 +15,7 @@
                         <button name="reset_to_draft" type="object" string="Reset To Draft"
                                 invisible="state not in ['done','cancelled']"/>
                         <button name="create_order" type="object" string="Create Order"
-                                invisible="type not in ['sale','purchase'] or purchase_id or sale_id"/>
+                                invisible="type not in ['sale','purchase','rental'] or purchase_id or sale_id"/>
                         <button name="create_invoice" type="object" string="Create Invoice"
                                 invisible="type not in ['vendor_bill','customer_invoice'] or invoice_id"/>
                         <button name="create_repair" type="object" string="Create Repair"
@@ -26,24 +26,47 @@
                         <widget name="web_ribbon" title="Archived" bg_color="text-bg-danger" invisible="active"/>
                         <group col="2">
                             <group>
-                                <field name="description" readonly="state in ['done','cancelled'] or invoice_id or sale_id or purchase_id or repair_id"/>
-                                <field name="service_type_id" options="{'no_create': True, 'no_create_edit':True}"
+                                <field name="description"
                                        readonly="state in ['done','cancelled'] or invoice_id or sale_id or purchase_id or repair_id"/>
-                                <field name="type" required="1" readonly="1"/>
-                                <field name="date" required="1" readonly="state in ['done','cancelled'] or invoice_id or sale_id or purchase_id or repair_id"/>
-                                <field name="amount" widget="monetary" readonly="state in ['done','cancelled'] or invoice_id or sale_id or purchase_id or repair_id"/>
+                                <field name="service_type_id" options="{'no_create': True, 'no_create_edit':True}"
+                                       domain="[('category','=','service')]"
+                                       readonly="state in ['done','cancelled'] or invoice_id or sale_id or purchase_id or repair_id"/>
+                                <field name="type" required="1" readonly="1" invisible="1"/>
+                                <field name="date" required="1"
+                                       readonly="state in ['done','cancelled'] or invoice_id or sale_id or purchase_id or repair_id"/>
+                                <field name="amount" widget="monetary"
+                                       readonly="state in ['done','cancelled'] or invoice_id or sale_id or purchase_id or repair_id"/>
                             </group>
                             <group>
-                                <field name="maintenance_equipment_id" readonly="state in ['done','cancelled'] or invoice_id or sale_id or purchase_id or repair_id"/>
+                                <field name="maintenance_equipment_id"
+                                       readonly="state in ['done','cancelled'] or invoice_id or sale_id or purchase_id or repair_id"/>
                                 <field name="vendor_id" widget="many2one_avatar"
                                        invisible="type not in ['purchase','vendor_bill','repair']"
                                        required="type in ['purchase','vendor_bill','repair']"
                                        readonly="state in ['done','cancelled'] or invoice_id or sale_id or purchase_id or repair_id"/>
                                 <field name="customer_id"
-                                       invisible="type not in ['sale','customer_invoice','repair']"
-                                       required="type in ['sale','customer_invoice','repair']"
+                                       invisible="type not in ['sale','customer_invoice','repair','rental']"
+                                       required="type in ['sale','customer_invoice','repair','rental']"
                                        readonly="state in ['done','cancelled'] or invoice_id or sale_id or purchase_id or repair_id"/>
-                                <field name="sale_id" invisible="type !='sale'" readonly="1"/>
+
+                                <label for="rental_start_date" string="Rental Dates" invisible="type not in ['rental']"/>
+                                <div name="dates" class="o_row" invisible="type not in ['rental']"
+                                     readonly="state in ['done','cancelled'] or invoice_id or sale_id or purchase_id or repair_id">
+                                    <field name="rental_start_date" widget="daterange"
+                                           required="type in ['rental']"
+                                           placeholder="From ..."
+                                           options="{&quot;related_end_date&quot;: &quot;rental_return_date&quot;}"/>
+                                    <i class="fa fa-long-arrow-right mx-2 oe_edit_only" aria-label="Arrow icon"
+                                       title="Arrow"/>
+                                    <i class="fa fa-long-arrow-right mx-2 oe_read_only" aria-label="Arrow icon"
+                                       title="Arrow"
+                                       invisible="not rental_start_date and not rental_return_date"/>
+                                    <field name="rental_return_date" widget="daterange"
+                                           required="type in ['rental']"
+                                           placeholder="To ..."
+                                           options="{&quot;related_start_date&quot;: &quot;rental_start_date&quot;}"/>
+                                </div>
+                                <field name="sale_id" invisible="type not in ['sale','rental']" readonly="1"/>
                                 <field name="purchase_id" invisible="type !='purchase'" readonly="1"/>
                                 <field name="invoice_id" string="Vendor Bill" readonly="1" force_save="1"
                                        invisible="type !='vendor_bill'"/>
@@ -55,9 +78,11 @@
                             </group>
                         </group>
                         <separator string="Notes"/>
-                        <field nolabel="1" name="notes" readonly="state in ['done','cancelled'] or invoice_id or sale_id or purchase_id or repair_id"
+                        <field nolabel="1" name="notes"
+                               readonly="state in ['done','cancelled'] or invoice_id or sale_id or purchase_id or repair_id"
                                placeholder="Write here any other information related to the service completed."/>
-                        <field name="lines_ids" readonly="state in ['done','cancelled'] or invoice_id or sale_id or purchase_id or repair_id">
+                        <field name="lines_ids"
+                               readonly="state in ['done','cancelled'] or invoice_id or sale_id or purchase_id or repair_id">
                             <tree editable="bottom">
                                 <field name="type" readonly="parent.type != 'repair'"
                                        column_invisible="parent.type != 'repair'"/>
@@ -109,8 +134,6 @@
                 </p>
             </field>
         </record>
-        <menuitem action="fleet.fleet_vehicle_service_types_action" parent="maintenance.menu_maintenance_configuration" name="Types"
-                  id="equipment_vehicle_service_types_menu" sequence="1" groups="base.group_no_one"/>
 
     </odoo>
 </odoo>

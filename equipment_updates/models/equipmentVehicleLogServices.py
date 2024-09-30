@@ -1,6 +1,6 @@
 from odoo import api, fields, models, _
 from odoo.exceptions import ValidationError
-
+from dateutil.relativedelta import relativedelta
 
 class equipmentVehicleLogServices(models.Model):
     _name = 'equipment.vehicle.log.services'
@@ -32,7 +32,28 @@ class equipmentVehicleLogServices(models.Model):
     lines_ids = fields.One2many("equipment.vehicle.log.services.lines", "equipment_log_id", "Lines")
     equipment_owner = fields.Many2one('res.partner', string='Equipment Owner', copy=False)
     service_type_id = fields.Many2one(
-        'fleet.service.type', 'Service Type', required=True) #default=lambda self: self.env.ref('fleet.type_service_service_7', raise_if_not_found=False),
+        'equipment.service.type', 'Service Type', required=True) #default=lambda self: self.env.ref('fleet.type_service_service_7', raise_if_not_found=False),
+
+    def _get_rental_start_date(self):
+        return fields.Datetime.now().replace(minute=0, second=0) + relativedelta(hours=1)
+    def _get_rental_return_date(self):
+        return fields.Datetime.now().replace(minute=0, second=0) + relativedelta(hours=1) + relativedelta(days=1)
+    rental_start_date = fields.Datetime(string="Rental Start Date", tracking=True, default=_get_rental_start_date)
+    rental_return_date = fields.Datetime(string="Rental Return Date", tracking=True, default=_get_rental_return_date)
+    duration_days = fields.Integer(
+        string="Duration in days",
+        compute='_compute_duration',
+        help="The duration in days of the rental period.",
+    )
+
+    @api.depends('rental_start_date', 'rental_return_date')
+    def _compute_duration(self):
+        self.duration_days = 0
+        self.remaining_hours = 0
+        for order in self:
+            if order.rental_start_date and order.rental_return_date:
+                duration = order.rental_return_date - order.rental_start_date
+                order.duration_days = duration.days
 
     def unlink(self):
         for record in self:
@@ -117,7 +138,26 @@ class equipmentVehicleLogServices(models.Model):
                     'order_line': lines,
                 })
                 self.purchase_id = purchase_obj.id
-
+            elif self.service_type_id.type == 'rental':
+                if self.sale_id:
+                    raise ValidationError(_("Sorry Theres sale order created, please reset to order draft .."))
+                lines = []
+                for line in self.lines_ids:
+                    lines.append((0, 0, {
+                        'product_id': line.product_id.id,
+                        'name': line.name,
+                        'price_unit': line.price_unit,
+                        'product_uom_qty': line.qty,
+                        'tax_id': line.taxes_id.ids,
+                    }))
+                sale_obj = self.env['sale.order'].create({
+                    'partner_id': self.customer_id.id,
+                    'rental_start_date': self.rental_start_date,
+                    'rental_return_date': self.rental_return_date,
+                    'order_line': lines,
+                    'is_rental_order': True
+                })
+                self.sale_id = sale_obj.id
     def create_invoice(self):
         if self.service_type_id.type == 'vendor_bill':
             lines = []

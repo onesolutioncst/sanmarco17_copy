@@ -23,10 +23,8 @@
                         <field name="contract_count" widget="statinfo" string="Contracts"/>
                     </button>
                 </div>
-                <sheet position="inside">
-                    <field name="task_state" widget="statusbar" options="{'clickable': '1', 'fold_field': 'fold'}"/>
-                </sheet>
                 <xpath expr="//field[@name='workcenter_id']" position="after">
+                    <field name="task_state" />
                     <label for="is_product" class="oe_inline"/>
                     <div>
                         <field name="is_product"/>

@@ -3,7 +3,4 @@ access_equipment_vehicle_log_services,equipment_vehicle_log_services,model_equip
 access_equipment_vehicle_log_services_lines,equipment_vehicle_log_services_lines,model_equipment_vehicle_log_services_lines,,1,1,1,1
 access_equipment_vehicle_log_contract_lines,equipment_vehicle_log_contract_lines,model_equipment_vehicle_log_contract_lines,,1,1,1,1
 access_equipment_vehicle_log_contract,equipment_vehicle_log_contract,model_equipment_vehicle_log_contract,,1,1,1,1
-
-
-
-
+access_equipment_service_type,equipment_service_type,model_equipment_service_type,,1,1,1,1
