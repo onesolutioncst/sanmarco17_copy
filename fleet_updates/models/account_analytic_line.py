@@ -4,14 +4,27 @@ import logging
 _logger = logging.getLogger(__name__)
 DATES_FORMAT = "%Y-%m-%d"
 
+
 class account_analytic_line(models.Model):
     _inherit = "account.analytic.line"
 
     fleet_existing_employee_id = fields.Many2many('hr.employee', compute='_compute_fleet_existing_employee_ids')
+    fleet_equipment_existing_employee_id = fields.Many2many('hr.employee',
+                                                            compute='_compute_fleet_equipment_existing_employee_ids')
+
+    @api.onchange('date')
+    def _compute_fleet_equipment_existing_employee_ids(self):
+        for record in self:
+            domain = [('is_fleet', '=', True), ('employee_type', '=', 'fleet')]
+            if 'is_equipment' in self.env['hr.employee'].sudo()._fields:
+                domain = ['|','|',('is_fleet', '=', True),('is_equipment', '=', True), ('employee_type', 'in', ['fleet','equipment'])]
+            hr_employee_objs = self.env['hr.employee'].sudo().search(domain)
+            record.fleet_equipment_existing_employee_id = hr_employee_objs.ids
 
     def _compute_fleet_existing_employee_ids(self):
         for record in self:
-            hr_employee_objs = self.env['hr.employee'].sudo().search([('is_fleet', '=', True), ('employee_type', '=', 'fleet')])
+            hr_employee_objs = self.env['hr.employee'].sudo().search(
+                [('is_fleet', '=', True), ('employee_type', '=', 'fleet')])
             record.fleet_existing_employee_id = hr_employee_objs.ids
 
     @api.model

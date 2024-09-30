@@ -29,6 +29,7 @@ class manufacture_agreement(models.TransientModel):
                         'product_id': mrp_suborders_details_obj.product_id.id,
                         'product_qty': mrp_suborders_details_obj.product_uom_qty,
                         'analytic_distribution': mrp_production.analytic_distribution,
+                        'mrp_production_id': mrp_production.id,
                         'mrp_manufacture_line_id': mrp_suborders_details_obj.id,
                     }))
         purchase_requisition_vals.update({

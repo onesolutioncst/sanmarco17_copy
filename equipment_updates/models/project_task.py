@@ -15,6 +15,8 @@ class project_task(models.Model):
         domain="[ ('id', 'in', equipment_existing_id)]"
     )
     equipment_existing_id = fields.Many2many('res.users', compute='_compute_equipment_existing_user_ids')
+    equipment_fleet_existing_id = fields.Many2many('res.users', compute='_compute_equipment_existing_user_ids')
+
     equipment_timesheet_ids = fields.One2many('account.analytic.line', 'task_id', 'Equipment Timesheets')
     allow_equipment_timesheets = fields.Boolean(
         "Allow Equipment timesheets",
@@ -26,6 +28,12 @@ class project_task(models.Model):
         for record in self:
             equipment_employee_objs = self.env['hr.employee'].sudo().search([('is_equipment','=',True), ('employee_type','=','equipment')])
             record.equipment_existing_id = equipment_employee_objs.user_id
+            if 'is_fleet' in self.env['hr.employee'].sudo()._fields:
+                fleet_equipment_employee_objs = self.env['hr.employee'].sudo().search(
+                    ['|','|','|', ('is_fleet', '=', True), ('is_equipment','=',True), ('employee_type', '=', 'fleet'),('employee_type','=','equipment')])
+                record.equipment_fleet_existing_id = fleet_equipment_employee_objs.user_id
+            else:
+                record.equipment_fleet_existing_id = equipment_employee_objs.user_id
 
     @api.depends('project_id.allow_equipment_timesheets')
     def _compute_allow_equipment_timesheets(self):

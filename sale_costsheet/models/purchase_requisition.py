@@ -125,9 +125,9 @@ class purchase_requisition(models.Model):
                     'purchase_requisition_id': self.id,
                     'name': line_obj.product_description_variants,
                     'purchase_requisition_line_id': line_obj.id,
-                    'quantity_percentage': 0.0,
+                    'quantity_percentage': 1,
                     'product_uom_qty': line_obj.product_qty,
-                    'is_reached': True,
+                    'is_reached': False,
                 }
             )
             line_obj.purchase_requisition_milestone_id = purchase_requisition_milestone_obj.id
@@ -147,6 +147,7 @@ class purchase_requisition_line(models.Model):
     milestone_qty = fields.Float(string="Milestone QTY", related="purchase_requisition_milestone_id.product_uom_qty")
     remaining_milestone_qty = fields.Float(string="Milestone QTY", compute="calc_remaining_milestone_qty")
     mrp_manufacture_line_id = fields.Many2one('stock.move', 'Components')
+    mrp_production_id = fields.Many2one('mrp.production', trace=True)
 
     def calc_remaining_milestone_qty(self):
         for record in self:
