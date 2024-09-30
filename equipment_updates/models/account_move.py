@@ -15,3 +15,9 @@ class sale_order(models.Model):
 
 
 
+class purchase_order(models.Model):
+    _inherit = 'purchase.order'
+
+    maintenance_equipment_id = fields.Many2one('maintenance.equipment', 'Equipment', required=True)
+
+

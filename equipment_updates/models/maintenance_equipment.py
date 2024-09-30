@@ -25,7 +25,7 @@ class maintenance_equipment(models.Model):
         ('03_approved', 'Approved'),
         *CLOSED_STATES.items(),
         ('04_waiting_normal', 'Waiting'),
-    ], string='State', compute="get_task_state"
+    ], string='Task State', compute="get_task_state"
     )
     service_count = fields.Integer(compute="_compute_count_all", string='Services')
     contract_count = fields.Integer(compute="_compute_count_all", string='Contract Count')

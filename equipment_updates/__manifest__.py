@@ -31,7 +31,7 @@
     'company': 'Onsolutionc LLC.',
     'maintainer': 'Onesolutionc Development Team',
     'website': "https://www.onesolutionc.com",
-    'depends': ['hr_maintenance', 'sale_costsheet', 'hr', 'project', 'hr_timesheet','fleet','repair'],
+    'depends': ['hr_maintenance', 'sale_costsheet', 'hr', 'project', 'hr_timesheet','repair'],
     'data': [
         'security/ir.model.access.csv',
         'views/maintenance_equipment_view.xml',
@@ -42,6 +42,7 @@
         # 'views/fleet_vehicle_log_services.xml',
         'views/equipment_log_service_view.xml',
         'views/equipment_vehicle_log_contract_view.xml',
+        'views/equipment_service_type_view.xml',
     ],
     'images': [],
     'license': 'AGPL-3',

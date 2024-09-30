@@ -11,7 +11,7 @@ class equipmentvehiclelogcontract(models.Model):
 
     active = fields.Boolean(default=True)
     maintenance_equipment_id = fields.Many2one('maintenance.equipment', 'Equipment', required=True)
-    cost_subtype_id = fields.Many2one('fleet.service.type', 'Type', help='Cost type purchased with this cost',
+    cost_subtype_id = fields.Many2one('equipment.service.type', 'Type', help='Cost type purchased with this cost',
                                       domain=[('category', '=', 'contract')])
     type = fields.Selection("Type", related='cost_subtype_id.type', stroe=True, )
     amount = fields.Monetary('Cost', tracking=True)
@@ -41,6 +41,7 @@ class equipmentvehiclelogcontract(models.Model):
     sale_id = fields.Many2one("sale.order", "Sale Order")
     purchase_id = fields.Many2one("purchase.order", "Purchase Order")
     invoice_id = fields.Many2one("account.move", "Invoice")
+    repair_id = fields.Many2one('repair.order', 'Repair Order')
     notes = fields.Html('Terms and Conditions', copy=False)
     cost_generated = fields.Monetary('Recurring Cost', tracking=True)
     cost_frequency = fields.Selection([
@@ -54,6 +55,26 @@ class equipmentvehiclelogcontract(models.Model):
     net_car_value = fields.Float(string='Purchase Value')
     customer_id = fields.Many2one("res.partner", "Customer", )
     lines_ids = fields.One2many("equipment.vehicle.log.contract.lines", "equipment_log_id", "Lines")
+    def _get_rental_start_date(self):
+        return fields.Datetime.now().replace(minute=0, second=0) + relativedelta(hours=1)
+    def _get_rental_return_date(self):
+        return fields.Datetime.now().replace(minute=0, second=0) + relativedelta(hours=1) + relativedelta(days=1)
+    rental_start_date = fields.Datetime(string="Rental Start Date", tracking=True, default=_get_rental_start_date)
+    rental_return_date = fields.Datetime(string="Rental Return Date", tracking=True, default=_get_rental_return_date)
+    duration_days = fields.Integer(
+        string="Duration in days",
+        compute='_compute_duration',
+        help="The duration in days of the rental period.",
+    )
+
+    @api.depends('rental_start_date', 'rental_return_date')
+    def _compute_duration(self):
+        self.duration_days = 0
+        self.remaining_hours = 0
+        for order in self:
+            if order.rental_start_date and order.rental_return_date:
+                duration = order.rental_return_date - order.rental_start_date
+                order.duration_days = duration.days
 
     @api.depends('lines_ids')
     def _compute_amount(self):
@@ -190,6 +211,28 @@ class equipmentvehiclelogcontract(models.Model):
             return 'السبت'
         elif day_name == 'Sunday':
             return 'الاحد'
+    def get_picking_type_id(self):
+        companies = self.company_id or self.env.company
+        default_warehouse = self.env.user.with_company(companies.id)._get_default_warehouse_id()
+        if default_warehouse and default_warehouse.repair_type_id:
+            return default_warehouse.repair_type_id.id
+
+    def create_repair(self):
+        if self.cost_subtype_id.type == 'repair':
+            lines = []
+            for line in self.lines_ids:
+                lines.append((0, 0, {
+                        'repair_line_type': line.type,
+                    'product_id': line.product_id.id,
+                    'product_uom_qty': line.qty,
+                }))
+            repair_obj = self.env['repair.order'].sudo().create({
+                'partner_id': self.customer_id.id,
+                'picking_type_id': self.get_picking_type_id(),
+                'maintenance_equipment_id': self.maintenance_equipment_id.id,
+                'move_ids': lines,
+            })
+            self.repair_id = repair_obj.id
 
     def create_order(self):
         self.ensure_one()
@@ -227,11 +270,31 @@ class equipmentvehiclelogcontract(models.Model):
                         'taxes_id': line.taxes_id.ids,
                     }))
                 purchase_obj = self.env['purchase.order'].create({
-                    'partner_id': self.vendor_id.id,
+                    'partner_id': self.insurer_id.id,
                     'maintenance_equipment_id': self.maintenance_equipment_id.id,
                     'order_line': lines,
                 })
                 self.purchase_id = purchase_obj.id
+            elif self.cost_subtype_id.type == 'rental':
+                if self.sale_id:
+                    raise ValidationError(_("Sorry Theres sale order created, please reset to order draft .."))
+                lines = []
+                for line in self.lines_ids:
+                    lines.append((0, 0, {
+                        'product_id': line.product_id.id,
+                        'name': line.name,
+                        'price_unit': line.price_unit,
+                        'product_uom_qty': line.qty,
+                        'tax_id': line.taxes_id.ids,
+                    }))
+                sale_obj = self.env['sale.order'].create({
+                    'partner_id': self.customer_id.id,
+                    'rental_start_date':self.rental_start_date,
+                    'rental_return_date': self.rental_return_date,
+                    'order_line': lines,
+                    'is_rental_order': True
+                })
+                self.sale_id = sale_obj.id
 
     def create_invoice(self):
         if self.cost_subtype_id.type == 'vendor_bill':

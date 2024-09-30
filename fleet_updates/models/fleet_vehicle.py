@@ -28,7 +28,7 @@ class fleet_vehicle(models.Model):
         ('03_approved', 'Approved'),
         *CLOSED_STATES.items(),
         ('04_waiting_normal', 'Waiting'),
-    ], string='State', compute="get_task_state"
+    ], string='Task State', compute="get_task_state"
     )
 
     def get_task_state(self):
