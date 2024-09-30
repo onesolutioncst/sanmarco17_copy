@@ -35,6 +35,17 @@ class account_move(models.Model):
     product_amount_supplier = fields.Float(string='Is Supplier Amount', compute="calc_product_type_amount", precompute=True, store=True)
     product_amount_customer = fields.Float(string='Is Customer Amount', compute="calc_product_type_amount", precompute=True, store=True)
     product_amount_costsheet = fields.Float(string='Is Costsheet Amount', compute="calc_product_type_amount", precompute=True, store=True)
+    ################### Sale amounts ############################
+    sale_product_amount_is_discount = fields.Float(string='Is Discount Amount', related='cons_sale_id.product_amount_is_discount')
+    sale_product_amount_refundable = fields.Float(string='Is Refundable Amount', related='cons_sale_id.product_amount_refundable')
+    sale_product_amount_subcontractor = fields.Float(string='Is Subcontractor Amount', related='cons_sale_id.product_amount_subcontractor')
+    sale_product_amount_additional = fields.Float(string='Is Additional Amount', related='cons_sale_id.product_amount_additional')
+    sale_product_amount_variation_Order = fields.Float(string='Is Variation Order Amount',related='cons_sale_id.product_amount_variation_Order')
+    sale_product_amount_wages = fields.Float(string='Is Wages Amount', related='cons_sale_id.product_amount_wages')
+    sale_product_amount_supplier = fields.Float(string='Is Supplier Amount', related='cons_sale_id.product_amount_supplier')
+    sale_product_amount_customer = fields.Float(string='Is Customer Amount',related='cons_sale_id.product_amount_customer')
+    sale_product_amount_costsheet = fields.Float(string='Is Costsheet Amount', related='cons_sale_id.product_amount_costsheet')
+
     crm_lead_id = fields.Many2one('crm.lead', 'LEAD/Opportunity')
 
     can_see_contract_terms = fields.Boolean('Can See Contract Terms', compute="calc_can_see_contract_terms")
