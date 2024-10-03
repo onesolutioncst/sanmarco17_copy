@@ -293,17 +293,6 @@ class purchase_order(models.Model):
                 order_lines.append((0, 0, order_line_values))
         self.order_line = order_lines
 
-    def button_confirm(self):
-        res = super(purchase_order, self).button_confirm()
-        for record in self:
-            for purchase_order_line_obj in record.order_line:
-                if purchase_order_line_obj.purchase_requisition_line_id and purchase_order_line_obj.purchase_requisition_line_id.mrp_manufacture_line_id:
-                    if purchase_order_line_obj.purchase_requisition_line_id.mrp_manufacture_line_id.product_uom_qty > purchase_order_line_obj.product_qty:
-                        purchase_order_line_obj.purchase_requisition_line_id.mrp_manufacture_line_id.product_uom_qty = purchase_order_line_obj.purchase_requisition_line_id.mrp_manufacture_line_id.product_uom_qty - purchase_order_line_obj.product_qty
-                    else:
-                        purchase_order_line_obj.purchase_requisition_line_id.mrp_manufacture_line_id.total_up = purchase_order_line_obj.product_qty - purchase_order_line_obj.purchase_requisition_line_id.mrp_manufacture_line_id.product_uom_qty
-        return res
-
     def _prepare_invoice(self):
         invoice_vals = super(purchase_order, self)._prepare_invoice()
         invoice_vals['cons_purchase_id'] = self.id

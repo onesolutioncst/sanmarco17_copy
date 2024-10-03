@@ -327,7 +327,7 @@ class stock_move(models.Model):
             record.upconsume_qty_cost = record.upconsume_qty * record.constru_standard_price
 
             purchase_requisition_objs = self.env['purchase.requisition'].sudo().search(
-                [('mrp_production_id', '=', record.raw_material_production_id.id)])
+                [('mrp_production_id', '=', record.raw_material_production_id.id), ('state','not in',['draft','cancel'])])
             for purchase_requisition_obj in purchase_requisition_objs:
                 for move_raw_obj in purchase_requisition_obj.line_ids:
                     if move_raw_obj.product_id == record.product_id:
