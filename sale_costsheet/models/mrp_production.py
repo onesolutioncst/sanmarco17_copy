@@ -1,3 +1,5 @@
+from typing import Dict, List
+
 from odoo import api, fields, models, _, SUPERUSER_ID, tools
 import logging
 
@@ -187,14 +189,36 @@ class mrp_production(models.Model):
                 ))
         return moves
 
-
+    def action_cancel(self):
+        costsheetcancel = super(mrp_production, self).action_cancel()
+        if self.is_costsheet:
+            new_wizard = self.env['costsheet.cancel.wizard'].sudo().create({
+                'mrp_manufacture_id': self.id,
+            })
+            return {
+                'name': _('Cancel Costsheet Sub Orders'),
+                'view_mode': 'form',
+                'res_model': 'costsheet.cancel.wizard',
+                'type': 'ir.actions.act_window',
+                'target': 'new',
+                'res_id': new_wizard.id,
+            }
+        return costsheetcancel
 class stock_move(models.Model):
     _inherit = "stock.move"
 
     origin_qty = fields.Float('Origin Quantity')
     origin_qty_cost = fields.Float(compute="calc_qty_orders", string="Origin Quantity Cost")
     planned_price = fields.Float('Planned Price')
-
+    extra_product_uom_qty = fields.Float(
+        'Extra To Consume',
+        digits='Product Unit of Measure',
+        default=0, required=True,
+        help="This is the Extra quantity of product that is planned to be moved."
+             "Lowering this quantity does not generate a backorder."
+             "Changing this quantity on assigned moves affects "
+             "the product reservation, and should be done with care.")
+    real_product_uom_qty = fields.Float(compute="onchange_extra_product_uom_qty", string='Real To Consumne')
     # quantity = fields.Float(compute="calc_qty_orders", string='Quantity', readonly=False, help="Quantity SubOrder", )
     qty_orders = fields.Float(compute="calc_qty_orders", string='D S', help="Delivery SubOrder", )
     remaining_qty = fields.Float(compute="calc_qty_orders", string='R S ', help="Remaining SubOrder", )
@@ -218,6 +242,25 @@ class stock_move(models.Model):
     constru_unit_price = fields.Float(compute="calc_constru_unit_price", string='Unit Price')
     total_up = fields.Float('Total Up', readonly=True)
     total_up_cost = fields.Float('Total UP Cost', compute="calc_total_up_cost")
+    main_stock_move_id = fields.Many2one('stock.move')
+    @api.onchange('extra_product_uom_qty','raw_material_production_id')
+    def onchange_extra_product_uom_qty(self):
+        for record in self:
+            #Get all to consumne that added by hand
+            qty_orders_cancelled = 0.0
+            qty_orders_done = 0.0
+            mrp_suborders_objs = self.env['mrp.production'].sudo().search(
+                [('mrp_production_id', '=', record.raw_material_production_id.id), ('state', 'in', ['cancel','done'])])
+            if mrp_suborders_objs:
+                for mrp_suborders_obj in mrp_suborders_objs:
+                    for move_raw_obj in mrp_suborders_obj.move_raw_ids:
+                        if move_raw_obj.product_id == record.product_id and mrp_suborders_obj.state == 'cancel':
+                            qty_orders_cancelled += move_raw_obj.product_uom_qty  # product_qty
+                        if move_raw_obj.product_id == record.product_id and mrp_suborders_obj.state == 'done':
+                            qty_orders_done += move_raw_obj.quantity  # product_qty
+
+            record.real_product_uom_qty = qty_orders_cancelled + record.extra_product_uom_qty + record.origin_qty - qty_orders_done
+
 
     @api.depends('total_up', 'constru_standard_price')
     def calc_total_up_cost(self):
@@ -244,6 +287,8 @@ class stock_move(models.Model):
             if purchase_requisition_line_obj:
                 record.constru_unit_price = purchase_requisition_line_obj.price_unit
 
+    @api.onchange('raw_material_production_id.suborder_count')
+    @api.depends('raw_material_production_id.suborder_count')
     def calc_qty_orders(self):
         for record in self:
             qty_orders = 0.0
@@ -255,19 +300,27 @@ class stock_move(models.Model):
             qty_orders_agreement = 0.0
             qty_agreement = 0.0
             mrp_suborders_objs = self.env['mrp.production'].sudo().search(
-                [('mrp_production_id', '=', record.raw_material_production_id.id)])
-            for mrp_suborders_obj in mrp_suborders_objs:
-                for move_raw_obj in mrp_suborders_obj.move_raw_ids:
-                    if move_raw_obj.product_id == record.product_id:
-                        qty_orders += move_raw_obj.product_qty
-            record.qty_orders = qty_orders
-            if qty_orders > record.product_uom_qty:
-                record.upconsume_qty = qty_orders - record.product_uom_qty
-            else:
+                [('mrp_production_id', '=', record.raw_material_production_id.id),('state','!=','cancel')])
+            if mrp_suborders_objs:
+                for mrp_suborders_obj in mrp_suborders_objs:
+                    for move_raw_obj in mrp_suborders_obj.move_raw_ids:
+                        if move_raw_obj.product_id == record.product_id:
+                            qty_orders += move_raw_obj.quantity  #product_qty
                 record.remaining_qty = record.origin_qty - qty_orders
+            else:
+                qty_orders = record.quantity
+            record.qty_orders = qty_orders
+            # if qty_orders > record.product_uom_qty:
+            #     record.upconsume_qty = qty_orders - record.product_uom_qty
+            # else:
+            record.remaining_qty = record.origin_qty - qty_orders
             # record.quantity = qty_orders
-            # if not record.raw_material_production_id.mrp_production_id:
-            #     record.product_uom_qty = record.product_uom_qty - record.qty_orders
+            if not record.raw_material_production_id.mrp_production_id:
+                if record.origin_qty > record.qty_orders:
+                    record.product_uom_qty = record.origin_qty - record.qty_orders
+                else:
+                    record.product_uom_qty = 0.0
+                    record.upconsume_qty = record.qty_orders - record.origin_qty
             record.origin_qty_cost = record.origin_qty * record.constru_standard_price
             record.qty_orders_cost = qty_orders * record.constru_standard_price
             record.remaining_qty_cost = record.remaining_qty * record.constru_standard_price

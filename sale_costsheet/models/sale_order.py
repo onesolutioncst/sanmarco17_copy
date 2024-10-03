@@ -144,6 +144,10 @@ class sale_order(models.Model):
                                     [('code', '=', 'mrp_operation'), ('warehouse_id', '=', record.warehouse_id.id)],
                                     limit=1).id
                             })
+                        if self.analytic_account_id:
+                            mrp_dic.update({
+                                'analytic_distribution':{self.analytic_account_id.id: 100}
+                            })
                         mrp_production_costsheet_obj = sale_line_obj.mrp_production_costsheet_id.create(mrp_dic)
                         sale_line_obj.mrp_production_costsheet_id = mrp_production_costsheet_obj.id
                         sale_line_obj.mrp_production_costsheet_id.message_post_with_source(

@@ -39,6 +39,16 @@ class purchase_order(models.Model):
     product_amount_supplier = fields.Float(string='Is Supplier Amount', compute="calc_product_type_amount")
     product_amount_customer = fields.Float(string='Is Customer Amount', compute="calc_product_type_amount")
     product_amount_costsheet = fields.Float(string='Is Costsheet Amount', compute="calc_product_type_amount")
+    ################ Blanked order amounts ###############################
+    requisition_product_amount_is_discount = fields.Float(string='Is Discount Amount', related="requisition_id.product_amount_is_discount")
+    requisition_product_amount_refundable = fields.Float(string='Is Refundable Amount', related="requisition_id.product_amount_refundable")
+    requisition_product_amount_subcontractor = fields.Float(string='Is Subcontractor Amount', related="requisition_id.product_amount_subcontractor")
+    requisition_product_amount_additional = fields.Float(string='Is Additional Amount', related="requisition_id.product_amount_additional")
+    requisition_product_amount_variation_Order = fields.Float(string='Is Variation Order Amount', related="requisition_id.product_amount_variation_Order")
+    requisition_product_amount_wages = fields.Float(string='Is Wages Amount', related="requisition_id.product_amount_wages")
+    requisition_product_amount_supplier = fields.Float(string='Is Supplier Amount', related="requisition_id.product_amount_supplier")
+    requisition_product_amount_customer = fields.Float(string='Is Customer Amount', related="requisition_id.product_amount_customer")
+    requisition_product_amount_costsheet = fields.Float(string='Is Costsheet Amount', related="requisition_id.product_amount_costsheet")
 
     crm_lead_id = fields.Many2one('crm.lead', 'LEAD/Opportunity')
 

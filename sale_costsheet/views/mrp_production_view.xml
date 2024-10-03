@@ -64,11 +64,13 @@
                             string="Create Agreement"/>
                 </header>
                 <xpath expr="//field[@name='move_raw_ids']//tree/field[@name='product_uom_qty']" position="after">
+<!--                    <field name="extra_product_uom_qty" optional="hide" sum="total"/>-->
+<!--                    <field name="real_product_uom_qty" optional="hide" sum="total"/>-->
                     <field name="total_up" optional="hide" sum="total"/>
                     <field name="total_up_cost" optional="hide" sum="total"/>
                     <field name="planned_price" optional="hide" readonly="parent.state != 'draft'" sum="total"/>
-                    <field name="origin_qty" optional="hide" readonly="parent.state != 'draft'" sum="total"/>
-                    <field name="qty_orders_cost" optional="hide" readonly="parent.state != 'draft'" sum="total"/>
+                    <field name="origin_qty" optional="hide" readonly="1" force_save="1" sum="total"/>
+                    <field name="origin_qty_cost" optional="hide" sum="total"/>
                 </xpath>
 
                 <xpath expr="//field[@name='move_raw_ids']//tree" position="inside">

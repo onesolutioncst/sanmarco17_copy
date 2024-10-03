@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record model="ir.ui.view" id="costsheet_cancel_wizard_view">
+        <field name="name">costsheet_cancel_wizard wizard</field>
+        <field name="model">costsheet.cancel.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Cancel Manufacture Costsheet" delete="0" create="0">
+                <p>
+                    Are you need to add this product qty to main to consume ?
+                </p>
+                <footer>
+                    <button name="cancel_manufacture_costsheet" string="Cancel" type="object" class="btn-primary"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+</odoo>
