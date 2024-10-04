@@ -153,6 +153,44 @@
                                options="{'currency_field': 'currency_id'}"
                                readonly="True"/>
                     </group>
+                    <group name="purchase_amounts" string="Purchased Amount">
+                        <field name="purchase_product_amount_is_discount" widget='monetary'
+                               invisible="purchase_product_amount_is_discount == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="purchase_product_amount_refundable" widget='monetary'
+                               invisible="purchase_product_amount_refundable == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="purchase_product_amount_subcontractor" widget='monetary'
+                               invisible="purchase_product_amount_subcontractor == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="purchase_product_amount_additional" widget='monetary'
+                               invisible="purchase_product_amount_additional == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="purchase_product_amount_variation_Order" widget='monetary'
+                               invisible="purchase_product_amount_variation_Order == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="purchase_product_amount_wages" widget='monetary'
+                               invisible="purchase_product_amount_wages == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="purchase_product_amount_supplier" widget='monetary'
+                               invisible="purchase_product_amount_supplier == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="purchase_product_amount_customer" widget='monetary'
+                               invisible="purchase_product_amount_customer == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="purchase_product_amount_costsheet" widget='monetary'
+                               invisible="purchase_product_amount_costsheet == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                    </group>
                 </xpath>
             </field>
         </record>

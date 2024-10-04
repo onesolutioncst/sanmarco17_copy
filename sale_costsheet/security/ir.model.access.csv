@@ -4,4 +4,5 @@ access_mrp_suborders_details_user,mrp_suborders_details_user,model_mrp_suborders
 access_manufacture_agreement_user,manufacture_agreement_user,model_manufacture_agreement,,1,1,1,0
 access_purchase_requisition_milestone,purchase_requisition_milestone,model_purchase_requisition_milestone,,1,1,1,0
 access_stock_move_report,stock_move_report,model_stock_move_new_report,,1,1,1,1
+access_costsheet_cancel_wizard,costsheet_cancel_wizard,model_costsheet_cancel_wizard,,1,1,1,1
 

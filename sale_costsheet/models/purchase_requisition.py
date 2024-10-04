@@ -1,6 +1,8 @@
 from odoo import api, fields, models, _, SUPERUSER_ID, tools
 import logging, json
 
+from odoo.exceptions import ValidationError
+
 _logger = logging.getLogger(__name__)
 DATES_FORMAT = "%Y-%m-%d"
 
@@ -115,6 +117,14 @@ class purchase_requisition(models.Model):
             'domain': [('purchase_requisition_id', '=', self.id)],
             'context':{'default_purchase_requisition_id': self.id}
         }
+    def action_cancel(self):
+        if self.order_count > 0:
+            raise ValidationError(_("Sorry you cant cancel this Agreement as it's linked to RFQ, Please delete it frist"))
+        cancel_requisition = super(purchase_requisition, self).action_cancel()
+        if self.env['purchase.requisition.milestone'].sudo().search_count([('purchase_requisition_id','=',self.id)]):
+            self.env['purchase.requisition.milestone'].sudo().search([('purchase_requisition_id', '=', self.id)]).unlink()
+        return cancel_requisition
+
 
     def action_in_progress(self):
         in_progress = super(purchase_requisition, self).action_in_progress()

@@ -49,7 +49,7 @@
         'views/account_move_view.xml',
         'views/crm_lead_view.xml',
         'report/stock_move_report_view.xml',
-
+        'wizard/costsheet_cancel_wizard_view.xml',
     ],
     'images': [],
     'license': 'AGPL-3',

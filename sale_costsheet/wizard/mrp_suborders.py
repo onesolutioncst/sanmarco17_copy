@@ -20,7 +20,8 @@ class mrp_suborders(models.Model):
                     if self.user_has_groups('sale_costsheet.group_costsheet_up_consume'):
                         manufacutre_lines.append((0, 0, {
                             'product_id': mrp_suborders_details_obj.product_id.id,
-                            'product_uom_qty': mrp_suborders_details_obj.quantity
+                            'product_uom_qty': mrp_suborders_details_obj.quantity,
+                            'main_stock_move_id': mrp_suborders_details_obj.mrp_manufacture_line_id.id
                         }))
                     else:
                         if self.mrp_manufacture_id and self.mrp_manufacture_id.analytic_distribution:
@@ -41,9 +42,13 @@ class mrp_suborders(models.Model):
                 else:
                     manufacutre_lines.append((0, 0, {
                         'product_id': mrp_suborders_details_obj.product_id.id,
-                        'product_uom_qty': mrp_suborders_details_obj.quantity
+                        'product_uom_qty': mrp_suborders_details_obj.quantity,
+                        'main_stock_move_id': mrp_suborders_details_obj.mrp_manufacture_line_id.id
                     }))
-                mrp_suborders_details_obj.mrp_manufacture_line_id.product_uom_qty  = mrp_suborders_details_obj.product_uom_qty - mrp_suborders_details_obj.quantity
+                # if mrp_suborders_details_obj.quantity > mrp_suborders_details_obj.product_uom_qty:
+                #     mrp_suborders_details_obj.mrp_manufacture_line_id.product_uom_qty = 0.0
+                # else:
+                #     mrp_suborders_details_obj.mrp_manufacture_line_id.product_uom_qty = mrp_suborders_details_obj.product_uom_qty - mrp_suborders_details_obj.quantity
         if manufacutre_lines:
             next_seq = self.env['mrp.production'].sudo().search_count([('mrp_production_id','=',self.mrp_manufacture_id.id)])
             name = self.mrp_manufacture_id._get_name_backorder(self.mrp_manufacture_id.name, next_seq+1)
@@ -58,6 +63,7 @@ class mrp_suborders(models.Model):
                 'picking_type_id': self.mrp_manufacture_id.picking_type_id.id,
                 'location_src_id':self.mrp_manufacture_id.location_src_id.id,
                 'location_dest_id': self.mrp_manufacture_id.location_dest_id.id,
+                'is_costsheet': True,
                 'move_raw_ids':manufacutre_lines
             }
             mrp_production_obj = self.env['mrp.production'].sudo().create(manufacutre_vals)
