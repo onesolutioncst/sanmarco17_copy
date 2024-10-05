@@ -221,6 +221,7 @@ class stock_move(models.Model):
     real_product_uom_qty = fields.Float(compute="onchange_extra_product_uom_qty", string='Real To Consumne')
     # quantity = fields.Float(compute="calc_qty_orders", string='Quantity', readonly=False, help="Quantity SubOrder", )
     qty_orders = fields.Float(compute="calc_qty_orders", string='D S', help="Delivery SubOrder", )
+
     remaining_qty = fields.Float(compute="calc_qty_orders", string='R S ', help="Remaining SubOrder", )
     upconsume_qty = fields.Float(compute="calc_qty_orders", string='Up C S ', help="Up Consume SubOrder", )
     qty_orders_cost = fields.Float(compute="calc_qty_orders", string='D S Cost', help="Delivery SubOrder", )
@@ -230,13 +231,9 @@ class stock_move(models.Model):
     qty_agreement = fields.Float(compute="calc_qty_orders", string='Q A', help="Delivery Agreement", )
     qty_orders_agreement = fields.Float(compute="calc_qty_orders", string='D A', help="Delivery Agreement", )
     remaining_qty_agreement = fields.Float(compute="calc_qty_orders", string='R A ', help="Remaining Agreement", )
-    upconsume_qty_agreement = fields.Float(compute="calc_qty_orders", string='Up C A', help="Up Consume Agreement", )
-
     qty_orders_agreement_cost = fields.Float(compute="calc_qty_orders", string='D A Cost', help="Delivery Agreement", )
     remaining_qty_agreement_cost = fields.Float(compute="calc_qty_orders", string='R A Cost',
                                                 help="Remaining Agreement", )
-    upconsume_qty_agreement_cost = fields.Float(compute="calc_qty_orders", string='Up C A Cost',
-                                                help="Up Consume Agreement", )
 
     constru_standard_price = fields.Float('Cost Price', related="product_id.standard_price", store=True)
     constru_unit_price = fields.Float(compute="calc_constru_unit_price", string='Unit Price')
@@ -285,7 +282,7 @@ class stock_move(models.Model):
                 ], limit=1
             )
             if purchase_requisition_line_obj:
-                record.constru_unit_price = purchase_requisition_line_obj.price_unit
+                record.constru_unit_price = purchase_requisition_line_obj.price_unit + purchase_requisition_line_obj.price_unit*purchase_requisition_line_obj.line_percentage
 
     @api.onchange('raw_material_production_id.suborder_count')
     @api.depends('raw_material_production_id.suborder_count')
@@ -295,7 +292,6 @@ class stock_move(models.Model):
             record.qty_orders = qty_orders
             record.upconsume_qty = 0.0
             record.remaining_qty = 0.0
-            record.upconsume_qty_agreement = 0.0
             record.remaining_qty_agreement = 0.0
             qty_orders_agreement = 0.0
             qty_agreement = 0.0
@@ -315,12 +311,7 @@ class stock_move(models.Model):
             # else:
             record.remaining_qty = record.origin_qty - qty_orders
             # record.quantity = qty_orders
-            if not record.raw_material_production_id.mrp_production_id:
-                if record.origin_qty > record.qty_orders:
-                    record.product_uom_qty = record.origin_qty - record.qty_orders
-                else:
-                    record.product_uom_qty = 0.0
-                    record.upconsume_qty = record.qty_orders - record.origin_qty
+
             record.origin_qty_cost = record.origin_qty * record.constru_standard_price
             record.qty_orders_cost = qty_orders * record.constru_standard_price
             record.remaining_qty_cost = record.remaining_qty * record.constru_standard_price
@@ -335,15 +326,16 @@ class stock_move(models.Model):
                         qty_agreement += move_raw_obj.product_qty
             record.qty_orders_agreement = qty_orders_agreement
             record.qty_agreement = qty_agreement
-
-            if qty_orders_agreement > qty_agreement:
-                record.upconsume_qty_agreement = qty_orders_agreement - qty_agreement
-            else:
-                record.remaining_qty_agreement = qty_agreement - qty_orders_agreement
+            record.remaining_qty_agreement = qty_agreement - qty_orders_agreement
+            if not record.raw_material_production_id.mrp_production_id:
+                if record.origin_qty > qty_orders + qty_orders_agreement:
+                    record.product_uom_qty = record.origin_qty - (qty_orders + qty_orders_agreement)
+                else:
+                    record.product_uom_qty = 0.0
+                    record.upconsume_qty = (qty_orders + qty_orders_agreement) - record.origin_qty
 
             record.qty_orders_agreement_cost = record.qty_orders_agreement * record.constru_unit_price
             record.remaining_qty_agreement_cost = record.remaining_qty_agreement * record.constru_unit_price
-            record.upconsume_qty_agreement_cost = record.upconsume_qty_agreement * record.constru_unit_price
             if record.raw_material_production_id.is_costsheet:
                 stock_move_report_dict = {
                     'stock_move_id': record.id,
@@ -374,10 +366,8 @@ class stock_move(models.Model):
 
                     'qty_orders_agreement': record.qty_orders_agreement,
                     'remaining_qty_agreement': record.remaining_qty_agreement,
-                    'upconsume_qty_agreement': record.upconsume_qty_agreement,
                     'qty_orders_agreement_cost': record.qty_orders_agreement_cost,
                     'remaining_qty_agreement_cost': record.remaining_qty_agreement_cost,
-                    'upconsume_qty_agreement_cost': record.upconsume_qty_agreement_cost,
 
                     'planned_price': record.planned_price,
                     'constru_unit_price': record.constru_unit_price,
@@ -409,13 +399,9 @@ class stock_move(models.Model):
 #     qty_agreement = fields.Float(string='Q A', help="Delivery Agreement", )
 #     qty_orders_agreement = fields.Float(string='D A', help="Delivery Agreement", )
 #     remaining_qty_agreement = fields.Float(string='R A ', help="Remaining Agreement", )
-#     upconsume_qty_agreement = fields.Float(string='Up C A', help="Up Consume Agreement", )
-#
 #     qty_orders_agreement_cost = fields.Float(string='D A Cost', help="Delivery Agreement", )
 #     remaining_qty_agreement_cost = fields.Float(string='R A Cost',
 #                                                 help="Remaining Agreement", )
-#     upconsume_qty_agreement_cost = fields.Float(string='Up C A Cost',
-#                                                 help="Up Consume Agreement", )
 #
 #     constru_standard_price = fields.Float('Cost Price', related="product_id.standard_price", store=True)
 #     constru_unit_price = fields.Float(compute="calc_constru_unit_price", string='Unit Price')
