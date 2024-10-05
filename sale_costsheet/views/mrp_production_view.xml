@@ -64,8 +64,8 @@
                             string="Create Agreement"/>
                 </header>
                 <xpath expr="//field[@name='move_raw_ids']//tree/field[@name='product_uom_qty']" position="after">
-<!--                    <field name="extra_product_uom_qty" optional="hide" sum="total"/>-->
-<!--                    <field name="real_product_uom_qty" optional="hide" sum="total"/>-->
+                    <field name="upconsume_qty" optional="hide" sum="total"/>
+                    <field name="upconsume_qty_cost" optional="hide" sum="total"/>
                     <field name="total_up" optional="hide" sum="total"/>
                     <field name="total_up_cost" optional="hide" sum="total"/>
                     <field name="planned_price" optional="hide" readonly="parent.state != 'draft'" sum="total"/>
@@ -78,17 +78,12 @@
                     <field name="qty_orders_cost" optional="hide" sum="total"/>
                     <field name="remaining_qty" optional="hide" sum="total"/>
                     <field name="remaining_qty_cost" optional="hide" sum="total"/>
-                    <field name="upconsume_qty" optional="hide" sum="total"/>
-                    <field name="upconsume_qty_cost" optional="hide" sum="total"/>
 
                     <field name="qty_agreement" optional="hide" sum="total"/>
                     <field name="qty_orders_agreement" optional="hide" sum="total"/>
                     <field name="qty_orders_agreement_cost" optional="hide" sum="total"/>
                     <field name="remaining_qty_agreement" optional="hide" sum="total"/>
                     <field name="remaining_qty_agreement_cost" optional="hide" sum="total"/>
-                    <field name="upconsume_qty_agreement" optional="hide" sum="total"/>
-                    <field name="upconsume_qty_agreement_cost" optional="hide" sum="total"/>
-
 
                     <field name="constru_unit_price" optional="hide" sum="total"/>
                     <field name="constru_standard_price" optional="hide" sum="total"/>

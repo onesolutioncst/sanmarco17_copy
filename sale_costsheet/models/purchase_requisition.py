@@ -1,6 +1,7 @@
 from odoo import api, fields, models, _, SUPERUSER_ID, tools
 import logging, json
 
+from odoo.addons.test_convert.tests.test_env import record
 from odoo.exceptions import ValidationError
 
 _logger = logging.getLogger(__name__)
@@ -37,6 +38,12 @@ class purchase_requisition(models.Model):
     product_amount_supplier = fields.Float(string='Is Supplier Amount', compute="calc_product_type_amount")
     product_amount_customer = fields.Float(string='Is Customer Amount', compute="calc_product_type_amount")
     product_amount_costsheet = fields.Float(string='Is Costsheet Amount', compute="calc_product_type_amount")
+    total_percentage = fields.Float('Percentage')
+
+    @api.onchange('total_percentage')
+    def onchange_total_percentage(self):
+        for record in self:
+            record.line_ids.line_percentage  = record.total_percentage
 
     @api.depends('line_ids')
     def calc_product_type_amount(self):
@@ -158,7 +165,7 @@ class purchase_requisition_line(models.Model):
     remaining_milestone_qty = fields.Float(string="Milestone QTY", compute="calc_remaining_milestone_qty")
     mrp_manufacture_line_id = fields.Many2one('stock.move', 'Components')
     mrp_production_id = fields.Many2one('mrp.production', trace=True)
-
+    line_percentage = fields.Float('Percentage')
     def calc_remaining_milestone_qty(self):
         for record in self:
             purchase_order_line_objs = self.env['purchase.order.line'].sudo().search([('purchase_requisition_line_id','=',record.id)])
