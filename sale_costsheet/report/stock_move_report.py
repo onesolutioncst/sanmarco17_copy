@@ -53,7 +53,7 @@ class stock_move_new_report(models.Model):
     upconsume_qty_agreement_cost = fields.Float(string='Up C A Cost', help="Up Consume Agreement", )
 
     planned_price = fields.Float(string='Planned Price')
-    constru_unit_price = fields.Float(string='Unit Price', readonly=True)
+    agreement_unit_price_before = fields.Float(string='Agreement Price(Before)', readonly=True)
     total_up = fields.Float('Total Up', readonly=True)
     total_up_cost = fields.Float('Total UP Cost', readonly=True)
 
