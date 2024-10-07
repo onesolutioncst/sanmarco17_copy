@@ -33,6 +33,12 @@
                     <field name="product_id" context="{'default_detailed_type': 'product'}" readonly="state != 'draft'"
                            invisible="is_costsheet == False" default_focus="1" placeholder="Product to build..."/>
                 </field>
+                <label name="bom_label" position="before">
+                    <field name="unit_price_basedon" />
+                    <field name="sale_contract_unit_price" />
+                    <field name="unit_percentage" widget="percentage"/>
+                    <field name="sale_unit_price_afterpercentage" />
+                </label>
                 <div name="button_box" position="inside">
                     <button name="action_view_suborder" type="object" class="oe_stat_button" icon="fa-pencil-square-o"
                             invisible="suborder_count == 0">
@@ -71,6 +77,8 @@
                     <field name="planned_price" optional="hide" readonly="parent.state != 'draft'" sum="total"/>
                     <field name="origin_qty" optional="hide" readonly="1" force_save="1" sum="total"/>
                     <field name="origin_qty_cost" optional="hide" sum="total"/>
+                    <field name="origin_qty_agreementpricebefore_cost" optional="hide" sum="total"/>
+                    <field name="origin_qty_agreementpriceafter_cost" optional="hide" sum="total"/>
                 </xpath>
 
                 <xpath expr="//field[@name='move_raw_ids']//tree" position="inside">
@@ -85,7 +93,7 @@
                     <field name="remaining_qty_agreement" optional="hide" sum="total"/>
                     <field name="remaining_qty_agreement_cost" optional="hide" sum="total"/>
 
-                    <field name="constru_unit_price" optional="hide" sum="total"/>
+                    <field name="agreement_unit_price_before" optional="hide" sum="total"/>
                     <field name="constru_standard_price" optional="hide" sum="total"/>
                     <!--                    <control>-->
                     <!--                        <button name="action_add_from_catalog" string="Catalog" type="object" class="px-4 btn-link"-->

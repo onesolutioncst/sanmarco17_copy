@@ -26,6 +26,27 @@ class mrp_production(models.Model):
     timesheet_count = fields.Float(compute="calc_suborder_count")
     mrp_production_id = fields.Many2one('mrp.production')
     purchase_requisition_id = fields.Many2one('purchase.requisition', )
+    unit_price_basedon = fields.Selection([('agreementpricebefore','Agreement Price Before'), ('agreementpriceafter','Agreement Price After')], 'Unit Price Based ON')
+    sale_contract_unit_price = fields.Float('Sales Unit Price', compute="calc_sale_contract_unit_price")
+    unit_percentage = fields.Float('Unit Percentage')
+    sale_unit_price_afterpercentage = fields.Float('Sales Unit Price', compute="calc_sale_contract_unit_price")
+
+    @api.onchange('unit_price_basedon', 'product_qty','move_raw_ids','sale_unit_price_afterpercentage')
+    @api.depends('unit_price_basedon', 'product_qty','move_raw_ids','sale_unit_price_afterpercentage')
+    def calc_sale_contract_unit_price(self):
+        for record in self:
+            record.sale_contract_unit_price = 0.0
+            if record.unit_price_basedon == 'agreementpricebefore':
+                record.sale_contract_unit_price = sum(move_raw_obj.origin_qty_agreementpricebefore_cost for move_raw_obj in record.move_raw_ids) / record.product_qty
+            elif record.unit_price_basedon == 'agreementpriceafter':
+                record.sale_contract_unit_price = sum(move_raw_obj.origin_qty_agreementpriceafter_cost for move_raw_obj in record.move_raw_ids) / record.product_qty
+            else:
+                record.sale_contract_unit_price = 0.0
+            record.sale_unit_price_afterpercentage = record.sale_contract_unit_price + record.sale_contract_unit_price * record.unit_percentage
+            if record.sale_line_costsheet_id:
+                record.sale_line_costsheet_id.price_unit=record.sale_contract_unit_price + record.sale_contract_unit_price * record.unit_percentage
+
+
 
     @api.onchange('is_costsheet')
     def check_onchange_is_costsheet(self):
@@ -208,7 +229,9 @@ class stock_move(models.Model):
     _inherit = "stock.move"
 
     origin_qty = fields.Float('Origin Quantity')
-    origin_qty_cost = fields.Float(compute="calc_qty_orders", string="Origin Quantity Cost")
+    origin_qty_cost = fields.Float(compute="calc_qty_orders", string="Origin Quantity Standard Cost")
+    origin_qty_agreementpricebefore_cost = fields.Float(compute="calc_qty_orders", string="Origin Quantity Cost Agreement Price Before")
+    origin_qty_agreementpriceafter_cost = fields.Float(compute="calc_qty_orders", string="Origin Quantity Cost Agreement Price After")
     planned_price = fields.Float('Planned Price')
     extra_product_uom_qty = fields.Float(
         'Extra To Consume',
@@ -236,7 +259,8 @@ class stock_move(models.Model):
                                                 help="Remaining Agreement", )
 
     constru_standard_price = fields.Float('Cost Price', related="product_id.standard_price", store=True)
-    constru_unit_price = fields.Float(compute="calc_constru_unit_price", string='Unit Price')
+    agreement_unit_price_before = fields.Float(compute="calc_agreement_unit_price", string='Agreement Price(Before)')
+    agreement_unit_price_after = fields.Float(compute="calc_agreement_unit_price", string='Agreement Price(After)')
     total_up = fields.Float('Total Up', readonly=True)
     total_up_cost = fields.Float('Total UP Cost', compute="calc_total_up_cost")
     main_stock_move_id = fields.Many2one('stock.move')
@@ -271,9 +295,10 @@ class stock_move(models.Model):
         return super(stock_move, self).create(vals)
 
     @api.depends('raw_material_production_id', 'product_id')
-    def calc_constru_unit_price(self):
+    def calc_agreement_unit_price(self):
         for record in self:
-            record.constru_unit_price = 0.0
+            record.agreement_unit_price_after = 0.0
+            record.agreement_unit_price_before = 0.0
             purchase_requisition_line_obj = self.env['purchase.requisition.line'].sudo().search(
                 [
                     ('product_id', '=', record.product_id.id),
@@ -282,7 +307,8 @@ class stock_move(models.Model):
                 ], limit=1
             )
             if purchase_requisition_line_obj:
-                record.constru_unit_price = purchase_requisition_line_obj.price_unit + purchase_requisition_line_obj.price_unit*purchase_requisition_line_obj.line_percentage
+                record.agreement_unit_price_after = purchase_requisition_line_obj.price_unit + purchase_requisition_line_obj.price_unit*purchase_requisition_line_obj.line_percentage
+                record.agreement_unit_price_before = purchase_requisition_line_obj.price_unit
 
     @api.onchange('raw_material_production_id.suborder_count')
     @api.depends('raw_material_production_id.suborder_count')
@@ -313,6 +339,8 @@ class stock_move(models.Model):
             # record.quantity = qty_orders
 
             record.origin_qty_cost = record.origin_qty * record.constru_standard_price
+            record.origin_qty_agreementpricebefore_cost = record.origin_qty * record.agreement_unit_price_before
+            record.origin_qty_agreementpriceafter_cost = record.origin_qty * record.agreement_unit_price_after
             record.qty_orders_cost = qty_orders * record.constru_standard_price
             record.remaining_qty_cost = record.remaining_qty * record.constru_standard_price
             record.upconsume_qty_cost = record.upconsume_qty * record.constru_standard_price
@@ -334,8 +362,8 @@ class stock_move(models.Model):
                     record.product_uom_qty = 0.0
                     record.upconsume_qty = (qty_orders + qty_orders_agreement) - record.origin_qty
 
-            record.qty_orders_agreement_cost = record.qty_orders_agreement * record.constru_unit_price
-            record.remaining_qty_agreement_cost = record.remaining_qty_agreement * record.constru_unit_price
+            record.qty_orders_agreement_cost = record.qty_orders_agreement * record.agreement_unit_price_before
+            record.remaining_qty_agreement_cost = record.remaining_qty_agreement * record.agreement_unit_price_before
             if record.raw_material_production_id.is_costsheet:
                 stock_move_report_dict = {
                     'stock_move_id': record.id,
@@ -370,7 +398,7 @@ class stock_move(models.Model):
                     'remaining_qty_agreement_cost': record.remaining_qty_agreement_cost,
 
                     'planned_price': record.planned_price,
-                    'constru_unit_price': record.constru_unit_price,
+                    'agreement_unit_price_before': record.agreement_unit_price_before,
                     'total_up': record.total_up,
                     'total_up_cost': record.total_up_cost,
                 }
