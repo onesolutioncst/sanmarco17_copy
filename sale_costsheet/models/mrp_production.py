@@ -18,33 +18,62 @@ class mrp_production(models.Model):
         compute='_compute_product_id', store=True, copy=True, precompute=True,
         readonly=False, required=True, check_company=True)
 
-    is_costsheet = fields.Boolean('Costsheet')
-    sale_costsheet_id = fields.Many2one('sale.order')
-    sale_line_costsheet_id = fields.Many2one('sale.order.line')
-    suborder_count = fields.Integer(compute="calc_suborder_count")
-    requisition_count = fields.Integer(compute="calc_suborder_count")
-    timesheet_count = fields.Float(compute="calc_suborder_count")
-    mrp_production_id = fields.Many2one('mrp.production')
-    purchase_requisition_id = fields.Many2one('purchase.requisition', )
-    unit_price_basedon = fields.Selection([('agreementpricebefore','Agreement Price Before'), ('agreementpriceafter','Agreement Price After')], 'Unit Price Based ON')
-    sale_contract_unit_price = fields.Float('Sales Unit Price', compute="calc_sale_contract_unit_price")
-    unit_percentage = fields.Float('Unit Percentage')
-    sale_unit_price_afterpercentage = fields.Float('Sales Unit Price', compute="calc_sale_contract_unit_price")
+    is_costsheet = fields.Boolean('Costsheet', trace=True)
+    sale_costsheet_id = fields.Many2one('sale.order', trace=True)
+    sale_line_costsheet_id = fields.Many2one('sale.order.line', trace=True)
+    suborder_count = fields.Integer(compute="calc_suborder_count", trace=True)
+    requisition_count = fields.Integer(compute="calc_suborder_count", trace=True)
+    timesheet_count = fields.Float(compute="calc_suborder_count", trace=True)
+    mrp_production_id = fields.Many2one('mrp.production', trace=True)
+    purchase_requisition_id = fields.Many2one('purchase.requisition', trace=True )
 
-    @api.onchange('unit_price_basedon', 'product_qty','move_raw_ids','sale_unit_price_afterpercentage')
-    @api.depends('unit_price_basedon', 'product_qty','move_raw_ids','sale_unit_price_afterpercentage')
+    unit_price_standardprice = fields.Float('Unit Price Standard Price',compute="calc_sale_contract_unit_price", trace=True)
+    unit_price_agreementbefore = fields.Float('Unit Price Agreement Before',compute="calc_sale_contract_unit_price", trace=True)
+    unit_price_agreementafter = fields.Float('Unit Price Agreement after',compute="calc_sale_contract_unit_price", trace=True)
+
+    unit_percentage_standardprice = fields.Float('Percentage', trace=True)
+    unit_percentage_agreementbefore = fields.Float('Percentage', trace=True)
+    unit_percentage_agreementafter = fields.Float('Percentage', trace=True)
+
+    standardprice_after_percentage = fields.Float('Total Standard Price', compute="calc_sale_contract_unit_price",trace=True)
+    agreementbefore_after_percentage = fields.Float('Total Agreement Before', compute="calc_sale_contract_unit_price",trace=True)
+    agreementafter_after_percentage = fields.Float('Total Agreement after', compute="calc_sale_contract_unit_price",trace=True)
+
+    published_unit_price = fields.Boolean()
+
+
+    def action_publish_standradprice(self):
+        for record in self:
+            if record.sale_line_costsheet_id:
+                record.sale_line_costsheet_id.price_unit = record.standardprice_after_percentage
+                if record.state != 'draft':
+                    record.published_unit_price=True
+        return True
+    def action_publish_agreementbefore(self):
+        for record in self:
+            if record.sale_line_costsheet_id:
+                record.sale_line_costsheet_id.price_unit = record.agreementbefore_after_percentage
+                if record.state != 'draft':
+                    record.published_unit_price=True
+        return True
+    def action_publish_agreementafter(self):
+        for record in self:
+            if record.sale_line_costsheet_id:
+                record.sale_line_costsheet_id.price_unit = record.agreementafter_after_percentage
+                if record.state != 'draft':
+                    record.published_unit_price=True
+        return True
+
+    @api.onchange('product_qty','move_raw_ids','unit_percentage_standardprice', 'unit_percentage_agreementbefore', 'unit_percentage_agreementafter')
+    @api.depends('product_qty','move_raw_ids', 'unit_percentage_standardprice', 'unit_percentage_agreementbefore', 'unit_percentage_agreementafter')
     def calc_sale_contract_unit_price(self):
         for record in self:
-            record.sale_contract_unit_price = 0.0
-            if record.unit_price_basedon == 'agreementpricebefore':
-                record.sale_contract_unit_price = sum(move_raw_obj.origin_qty_agreementpricebefore_cost for move_raw_obj in record.move_raw_ids) / record.product_qty
-            elif record.unit_price_basedon == 'agreementpriceafter':
-                record.sale_contract_unit_price = sum(move_raw_obj.origin_qty_agreementpriceafter_cost for move_raw_obj in record.move_raw_ids) / record.product_qty
-            else:
-                record.sale_contract_unit_price = 0.0
-            record.sale_unit_price_afterpercentage = record.sale_contract_unit_price + record.sale_contract_unit_price * record.unit_percentage
-            if record.sale_line_costsheet_id:
-                record.sale_line_costsheet_id.price_unit=record.sale_contract_unit_price + record.sale_contract_unit_price * record.unit_percentage
+            record.unit_price_standardprice = sum(move_raw_obj.origin_qty_cost for move_raw_obj in record.move_raw_ids) / record.product_qty
+            record.unit_price_agreementbefore = sum(move_raw_obj.origin_qty_agreementpricebefore_cost for move_raw_obj in record.move_raw_ids) / record.product_qty
+            record.unit_price_agreementafter = sum(move_raw_obj.origin_qty_agreementpriceafter_cost for move_raw_obj in record.move_raw_ids) / record.product_qty
+            record.standardprice_after_percentage = record.unit_price_standardprice +record.unit_price_standardprice * record.unit_percentage_standardprice
+            record.agreementbefore_after_percentage =record.unit_price_agreementbefore + record.unit_price_agreementbefore *record.unit_percentage_agreementbefore
+            record.agreementafter_after_percentage = record.unit_price_agreementafter + record.unit_price_agreementafter * record.unit_percentage_agreementafter
 
 
 
@@ -228,11 +257,11 @@ class mrp_production(models.Model):
 class stock_move(models.Model):
     _inherit = "stock.move"
 
-    origin_qty = fields.Float('Origin Quantity')
-    origin_qty_cost = fields.Float(compute="calc_qty_orders", string="Origin Quantity Standard Cost")
-    origin_qty_agreementpricebefore_cost = fields.Float(compute="calc_qty_orders", string="Origin Quantity Cost Agreement Price Before")
-    origin_qty_agreementpriceafter_cost = fields.Float(compute="calc_qty_orders", string="Origin Quantity Cost Agreement Price After")
-    planned_price = fields.Float('Planned Price')
+    origin_qty = fields.Float('Origin Quantity', trace=True)
+    origin_qty_cost = fields.Float(compute="calc_qty_orders", string="Origin Quantity Standard Cost", trace=True)
+    origin_qty_agreementpricebefore_cost = fields.Float(compute="calc_qty_orders", string="Origin Quantity Cost Agreement Price Before", trace=True)
+    origin_qty_agreementpriceafter_cost = fields.Float(compute="calc_qty_orders", string="Origin Quantity Cost Agreement Price After", trace=True)
+    planned_price = fields.Float('Planned Price', trace=True)
     extra_product_uom_qty = fields.Float(
         'Extra To Consume',
         digits='Product Unit of Measure',
@@ -240,30 +269,30 @@ class stock_move(models.Model):
         help="This is the Extra quantity of product that is planned to be moved."
              "Lowering this quantity does not generate a backorder."
              "Changing this quantity on assigned moves affects "
-             "the product reservation, and should be done with care.")
-    real_product_uom_qty = fields.Float(compute="onchange_extra_product_uom_qty", string='Real To Consumne')
+             "the product reservation, and should be done with care.", trace=True)
+    real_product_uom_qty = fields.Float(compute="onchange_extra_product_uom_qty", string='Real To Consumne', trace=True)
     # quantity = fields.Float(compute="calc_qty_orders", string='Quantity', readonly=False, help="Quantity SubOrder", )
-    qty_orders = fields.Float(compute="calc_qty_orders", string='D S', help="Delivery SubOrder", )
+    qty_orders = fields.Float(compute="calc_qty_orders", string='D S', help="Delivery SubOrder", trace=True )
 
-    remaining_qty = fields.Float(compute="calc_qty_orders", string='R S ', help="Remaining SubOrder", )
-    upconsume_qty = fields.Float(compute="calc_qty_orders", string='Up C S ', help="Up Consume SubOrder", )
-    qty_orders_cost = fields.Float(compute="calc_qty_orders", string='D S Cost', help="Delivery SubOrder", )
-    remaining_qty_cost = fields.Float(compute="calc_qty_orders", string='R S Cost', help="Remaining SubOrder", )
-    upconsume_qty_cost = fields.Float(compute="calc_qty_orders", string='Up C S Cost', help="Up Consume SubOrder", )
+    remaining_qty = fields.Float(compute="calc_qty_orders", string='R S ', help="Remaining SubOrder", trace=True )
+    upconsume_qty = fields.Float(compute="calc_qty_orders", string='Up C S ', help="Up Consume SubOrder", trace=True )
+    qty_orders_cost = fields.Float(compute="calc_qty_orders", string='D S Cost', help="Delivery SubOrder", trace=True )
+    remaining_qty_cost = fields.Float(compute="calc_qty_orders", string='R S Cost', help="Remaining SubOrder", trace=True )
+    upconsume_qty_cost = fields.Float(compute="calc_qty_orders", string='Up C S Cost', help="Up Consume SubOrder", trace=True )
 
-    qty_agreement = fields.Float(compute="calc_qty_orders", string='Q A', help="Delivery Agreement", )
-    qty_orders_agreement = fields.Float(compute="calc_qty_orders", string='D A', help="Delivery Agreement", )
-    remaining_qty_agreement = fields.Float(compute="calc_qty_orders", string='R A ', help="Remaining Agreement", )
-    qty_orders_agreement_cost = fields.Float(compute="calc_qty_orders", string='D A Cost', help="Delivery Agreement", )
+    qty_agreement = fields.Float(compute="calc_qty_orders", string='Q A', help="Delivery Agreement", trace=True )
+    qty_orders_agreement = fields.Float(compute="calc_qty_orders", string='D A', help="Delivery Agreement", trace=True )
+    remaining_qty_agreement = fields.Float(compute="calc_qty_orders", string='R A ', help="Remaining Agreement", trace=True )
+    qty_orders_agreement_cost = fields.Float(compute="calc_qty_orders", string='D A Cost', help="Delivery Agreement", trace=True )
     remaining_qty_agreement_cost = fields.Float(compute="calc_qty_orders", string='R A Cost',
-                                                help="Remaining Agreement", )
+                                                help="Remaining Agreement", trace=True )
 
-    constru_standard_price = fields.Float('Cost Price', related="product_id.standard_price", store=True)
-    agreement_unit_price_before = fields.Float(compute="calc_agreement_unit_price", string='Agreement Price(Before)')
-    agreement_unit_price_after = fields.Float(compute="calc_agreement_unit_price", string='Agreement Price(After)')
-    total_up = fields.Float('Total Up', readonly=True)
-    total_up_cost = fields.Float('Total UP Cost', compute="calc_total_up_cost")
-    main_stock_move_id = fields.Many2one('stock.move')
+    constru_standard_price = fields.Float('Cost Price', related="product_id.standard_price", store=True, trace=True)
+    agreement_unit_price_before = fields.Float(compute="calc_agreement_unit_price", string='Agreement Price(Before)', trace=True)
+    agreement_unit_price_after = fields.Float(compute="calc_agreement_unit_price", string='Agreement Price(After)', trace=True)
+    total_up = fields.Float('Total Up', readonly=True, trace=True)
+    total_up_cost = fields.Float('Total UP Cost', compute="calc_total_up_cost", trace=True)
+    main_stock_move_id = fields.Many2one('stock.move', trace=True)
     @api.onchange('extra_product_uom_qty','raw_material_production_id')
     def onchange_extra_product_uom_qty(self):
         for record in self:
