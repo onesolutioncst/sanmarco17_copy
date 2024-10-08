@@ -1,3 +1,5 @@
+from typing import Dict, List
+
 from odoo import api, fields, models, _, SUPERUSER_ID, tools
 import logging
 
@@ -24,6 +26,27 @@ class mrp_production(models.Model):
     timesheet_count = fields.Float(compute="calc_suborder_count")
     mrp_production_id = fields.Many2one('mrp.production')
     purchase_requisition_id = fields.Many2one('purchase.requisition', )
+    unit_price_basedon = fields.Selection([('agreementpricebefore','Agreement Price Before'), ('agreementpriceafter','Agreement Price After')], 'Unit Price Based ON')
+    sale_contract_unit_price = fields.Float('Sales Unit Price', compute="calc_sale_contract_unit_price")
+    unit_percentage = fields.Float('Unit Percentage')
+    sale_unit_price_afterpercentage = fields.Float('Sales Unit Price', compute="calc_sale_contract_unit_price")
+
+    @api.onchange('unit_price_basedon', 'product_qty','move_raw_ids','sale_unit_price_afterpercentage')
+    @api.depends('unit_price_basedon', 'product_qty','move_raw_ids','sale_unit_price_afterpercentage')
+    def calc_sale_contract_unit_price(self):
+        for record in self:
+            record.sale_contract_unit_price = 0.0
+            if record.unit_price_basedon == 'agreementpricebefore':
+                record.sale_contract_unit_price = sum(move_raw_obj.origin_qty_agreementpricebefore_cost for move_raw_obj in record.move_raw_ids) / record.product_qty
+            elif record.unit_price_basedon == 'agreementpriceafter':
+                record.sale_contract_unit_price = sum(move_raw_obj.origin_qty_agreementpriceafter_cost for move_raw_obj in record.move_raw_ids) / record.product_qty
+            else:
+                record.sale_contract_unit_price = 0.0
+            record.sale_unit_price_afterpercentage = record.sale_contract_unit_price + record.sale_contract_unit_price * record.unit_percentage
+            if record.sale_line_costsheet_id:
+                record.sale_line_costsheet_id.price_unit=record.sale_contract_unit_price + record.sale_contract_unit_price * record.unit_percentage
+
+
 
     @api.onchange('is_costsheet')
     def check_onchange_is_costsheet(self):
@@ -187,16 +210,41 @@ class mrp_production(models.Model):
                 ))
         return moves
 
-
+    def action_cancel(self):
+        costsheetcancel = super(mrp_production, self).action_cancel()
+        if self.is_costsheet:
+            new_wizard = self.env['costsheet.cancel.wizard'].sudo().create({
+                'mrp_manufacture_id': self.id,
+            })
+            return {
+                'name': _('Cancel Costsheet Sub Orders'),
+                'view_mode': 'form',
+                'res_model': 'costsheet.cancel.wizard',
+                'type': 'ir.actions.act_window',
+                'target': 'new',
+                'res_id': new_wizard.id,
+            }
+        return costsheetcancel
 class stock_move(models.Model):
     _inherit = "stock.move"
 
     origin_qty = fields.Float('Origin Quantity')
-    origin_qty_cost = fields.Float(compute="calc_qty_orders", string="Origin Quantity Cost")
+    origin_qty_cost = fields.Float(compute="calc_qty_orders", string="Origin Quantity Standard Cost")
+    origin_qty_agreementpricebefore_cost = fields.Float(compute="calc_qty_orders", string="Origin Quantity Cost Agreement Price Before")
+    origin_qty_agreementpriceafter_cost = fields.Float(compute="calc_qty_orders", string="Origin Quantity Cost Agreement Price After")
     planned_price = fields.Float('Planned Price')
-
+    extra_product_uom_qty = fields.Float(
+        'Extra To Consume',
+        digits='Product Unit of Measure',
+        default=0, required=True,
+        help="This is the Extra quantity of product that is planned to be moved."
+             "Lowering this quantity does not generate a backorder."
+             "Changing this quantity on assigned moves affects "
+             "the product reservation, and should be done with care.")
+    real_product_uom_qty = fields.Float(compute="onchange_extra_product_uom_qty", string='Real To Consumne')
     # quantity = fields.Float(compute="calc_qty_orders", string='Quantity', readonly=False, help="Quantity SubOrder", )
     qty_orders = fields.Float(compute="calc_qty_orders", string='D S', help="Delivery SubOrder", )
+
     remaining_qty = fields.Float(compute="calc_qty_orders", string='R S ', help="Remaining SubOrder", )
     upconsume_qty = fields.Float(compute="calc_qty_orders", string='Up C S ', help="Up Consume SubOrder", )
     qty_orders_cost = fields.Float(compute="calc_qty_orders", string='D S Cost', help="Delivery SubOrder", )
@@ -206,18 +254,34 @@ class stock_move(models.Model):
     qty_agreement = fields.Float(compute="calc_qty_orders", string='Q A', help="Delivery Agreement", )
     qty_orders_agreement = fields.Float(compute="calc_qty_orders", string='D A', help="Delivery Agreement", )
     remaining_qty_agreement = fields.Float(compute="calc_qty_orders", string='R A ', help="Remaining Agreement", )
-    upconsume_qty_agreement = fields.Float(compute="calc_qty_orders", string='Up C A', help="Up Consume Agreement", )
-
     qty_orders_agreement_cost = fields.Float(compute="calc_qty_orders", string='D A Cost', help="Delivery Agreement", )
     remaining_qty_agreement_cost = fields.Float(compute="calc_qty_orders", string='R A Cost',
                                                 help="Remaining Agreement", )
-    upconsume_qty_agreement_cost = fields.Float(compute="calc_qty_orders", string='Up C A Cost',
-                                                help="Up Consume Agreement", )
 
     constru_standard_price = fields.Float('Cost Price', related="product_id.standard_price", store=True)
-    constru_unit_price = fields.Float(compute="calc_constru_unit_price", string='Unit Price')
+    agreement_unit_price_before = fields.Float(compute="calc_agreement_unit_price", string='Agreement Price(Before)')
+    agreement_unit_price_after = fields.Float(compute="calc_agreement_unit_price", string='Agreement Price(After)')
     total_up = fields.Float('Total Up', readonly=True)
     total_up_cost = fields.Float('Total UP Cost', compute="calc_total_up_cost")
+    main_stock_move_id = fields.Many2one('stock.move')
+    @api.onchange('extra_product_uom_qty','raw_material_production_id')
+    def onchange_extra_product_uom_qty(self):
+        for record in self:
+            #Get all to consumne that added by hand
+            qty_orders_cancelled = 0.0
+            qty_orders_done = 0.0
+            mrp_suborders_objs = self.env['mrp.production'].sudo().search(
+                [('mrp_production_id', '=', record.raw_material_production_id.id), ('state', 'in', ['cancel','done'])])
+            if mrp_suborders_objs:
+                for mrp_suborders_obj in mrp_suborders_objs:
+                    for move_raw_obj in mrp_suborders_obj.move_raw_ids:
+                        if move_raw_obj.product_id == record.product_id and mrp_suborders_obj.state == 'cancel':
+                            qty_orders_cancelled += move_raw_obj.product_uom_qty  # product_qty
+                        if move_raw_obj.product_id == record.product_id and mrp_suborders_obj.state == 'done':
+                            qty_orders_done += move_raw_obj.quantity  # product_qty
+
+            record.real_product_uom_qty = qty_orders_cancelled + record.extra_product_uom_qty + record.origin_qty - qty_orders_done
+
 
     @api.depends('total_up', 'constru_standard_price')
     def calc_total_up_cost(self):
@@ -231,9 +295,10 @@ class stock_move(models.Model):
         return super(stock_move, self).create(vals)
 
     @api.depends('raw_material_production_id', 'product_id')
-    def calc_constru_unit_price(self):
+    def calc_agreement_unit_price(self):
         for record in self:
-            record.constru_unit_price = 0.0
+            record.agreement_unit_price_after = 0.0
+            record.agreement_unit_price_before = 0.0
             purchase_requisition_line_obj = self.env['purchase.requisition.line'].sudo().search(
                 [
                     ('product_id', '=', record.product_id.id),
@@ -242,39 +307,46 @@ class stock_move(models.Model):
                 ], limit=1
             )
             if purchase_requisition_line_obj:
-                record.constru_unit_price = purchase_requisition_line_obj.price_unit
+                record.agreement_unit_price_after = purchase_requisition_line_obj.price_unit + purchase_requisition_line_obj.price_unit*purchase_requisition_line_obj.line_percentage
+                record.agreement_unit_price_before = purchase_requisition_line_obj.price_unit
 
+    @api.onchange('raw_material_production_id.suborder_count')
+    @api.depends('raw_material_production_id.suborder_count')
     def calc_qty_orders(self):
         for record in self:
             qty_orders = 0.0
             record.qty_orders = qty_orders
             record.upconsume_qty = 0.0
             record.remaining_qty = 0.0
-            record.upconsume_qty_agreement = 0.0
             record.remaining_qty_agreement = 0.0
             qty_orders_agreement = 0.0
             qty_agreement = 0.0
             mrp_suborders_objs = self.env['mrp.production'].sudo().search(
-                [('mrp_production_id', '=', record.raw_material_production_id.id)])
-            for mrp_suborders_obj in mrp_suborders_objs:
-                for move_raw_obj in mrp_suborders_obj.move_raw_ids:
-                    if move_raw_obj.product_id == record.product_id:
-                        qty_orders += move_raw_obj.product_qty
-            record.qty_orders = qty_orders
-            if qty_orders > record.product_uom_qty:
-                record.upconsume_qty = qty_orders - record.product_uom_qty
-            else:
+                [('mrp_production_id', '=', record.raw_material_production_id.id),('state','!=','cancel')])
+            if mrp_suborders_objs:
+                for mrp_suborders_obj in mrp_suborders_objs:
+                    for move_raw_obj in mrp_suborders_obj.move_raw_ids:
+                        if move_raw_obj.product_id == record.product_id:
+                            qty_orders += move_raw_obj.quantity  #product_qty
                 record.remaining_qty = record.origin_qty - qty_orders
+            else:
+                qty_orders = record.quantity
+            record.qty_orders = qty_orders
+            # if qty_orders > record.product_uom_qty:
+            #     record.upconsume_qty = qty_orders - record.product_uom_qty
+            # else:
+            record.remaining_qty = record.origin_qty - qty_orders
             # record.quantity = qty_orders
-            # if not record.raw_material_production_id.mrp_production_id:
-            #     record.product_uom_qty = record.product_uom_qty - record.qty_orders
+
             record.origin_qty_cost = record.origin_qty * record.constru_standard_price
+            record.origin_qty_agreementpricebefore_cost = record.origin_qty * record.agreement_unit_price_before
+            record.origin_qty_agreementpriceafter_cost = record.origin_qty * record.agreement_unit_price_after
             record.qty_orders_cost = qty_orders * record.constru_standard_price
             record.remaining_qty_cost = record.remaining_qty * record.constru_standard_price
             record.upconsume_qty_cost = record.upconsume_qty * record.constru_standard_price
 
             purchase_requisition_objs = self.env['purchase.requisition'].sudo().search(
-                [('mrp_production_id', '=', record.raw_material_production_id.id)])
+                [('mrp_production_id', '=', record.raw_material_production_id.id), ('state','not in',['draft','cancel'])])
             for purchase_requisition_obj in purchase_requisition_objs:
                 for move_raw_obj in purchase_requisition_obj.line_ids:
                     if move_raw_obj.product_id == record.product_id:
@@ -282,15 +354,16 @@ class stock_move(models.Model):
                         qty_agreement += move_raw_obj.product_qty
             record.qty_orders_agreement = qty_orders_agreement
             record.qty_agreement = qty_agreement
+            record.remaining_qty_agreement = qty_agreement - qty_orders_agreement
+            if not record.raw_material_production_id.mrp_production_id:
+                if record.origin_qty > qty_orders + qty_orders_agreement:
+                    record.product_uom_qty = record.origin_qty - (qty_orders + qty_orders_agreement)
+                else:
+                    record.product_uom_qty = 0.0
+                    record.upconsume_qty = (qty_orders + qty_orders_agreement) - record.origin_qty
 
-            if qty_orders_agreement > qty_agreement:
-                record.upconsume_qty_agreement = qty_orders_agreement - qty_agreement
-            else:
-                record.remaining_qty_agreement = qty_agreement - qty_orders_agreement
-
-            record.qty_orders_agreement_cost = record.qty_orders_agreement * record.constru_unit_price
-            record.remaining_qty_agreement_cost = record.remaining_qty_agreement * record.constru_unit_price
-            record.upconsume_qty_agreement_cost = record.upconsume_qty_agreement * record.constru_unit_price
+            record.qty_orders_agreement_cost = record.qty_orders_agreement * record.agreement_unit_price_before
+            record.remaining_qty_agreement_cost = record.remaining_qty_agreement * record.agreement_unit_price_before
             if record.raw_material_production_id.is_costsheet:
                 stock_move_report_dict = {
                     'stock_move_id': record.id,
@@ -321,13 +394,11 @@ class stock_move(models.Model):
 
                     'qty_orders_agreement': record.qty_orders_agreement,
                     'remaining_qty_agreement': record.remaining_qty_agreement,
-                    'upconsume_qty_agreement': record.upconsume_qty_agreement,
                     'qty_orders_agreement_cost': record.qty_orders_agreement_cost,
                     'remaining_qty_agreement_cost': record.remaining_qty_agreement_cost,
-                    'upconsume_qty_agreement_cost': record.upconsume_qty_agreement_cost,
 
                     'planned_price': record.planned_price,
-                    'constru_unit_price': record.constru_unit_price,
+                    'agreement_unit_price_before': record.agreement_unit_price_before,
                     'total_up': record.total_up,
                     'total_up_cost': record.total_up_cost,
                 }
@@ -356,13 +427,9 @@ class stock_move(models.Model):
 #     qty_agreement = fields.Float(string='Q A', help="Delivery Agreement", )
 #     qty_orders_agreement = fields.Float(string='D A', help="Delivery Agreement", )
 #     remaining_qty_agreement = fields.Float(string='R A ', help="Remaining Agreement", )
-#     upconsume_qty_agreement = fields.Float(string='Up C A', help="Up Consume Agreement", )
-#
 #     qty_orders_agreement_cost = fields.Float(string='D A Cost', help="Delivery Agreement", )
 #     remaining_qty_agreement_cost = fields.Float(string='R A Cost',
 #                                                 help="Remaining Agreement", )
-#     upconsume_qty_agreement_cost = fields.Float(string='Up C A Cost',
-#                                                 help="Up Consume Agreement", )
 #
 #     constru_standard_price = fields.Float('Cost Price', related="product_id.standard_price", store=True)
 #     constru_unit_price = fields.Float(compute="calc_constru_unit_price", string='Unit Price')

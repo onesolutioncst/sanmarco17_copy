@@ -6,7 +6,17 @@
             <field name="model">purchase.requisition</field>
             <field name="inherit_id" ref="purchase_requisition.view_purchase_requisition_form"/>
             <field name="arch" type="xml">
+                <xpath expr="//field[@name='line_ids']//tree/field[@name='price_unit']" position="attributes">
+                    <attribute name="sum">Total</attribute>
+                </xpath>
+                <xpath expr="//field[@name='line_ids']//tree/field[@name='qty_ordered']" position="attributes">
+                    <attribute name="sum">Total</attribute>
+                </xpath>
+                <xpath expr="//field[@name='line_ids']//tree/field[@name='product_qty']" position="attributes">
+                    <attribute name="sum">Total</attribute>
+                </xpath>
                 <xpath expr="//field[@name='line_ids']//tree" position="inside">
+                    <field name="line_percentage" widget="percentage" optional="hide" />
                     <field name="remaining_qty" optional="hide" sum="Total"/>
                     <field name="upconsume_qty" optional="hide" sum="Total"/>
                     <field name="milestone_qty" optional="hide" sum="Total"/>
@@ -21,6 +31,7 @@
                     </button>
                 </div>
                 <field name="picking_type_id" position="after">
+                    <field name="total_percentage" widget="percentage"/>
                     <label for="is_retention_ar" class="oe_inline"/>
                     <div>
                         <field name="is_retention_ar"/>

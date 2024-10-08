@@ -25,9 +25,13 @@ class manufacture_agreement(models.TransientModel):
             origin += mrp_production.name + ','
             if not mrp_production.mrp_production_id:
                 for mrp_suborders_details_obj in mrp_production.move_raw_ids:
+                    vendor_priceunit = 0.0
+                    if mrp_suborders_details_obj.product_id.variant_seller_ids:
+                        vendor_priceunit = mrp_suborders_details_obj.product_id.variant_seller_ids[0].price
                     purchase_requisition.append((0, 0, {
                         'product_id': mrp_suborders_details_obj.product_id.id,
                         'product_qty': mrp_suborders_details_obj.product_uom_qty,
+                        'price_unit': vendor_priceunit,
                         'analytic_distribution': mrp_production.analytic_distribution,
                         'mrp_production_id': mrp_production.id,
                         'mrp_manufacture_line_id': mrp_suborders_details_obj.id,

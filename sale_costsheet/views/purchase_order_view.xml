@@ -12,7 +12,7 @@
                     <field name="purchase_requisition_line_id"/>
                 </xpath>
                 <xpath expr="//field[@name='notes']" position="after">
-                    <group name="amounts" string="Amounts" >
+                    <group name="amounts" string="Purchased Amounts" >
                         <field name="retention_ar_amount" widget='monetary'
                                invisible="retention_ar_amount == 0.0"
                                options="{'currency_field': 'currency_id'}"
@@ -63,6 +63,44 @@
                                readonly="True"/>
                         <field name="product_amount_costsheet" widget='monetary'
                                invisible="product_amount_costsheet == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                    </group>
+                    <group name="amounts" string="Agreement Amounts" >
+                        <field name="requisition_product_amount_is_discount" widget='monetary'
+                               invisible="requisition_product_amount_is_discount == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="requisition_product_amount_refundable" widget='monetary'
+                               invisible="requisition_product_amount_refundable == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="requisition_product_amount_subcontractor" widget='monetary'
+                               invisible="requisition_product_amount_subcontractor == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="requisition_product_amount_additional" widget='monetary'
+                               invisible="requisition_product_amount_additional == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="requisition_product_amount_variation_Order" widget='monetary'
+                               invisible="requisition_product_amount_variation_Order == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="requisition_product_amount_wages" widget='monetary'
+                               invisible="requisition_product_amount_wages == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="requisition_product_amount_supplier" widget='monetary'
+                               invisible="requisition_product_amount_supplier == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="requisition_product_amount_customer" widget='monetary'
+                               invisible="requisition_product_amount_customer == 0.0"
+                               options="{'currency_field': 'currency_id'}"
+                               readonly="True"/>
+                        <field name="requisition_product_amount_costsheet" widget='monetary'
+                               invisible="requisition_product_amount_costsheet == 0.0"
                                options="{'currency_field': 'currency_id'}"
                                readonly="True"/>
                     </group>

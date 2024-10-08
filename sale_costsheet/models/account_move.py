@@ -45,6 +45,16 @@ class account_move(models.Model):
     sale_product_amount_supplier = fields.Float(string='Is Supplier Amount', related='cons_sale_id.product_amount_supplier')
     sale_product_amount_customer = fields.Float(string='Is Customer Amount',related='cons_sale_id.product_amount_customer')
     sale_product_amount_costsheet = fields.Float(string='Is Costsheet Amount', related='cons_sale_id.product_amount_costsheet')
+    ################### Purchase amounts ############################
+    purchase_product_amount_is_discount = fields.Float(string='Is Discount Amount',related='cons_purchase_id.product_amount_is_discount')
+    purchase_product_amount_refundable = fields.Float(string='Is Refundable Amount',related='cons_purchase_id.product_amount_refundable')
+    purchase_product_amount_subcontractor = fields.Float(string='Is Subcontractor Amount',related='cons_purchase_id.product_amount_subcontractor')
+    purchase_product_amount_additional = fields.Float(string='Is Additional Amount',related='cons_purchase_id.product_amount_additional')
+    purchase_product_amount_variation_Order = fields.Float(string='Is Variation Order Amount',related='cons_purchase_id.product_amount_variation_Order')
+    purchase_product_amount_wages = fields.Float(string='Is Wages Amount', related='cons_purchase_id.product_amount_wages')
+    purchase_product_amount_supplier = fields.Float(string='Is Supplier Amount',related='cons_purchase_id.product_amount_supplier')
+    purchase_product_amount_customer = fields.Float(string='Is Customer Amount',related='cons_purchase_id.product_amount_customer')
+    purchase_product_amount_costsheet = fields.Float(string='Is Costsheet Amount',related='cons_purchase_id.product_amount_costsheet')
 
     crm_lead_id = fields.Many2one('crm.lead', 'LEAD/Opportunity')
 
