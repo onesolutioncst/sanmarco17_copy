@@ -207,7 +207,11 @@ class sale_order(models.Model):
                     'code': f'{order.name.upper()}',
                 })
                 order.warehouse_id = warehouse.id
-        return super(sale_order, self).action_confirm()
+        sale_order_confirm = super(sale_order, self).action_confirm()
+        for record in self:
+            mrp_production_objs = self.env['mrp.production'].search([('sale_costsheet_id','=',record.id)])
+            mrp_production_objs.analytic_distribution = {record.analytic_account_id.id: 100}
+        return sale_order_confirm
 
 
 

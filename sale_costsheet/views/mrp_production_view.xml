@@ -34,10 +34,37 @@
                            invisible="is_costsheet == False" default_focus="1" placeholder="Product to build..."/>
                 </field>
                 <label name="bom_label" position="before">
-                    <field name="unit_price_basedon" />
-                    <field name="sale_contract_unit_price" />
-                    <field name="unit_percentage" widget="percentage"/>
-                    <field name="sale_unit_price_afterpercentage" />
+                    <label for="unit_price_standardprice" name="unit_price_standardprice_label"/>
+                    <div class="o_row" name="stamdardunitprice_div">
+                        <field name="unit_price_standardprice"/>
+                        <field name="unit_percentage_standardprice" widget="percentage"/>
+                        <field name="standardprice_after_percentage"/>
+                        <button name="action_publish_standradprice" type="object" icon="fa-plus"
+                                title="Push standrad Price to Sale order" invisible="published_unit_price">
+                            <span class="ms-2">Publish Price</span>
+                        </button>
+                    </div>
+                    <label for="unit_price_agreementbefore" name="unit_price_agreementbefore_label"/>
+                    <div class="o_row" name="agreementbeforeunitprice_div">
+                        <field name="unit_price_agreementbefore"/>
+                        <field name="unit_percentage_agreementbefore" widget="percentage"/>
+                        <field name="agreementbefore_after_percentage"/>
+                        <button name="action_publish_agreementbefore" type="object" icon="fa-plus"
+                                title="Push standrad Price to Sale order" invisible="published_unit_price">
+                            <span class="ms-2">Publish Price</span>
+                        </button>
+                    </div>
+                    <label for="unit_price_agreementafter" name="unit_price_agreementafter_label"/>
+                    <div class="o_row" name="agreementafterunitprice_div">
+                        <field name="unit_price_agreementafter"/>
+                        <field name="unit_percentage_agreementafter" widget="percentage"/>
+                        <field name="agreementafter_after_percentage"/>
+                        <button name="action_publish_agreementafter" type="object" icon="fa-plus"
+                                title="Push standrad Price to Sale order" invisible="published_unit_price">
+                            <span class="ms-2">Publish Price</span>
+                        </button>
+                    </div>
+                    <field name="published_unit_price" invisible="1"/>
                 </label>
                 <div name="button_box" position="inside">
                     <button name="action_view_suborder" type="object" class="oe_stat_button" icon="fa-pencil-square-o"
