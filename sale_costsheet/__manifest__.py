@@ -34,6 +34,7 @@
     'depends': ['sale_stock', 'mrp_account', 'purchase_requisition', 'fleet', 'account', 'sale_project'],
     'data': [
         'data/server_action.xml',
+        # 'report/sale_order_report.xml',
         'security/delivery_security.xml',
         'security/ir.model.access.csv',
         'wizard/manufacture_agreement_views.xml',

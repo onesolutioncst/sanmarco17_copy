@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <template id="external_layout_pagebreak" inherit_id="web.external_layout">
+            <xpath expr="//t[@t-if='company.external_report_layout_id']" position="before">
+                <style>
+                    .page-break {
+                    page-break-after: always;
+                    }
+                </style>
+            </xpath>
+        </template>
+
+        <template id="report_saleorder_document_custom" inherit_id="sale.report_saleorder_document">
+            <xpath expr="//tbody" position="before">
+                <!-- Define variables for line counting -->
+                <t t-set="line_count" t-value="0"/>
+                <t t-set="page_limit" t-value="5"/> <!-- Set the number of lines per page -->
+            </xpath>
+
+            <xpath expr="//tr[@t-att-class='bg-200 fw-bold o_line_section']" position="after">
+                <t t-set="line_count" t-value="line_count + 1"/>
+                <t t-if="line_count % page_limit == 0">
+                    <!-- Insert a page break after every 'page_limit' lines -->
+                    <tr>
+                        <td colspan="99" class="page-break"></td>
+                    </tr>
+                </t>
+            </xpath>
+        </template>
+
+
+    </data>
+</odoo>

@@ -366,7 +366,7 @@ class stock_move(models.Model):
             # else:
             record.remaining_qty = record.origin_qty - qty_orders
             # record.quantity = qty_orders
-
+            record.origin_qty_cost = 0.0
             record.origin_qty_cost = record.origin_qty * record.constru_standard_price
             record.origin_qty_agreementpricebefore_cost = record.origin_qty * record.agreement_unit_price_before
             record.origin_qty_agreementpriceafter_cost = record.origin_qty * record.agreement_unit_price_after
