@@ -11,7 +11,7 @@ DATES_FORMAT = "%Y-%m-%d"
 class purchase_requisition(models.Model):
     _inherit = "purchase.requisition"
 
-    mrp_production_id = fields.Many2one('mrp.production', trace=True)
+    mrp_production_id = fields.Many2one('mrp.production', tracking=True)
     milestone_count = fields.Integer(compute='_compute_milestone_count')
     is_retention_ar = fields.Boolean('Is Retention')
     rentention_dis_type = fields.Selection([('fixed','Fixed'), ('percentage','Percentage')], 'Type')
@@ -164,7 +164,7 @@ class purchase_requisition_line(models.Model):
     milestone_qty = fields.Float(string="Milestone QTY", related="purchase_requisition_milestone_id.product_uom_qty")
     remaining_milestone_qty = fields.Float(string="Milestone QTY", compute="calc_remaining_milestone_qty")
     mrp_manufacture_line_id = fields.Many2one('stock.move', 'Components')
-    mrp_production_id = fields.Many2one('mrp.production', trace=True)
+    mrp_production_id = fields.Many2one('mrp.production', tracking=True)
     line_percentage = fields.Float('Percentage')
     def calc_remaining_milestone_qty(self):
         for record in self:

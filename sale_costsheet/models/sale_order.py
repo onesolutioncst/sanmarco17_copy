@@ -27,8 +27,8 @@ class sale_order(models.Model):
     advanced_ar_amount = fields.Float('Advanced(AR) Amount', compute="calc_costsheet_total_amount", store=True, precompute=True)
     insurance_ar_amount = fields.Float('Insurance(AR) Amount', compute="calc_costsheet_total_amount", store=True, precompute=True)
 
-    project_startdate = fields.Date('Project Start Date', trace=True, copy=False)
-    project_enddate = fields.Date('Project Start Date', trace=True, copy=False)
+    project_startdate = fields.Date('Project Start Date', tracking=True, copy=False)
+    project_enddate = fields.Date('Project Start Date', tracking=True, copy=False)
     is_warehouse = fields.Boolean('IS Warehouse')
     project_task_type_ids = fields.Many2many('project.task.type', string="Project Stages", copy=False)
     can_see_contract_terms = fields.Boolean('Can See Contract Terms', compute="calc_can_see_contract_terms", copy=False)
