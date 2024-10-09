@@ -68,12 +68,12 @@ class mrp_production(models.Model):
     @api.depends('product_qty','move_raw_ids', 'unit_percentage_standardprice', 'unit_percentage_agreementbefore', 'unit_percentage_agreementafter')
     def calc_sale_contract_unit_price(self):
         for record in self:
-            record.unit_price_standardprice = 0.0 # sum(move_raw_obj.origin_qty_cost for move_raw_obj in record.move_raw_ids) / record.product_qty
-            record.unit_price_agreementbefore = 0.0 #sum(move_raw_obj.origin_qty_agreementpricebefore_cost for move_raw_obj in record.move_raw_ids) / record.product_qty
-            record.unit_price_agreementafter = 0.0 #sum(move_raw_obj.origin_qty_agreementpriceafter_cost for move_raw_obj in record.move_raw_ids) / record.product_qty
-            record.standardprice_after_percentage = 0.0 #record.unit_price_standardprice +record.unit_price_standardprice * record.unit_percentage_standardprice
-            record.agreementbefore_after_percentage =0.0 #record.unit_price_agreementbefore + record.unit_price_agreementbefore *record.unit_percentage_agreementbefore
-            record.agreementafter_after_percentage = 0.0 # record.unit_price_agreementafter + record.unit_price_agreementafter * record.unit_percentage_agreementafter
+            record.unit_price_standardprice = sum(move_raw_obj.origin_qty_cost for move_raw_obj in record.move_raw_ids) / record.product_qty
+            record.unit_price_agreementbefore = sum(move_raw_obj.origin_qty_agreementpricebefore_cost for move_raw_obj in record.move_raw_ids) / record.product_qty
+            record.unit_price_agreementafter = sum(move_raw_obj.origin_qty_agreementpriceafter_cost for move_raw_obj in record.move_raw_ids) / record.product_qty
+            record.standardprice_after_percentage = record.unit_price_standardprice +record.unit_price_standardprice * record.unit_percentage_standardprice
+            record.agreementbefore_after_percentage = record.unit_price_agreementbefore + record.unit_price_agreementbefore *record.unit_percentage_agreementbefore
+            record.agreementafter_after_percentage = record.unit_price_agreementafter + record.unit_price_agreementafter * record.unit_percentage_agreementafter
 
 
 
@@ -258,7 +258,7 @@ class stock_move(models.Model):
     _inherit = "stock.move"
 
     origin_qty = fields.Float('Origin Quantity', tracking=True)
-    origin_qty_cost = fields.Float(compute="calc_qty_orders", string="Origin Quantity Standard Cost", tracking=True)
+    origin_qty_cost = fields.Float(compute="calc_qty_orders", string="Origin Quantity Standard Cost", tracking=True, readonly=False)
     origin_qty_agreementpricebefore_cost = fields.Float(compute="calc_qty_orders", string="Origin Quantity Cost Agreement Price Before", tracking=True)
     origin_qty_agreementpriceafter_cost = fields.Float(compute="calc_qty_orders", string="Origin Quantity Cost Agreement Price After", tracking=True)
     planned_price = fields.Float('Planned Price', tracking=True)
@@ -275,7 +275,7 @@ class stock_move(models.Model):
     qty_orders = fields.Float(compute="calc_qty_orders", string='D S', help="Delivery SubOrder", tracking=True )
 
     remaining_qty = fields.Float(compute="calc_qty_orders", string='R S ', help="Remaining SubOrder", tracking=True )
-    upconsume_qty = fields.Float(compute="calc_qty_orders", string='Up C S ', help="Up Consume SubOrder", tracking=True )
+    upconsume_qty = fields.Float(compute="calc_qty_orders", string='Up C S ', help="Up Consume SubOrder", tracking=True , readonly=False)
     qty_orders_cost = fields.Float(compute="calc_qty_orders", string='D S Cost', help="Delivery SubOrder", tracking=True )
     remaining_qty_cost = fields.Float(compute="calc_qty_orders", string='R S Cost', help="Remaining SubOrder", tracking=True )
     upconsume_qty_cost = fields.Float(compute="calc_qty_orders", string='Up C S Cost', help="Up Consume SubOrder", tracking=True )
