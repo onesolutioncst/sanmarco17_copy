@@ -259,7 +259,7 @@ class stock_move(models.Model):
 
     origin_qty = fields.Float('Origin Quantity', tracking=True)
     origin_qty_cost = fields.Float(compute="calc_qty_orders", string="Origin Quantity Standard Cost", tracking=True, readonly=False)
-    origin_qty_agreementpricebefore_cost = fields.Float(compute="calc_qty_orders", string="Origin Quantity Cost Agreement Price Before", tracking=True, readonly=False)
+    origin_qty_agreementpricebefore_cost = fields.Float(compute="calc_qty_orders", string="Origin Quantity Cost Agreement Price Before", tracking=True)
     origin_qty_agreementpriceafter_cost = fields.Float(compute="calc_qty_orders", string="Origin Quantity Cost Agreement Price After", tracking=True)
     planned_price = fields.Float('Planned Price', tracking=True)
     extra_product_uom_qty = fields.Float(
