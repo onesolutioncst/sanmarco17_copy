@@ -272,7 +272,7 @@ class stock_move(models.Model):
              "the product reservation, and should be done with care.", tracking=True)
     real_product_uom_qty = fields.Float(compute="onchange_extra_product_uom_qty", string='Real To Consumne', tracking=True)
     # quantity = fields.Float(compute="calc_qty_orders", string='Quantity', readonly=False, help="Quantity SubOrder", )
-    qty_orders = fields.Float(compute="calc_qty_orders", string='D S', help="Delivery SubOrder", tracking=True )
+    qty_orders = fields.Float(compute="calc_qty_orders", string='D S', help="Delivery SubOrder", tracking=True, readonly=False)
 
     remaining_qty = fields.Float(compute="calc_qty_orders", string='R S ', help="Remaining SubOrder", tracking=True )
     upconsume_qty = fields.Float(compute="calc_qty_orders", string='Up C S ', help="Up Consume SubOrder", tracking=True , readonly=False)
