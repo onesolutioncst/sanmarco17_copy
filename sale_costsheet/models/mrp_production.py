@@ -293,6 +293,8 @@ class stock_move(models.Model):
     total_up = fields.Float('Total Up', readonly=True, tracking=True)
     total_up_cost = fields.Float('Total UP Cost', compute="calc_total_up_cost", tracking=True)
     main_stock_move_id = fields.Many2one('stock.move', tracking=True)
+    raw_material_production_origin = fields.Char('Manufacturing Source', related="raw_material_production_id.origin")
+
     @api.onchange('extra_product_uom_qty','raw_material_production_id')
     def onchange_extra_product_uom_qty(self):
         for record in self:

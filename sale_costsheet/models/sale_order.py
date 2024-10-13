@@ -127,7 +127,7 @@ class sale_order(models.Model):
                     sale_line_obj.mrp_production_costsheet_id.write({'product_id': sale_line_obj.product_id.id,
                                                                      'product_qty': sale_line_obj.product_uom_qty})
                 else:
-                    if sale_line_obj.product_id.costsheet:
+                    if sale_line_obj.product_id.costsheet and sale_line_obj.product_qty > 0.0:
                         mrp_dic = {
                             'origin': self.name,
                             'product_id': sale_line_obj.product_id.id,
