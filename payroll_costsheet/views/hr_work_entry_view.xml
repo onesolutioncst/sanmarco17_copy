@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="_product" model="ir.ui.view">
+            <field name="name">hr.work.entry.type.form.add_product</field>
+            <field name="model">hr.work.entry.type</field>
+            <field name="inherit_id" ref="hr_work_entry.hr_work_entry_type_view_form"/>
+            <field name="arch" type="xml">
+                <field name="color" position="after">
+                    <field name="product_id" options="{'no_open': True, 'no_create': True}"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>
