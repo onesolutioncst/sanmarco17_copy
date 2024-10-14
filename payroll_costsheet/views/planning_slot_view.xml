@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="planning_slot_view_form_product" model="ir.ui.view">
+            <field name="name">planning.slot.view.form</field>
+            <field name="model">planning.slot</field>
+            <field name="inherit_id" ref="planning.planning_view_form"/>
+            <field name="arch" type="xml">
+                <field name="role_id" position="after">
+                    <field name="work_entry_product_id" options="{'no_open': True, 'no_create': True}"/>
+                </field>
+            </field>
+        </record>
+    </data>
+</odoo>
