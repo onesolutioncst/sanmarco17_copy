@@ -8,10 +8,17 @@ DATES_FORMAT = "%Y-%m-%d"
 class account_analytic_line(models.Model):
     _inherit = "account.analytic.line"
 
-    work_entry_product_id = fields.Many2one('product.product', 'Work entry Product')
+    work_entry_product_id = fields.Many2one('product.product', 'Product')
     product_cost = fields.Float('Cost', related="work_entry_product_id.standard_price", store=True, readonly=False)
     total_timesheet_cost = fields.Float(compute="calc_total_timesheet_cost", string='Timesheet Cost')
     planning_slot_id = fields.Many2one('planning.slot', 'Planning')
+    hr_work_entry_type_id = fields.Many2one('hr.work.entry.type', 'Work Entry Type')
+
+
+    @api.onchange('work_entry_product_id')
+    def onchange_work_entry_product_id(self):
+        for record in self:
+            record.hr_work_entry_type_id = record.work_entry_product_id.hr_work_entry_type_id.id or ''
 
     @api.onchange('product_cost', 'work_entry_product_id', 'unit_amount')
     @api.depends('product_cost', 'work_entry_product_id', 'unit_amount')
