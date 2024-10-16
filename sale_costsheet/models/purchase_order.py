@@ -208,11 +208,9 @@ class purchase_order(models.Model):
     def check_see_rfq(self, requisition_id):
         for record in requisition_id:
             for line_obj in record.line_ids:
-                purchase_order_line_objs = self.env['purchase.order.line'].sudo().search(
-                    [('purchase_requisition_line_id', '=', line_obj.id)])
-                remaining_milestone_qty = sum(
-                    purchase_order_line_obj.product_qty for purchase_order_line_obj in purchase_order_line_objs)
-                if line_obj.milestone_qty > remaining_milestone_qty:
+                purchase_order_line_objs = self.env['purchase.order.line'].sudo().search([('purchase_requisition_line_id', '=', line_obj.id)])
+                remaining_milestone_qty = sum(purchase_order_line_obj.product_qty for purchase_order_line_obj in purchase_order_line_objs)
+                if line_obj.milestone_qty > remaining_milestone_qty and line_obj.purchase_requisition_milestone_id and line_obj.purchase_requisition_milestone_id.is_reached:
                     return True
         return False
 
@@ -286,11 +284,11 @@ class purchase_order(models.Model):
                 purchase_order_line_obj.product_qty for purchase_order_line_obj in purchase_order_line_objs)
             product_qty = milestone_qty - done_milestone_qty
             # Create PO line
-            if product_qty != 0:
-                order_line_values = line._prepare_purchase_order_line(
+            if product_qty != 0 and line.purchase_requisition_milestone_id.is_reached:
+                order_lines.append((0, 0, line._prepare_purchase_order_line(
                     name=name, product_qty=product_qty, price_unit=price_unit,
-                    taxes_ids=taxes_ids)
-                order_lines.append((0, 0, order_line_values))
+                    taxes_ids=taxes_ids)))
+                # order_lines.append((0, 0, order_line_values))
         self.order_line = order_lines
 
     def _prepare_invoice(self):

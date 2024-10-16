@@ -1,4 +1,7 @@
+from os import readv
 from typing import Dict, List
+
+from vobject import readOne
 
 from odoo import api, fields, models, _, SUPERUSER_ID, tools
 import logging
@@ -241,18 +244,19 @@ class mrp_production(models.Model):
 
     def action_cancel(self):
         costsheetcancel = super(mrp_production, self).action_cancel()
-        if self.is_costsheet:
-            new_wizard = self.env['costsheet.cancel.wizard'].sudo().create({
-                'mrp_manufacture_id': self.id,
-            })
-            return {
-                'name': _('Cancel Costsheet Sub Orders'),
-                'view_mode': 'form',
-                'res_model': 'costsheet.cancel.wizard',
-                'type': 'ir.actions.act_window',
-                'target': 'new',
-                'res_id': new_wizard.id,
-            }
+        for record in self:
+            if record.is_costsheet:
+                new_wizard = self.env['costsheet.cancel.wizard'].sudo().create({
+                    'mrp_manufacture_id': record.id,
+                })
+                return {
+                    'name': _('Cancel Costsheet Sub Orders'),
+                    'view_mode': 'form',
+                    'res_model': 'costsheet.cancel.wizard',
+                    'type': 'ir.actions.act_window',
+                    'target': 'new',
+                    'res_id': new_wizard.id,
+                }
         return costsheetcancel
 class stock_move(models.Model):
     _inherit = "stock.move"
@@ -272,9 +276,9 @@ class stock_move(models.Model):
              "the product reservation, and should be done with care.", tracking=True)
     real_product_uom_qty = fields.Float(compute="onchange_extra_product_uom_qty", string='Real To Consumne', tracking=True)
     # quantity = fields.Float(compute="calc_qty_orders", string='Quantity', readonly=False, help="Quantity SubOrder", )
-    qty_orders = fields.Float(compute="calc_qty_orders", string='D S', help="Delivery SubOrder", tracking=True )
+    qty_orders = fields.Float(compute="calc_qty_orders", string='D S', help="Delivery SubOrder", tracking=True , readonly=False)
 
-    remaining_qty = fields.Float(compute="calc_qty_orders", string='R S ', help="Remaining SubOrder", tracking=True )
+    remaining_qty = fields.Float(compute="calc_qty_orders", string='R S ', help="Remaining SubOrder", tracking=True , readonly=False)
     upconsume_qty = fields.Float(compute="calc_qty_orders", string='Up C S ', help="Up Consume SubOrder", tracking=True , readonly=False)
     qty_orders_cost = fields.Float(compute="calc_qty_orders", string='D S Cost', help="Delivery SubOrder", tracking=True )
     remaining_qty_cost = fields.Float(compute="calc_qty_orders", string='R S Cost', help="Remaining SubOrder", tracking=True )
@@ -360,14 +364,18 @@ class stock_move(models.Model):
                     for move_raw_obj in mrp_suborders_obj.move_raw_ids:
                         if move_raw_obj.product_id == record.product_id:
                             qty_orders += move_raw_obj.quantity  #product_qty
-                record.remaining_qty = record.origin_qty - qty_orders
-            else:
-                qty_orders = record.quantity
+                if record.origin_qty > qty_orders:
+                    record.remaining_qty = record.origin_qty - qty_orders
+            # else:
+            #     qty_orders = record.quantity
             record.qty_orders = qty_orders
             # if qty_orders > record.product_uom_qty:
             #     record.upconsume_qty = qty_orders - record.product_uom_qty
             # else:
-            record.remaining_qty = record.origin_qty - qty_orders
+            if record.origin_qty > qty_orders:
+                record.remaining_qty = record.origin_qty - qty_orders
+            if record.remaining_qty == 0.0:
+                print("=============")
             # record.quantity = qty_orders
             record.origin_qty_cost = 0.0
             record.origin_qty_cost = record.origin_qty * record.constru_standard_price
