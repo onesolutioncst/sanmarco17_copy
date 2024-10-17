@@ -59,6 +59,8 @@ class mrp_suborders(models.Model):
                 'mrp_production_id': self.mrp_manufacture_id.id,
                 'product_id': self.mrp_manufacture_id.product_id.id,
                 'product_qty': self.mrp_manufacture_id.product_uom_qty,
+                'bom_id': mrp_suborders_details_obj.product_id.id.bom_ids[
+                    0].id if mrp_suborders_details_obj.product_id.id.bom_ids else '',
                 'analytic_distribution': self.mrp_manufacture_id.analytic_distribution,
                 'picking_type_id': self.mrp_manufacture_id.picking_type_id.id,
                 'location_src_id':self.mrp_manufacture_id.location_src_id.id,

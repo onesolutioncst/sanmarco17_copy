@@ -258,6 +258,13 @@ class mrp_production(models.Model):
                     'res_id': new_wizard.id,
                 }
         return costsheetcancel
+
+    def action_merge(self):
+        res = super().action_merge()
+        if res.get('production.id'):
+            mrp_production_obj = self.env['mrp.production'].sudo().browse(res.get('production.id'))
+            mrp_production_obj.mrp_production_id  = self[0].mrp_production_id.id
+        return res
 class stock_move(models.Model):
     _inherit = "stock.move"
 

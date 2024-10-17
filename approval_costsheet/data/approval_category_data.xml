@@ -15,7 +15,6 @@
             <field name="has_partner">no</field>
             <field name="has_payment_method">no</field>
             <field name="has_location">no</field>
-            <field name="requirer_document">no</field>
             <field name="has_costsheet_order">required</field>
             <field name="has_analytic_account">required</field>
             <field name="approval_minimum">1</field>
@@ -55,7 +54,6 @@
             <field name="has_partner">no</field>
             <field name="has_payment_method">no</field>
             <field name="has_location">no</field>
-            <field name="requirer_document">no</field>
             <field name="has_vendor_id">no</field>
             <field name="approval_minimum">1</field>
             <field name="manager_approval">approver</field>
