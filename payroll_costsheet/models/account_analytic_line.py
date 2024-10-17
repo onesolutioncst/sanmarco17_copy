@@ -1,10 +1,8 @@
 from odoo import api, fields, models, _, SUPERUSER_ID, tools
 import logging
-from datetime import timedelta
+from datetime import timedelta, datetime
 _logger = logging.getLogger(__name__)
 DATES_FORMAT = "%Y-%m-%d"
-
-
 class account_analytic_line(models.Model):
     _inherit = "account.analytic.line"
 
@@ -28,16 +26,28 @@ class account_analytic_line(models.Model):
 
     def create_timesheet_plan(self):
         for record in self:
+            if record.validated_status != 'validated':
+                continue
+            if not record.unit_amount:
+                continue
             hours = int(record.unit_amount)  # Get the whole number of hours
             minutes = round((record.unit_amount - hours) * 60)  # Convert the fractional part to minutes
             planning_dict = {
-                'start_datetime': record.date,
-                'end_datetime': record.date + timedelta(hours=hours, minutes=minutes),
+                'start_datetime': datetime.fromisoformat(record.date.isoformat()),
+                'end_datetime': datetime.fromisoformat(record.date.isoformat()) + timedelta(hours=hours,
+                                                                                            minutes=minutes),
                 'resource_id': record.employee_id.resource_id.id,
-                'work_entry_product_id': record.work_entry_product_id.id
             }
+            if record.work_entry_product_id:
+                planning_dict.update({
+                    'work_entry_product_id': record.work_entry_product_id.id
+                })
             if record.planning_slot_id:
                 record.planning_slot_id.write(planning_dict)
             else:
-                record.planning_slot_id.create(planning_dict)
-            return True
+                try:
+                    record.planning_slot_id.create(planning_dict)
+                except Exception as e:
+                    continue
+                    print(str(e))
+        return True

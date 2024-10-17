@@ -33,6 +33,7 @@
     'website': "https://www.onesolutionc.com",
     'depends': ['hr_payroll','hr_work_entry','hr_timesheet', 'project','planning'],
     'data': [
+        'data/server_action.xml',
         'views/hr_work_entry_view.xml',
         'views/account_analytic_line_view.xml',
         'views/planning_slot_view.xml',
