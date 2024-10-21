@@ -19,8 +19,7 @@ class PurchaseOrderUpdate(models.Model):
 			total = 0
 			if invoice_ids:
 				for bill in invoice_ids:
-					total = bill.amount_total
-					record.invoiced_amount = total
+					record.invoiced_amount += bill.amount_total
 			else:
 				record.invoiced_amount = total
 

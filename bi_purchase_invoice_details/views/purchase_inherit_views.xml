@@ -1,25 +1,31 @@
 <?xml version="1.0"?>
 <odoo>
-	<record id="view_order_form_inherit_purchase_invoice" model="ir.ui.view">
-		<field name="name">purchase.order.form.purchaseinvoice.module</field>
-		<field name="model">purchase.order</field>
-		<field name="inherit_id" ref="purchase.purchase_order_form"/>
-		<field name="arch" type="xml">
+    <record id="view_order_form_inherit_purchase_invoice" model="ir.ui.view">
+        <field name="name">purchase.order.form.purchaseinvoice.module</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_form"/>
+        <field name="arch" type="xml">
 
-			<xpath expr="//button[@name='action_view_invoice']" position="after">
-				<button name="action_amount_paid" type="object" class="oe_stat_button " icon="fa-pencil-square-o" invisible= "invoice_count == 0 " >
-					<field name="amount_paid_percent" widget="statinfo" string="Amount Paid Percent"/>
-				</button>
-			</xpath>
+            <xpath expr="//button[@name='action_view_invoice']" position="after">
+                <button name="action_amount_paid" type="object" class="oe_stat_button " icon="fa-pencil-square-o"
+                        invisible="invoice_count == 0 ">
+                    <field name="amount_paid_percent" widget="statinfo" string="Amount Paid Percent"/>
+                </button>
+            </xpath>
 
-			<xpath expr="//field[@name='notes']" position="after" >
-				<field name="currency_id" invisible="1"/> 
-				<field name="invoiced_amount" widget='monetary' options="{'currency_field': 'currency_id'}" readonly="True" />
-				<field name="paid_amount" widget='monetary' options="{'currency_field': 'currency_id'}" readonly="True" />
-				<field name="amount_due" widget='monetary' options="{'currency_field': 'currency_id'}" readonly="True" />
-			</xpath>
-			
-		</field>
+            <xpath expr="//field[@name='notes']" position="after">
+                <group>
+                    <field name="currency_id" invisible="1"/>
+                    <field name="invoiced_amount" widget='monetary' options="{'currency_field': 'currency_id'}"
+                           readonly="True" invisible="invoiced_amount == 0.0"/>
+                    <field name="paid_amount" widget='monetary' options="{'currency_field': 'currency_id'}"
+                           readonly="True" invisible="paid_amount == 0.0"/>
+                    <field name="amount_due" widget='monetary' options="{'currency_field': 'currency_id'}"
+                           readonly="True" invisible="amount_due == 0.0"/>
+                </group>
+            </xpath>
 
-	</record>
+        </field>
+
+    </record>
 </odoo>
