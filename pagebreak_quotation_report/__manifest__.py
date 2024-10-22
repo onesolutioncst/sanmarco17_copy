@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 {
-    'name': "Custom Pagebreak in Quotation Report",
+    'name': "Custom Pagebreak in Quotation Report Customization",
     'summary': """
         Modification in Quotation Report.""",
     'description': """
