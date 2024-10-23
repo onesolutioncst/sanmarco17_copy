@@ -19,7 +19,12 @@ class purchase_order(models.Model):
     is_insurance_ar = fields.Boolean('Is Insurance')
     insurance_dis_type = fields.Selection([('fixed', 'Fixed'), ('percentage', 'Percentage')], 'Type')
     insurance_amount = fields.Float('Amount')
-    can_see_contract_terms = fields.Boolean('Can See Contract Terms', compute="calc_can_see_contract_terms")
+
+    def get_can_see_contract_terms(self):
+        if self.user_has_groups('sale_costsheet.group_costsheet_contract_terms'):
+            return True
+
+    can_see_contract_terms = fields.Boolean('Can See Contract Terms', compute="calc_can_see_contract_terms", default=get_can_see_contract_terms)
 
     costsheet_inv_total_amount = fields.Float('Total Amount', compute="calc_costsheet_total_amount", precompute=True)
     retention_ar_amount = fields.Float('Retention(AR) Amount', compute="calc_costsheet_total_amount", precompute=True)

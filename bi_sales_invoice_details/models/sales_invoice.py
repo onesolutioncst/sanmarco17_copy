@@ -4,53 +4,36 @@
 from odoo import api, fields, models, _
 import logging
 _logger = logging.getLogger(__name__)
-
+from odoo.tools import SQL
 class SaleOrderUpdate(models.Model):
     _inherit = 'sale.order'
 
-    invoiced_amount = fields.Float(string = 'Invoiced Amount' ,compute ='_compute_invoice_amount',compute_sudo=True, store=True)
-    amount_due = fields.Float(string ='Amount Due',compute ='_compute_amount_due',compute_sudo=True, store=True)
-    paid_amount = fields.Float(string ='Paid Amount',compute ='_compute_paid_amount',compute_sudo=True ,default=0.0, store=True)
-    amount_paid_percent = fields.Float(compute = 'action_amount_paid',compute_sudo=True, store=True)
-    currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.user.company_id.currency_id)
+    invoiced_amount = fields.Float(string = 'Invoiced Amount' ,compute ='_compute_invoice_amount',compute_sudo=True , readonly=False , store=True)
+    amount_due = fields.Float(string ='Amount Due',compute ='_compute_invoice_amount',compute_sudo=True, readonly=False, store=True)
+    paid_amount = fields.Float(string ='Paid Amount',compute ='_compute_invoice_amount',compute_sudo=True , readonly=False, store=True)
+    remaining_amount = fields.Float(string='Remaining Amount', compute='_compute_invoice_amount', compute_sudo=True, readonly=False, store=True)
 
+    amount_paid_percent = fields.Float(compute = 'action_amount_paid',compute_sudo=True, readonly=False)
+    currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.user.company_id.currency_id)
+    recalc_fields = fields.Boolean(compute="_compute_invoice_amount")
+
+    @api.onchange('invoice_count', 'invoice_ids', 'invoice_status')
     @api.depends('invoice_count', 'invoice_ids', 'invoice_status')
     def _compute_invoice_amount(self):
         for record in self:
-            invoice_id = self.env['account.move'].search(['&',('invoice_origin','=', record.name),'|',('state','=','draft'),('state','=','posted'),
+            invoice_id = self.env['account.move'].search([('invoice_origin','=', record.name),
+                                                          ('state','in',['draft','posted']),
                                                           ('payment_state', 'not in', ['reversed', 'invoicing_legacy'])])
-            total = 0
-
-            if invoice_id:
-                for invoice in invoice_id:
-                    total += invoice.amount_total
-                    record.invoiced_amount = total
-            else:
-                record.invoiced_amount = total
-
-
-    @api.depends('paid_amount','invoiced_amount', 'amount_due')
-    def _compute_amount_due(self):
-        for record in self:
-            invoice_ids = self.env['account.move'].search(['&',('invoice_origin','=', record.name),'|',('state','=','draft'),('state','=','posted'),('payment_state', 'not in', ['reversed', 'invoicing_legacy'])])
-            amount = 0
-            if invoice_ids:
-                for inv in invoice_ids:
-                    amount  += inv.amount_residual   
-                    record.amount_due = amount
-            else:
-                record.amount_due = amount
-
-
-    @api.onchange('invoiced_amount', 'amount_due')
-    def _compute_paid_amount(self):
-        for record in self:
-            amount = record.invoiced_amount - record.amount_due
-            if amount:
-                record.paid_amount = amount
-            else:
-                record.paid_amount = 0.0
-
+            amount_total = 0.0
+            amount_residual = 0.0
+            record.recalc_fields = True
+            for invoice in self.invoice_ids:
+                amount_total += invoice.amount_total
+                amount_residual += invoice.amount_residual
+            record.invoiced_amount = amount_total
+            record.amount_due = amount_residual
+            record.paid_amount = amount_total - amount_residual
+            record.remaining_amount = record.amount_total - amount_total
 
     @api.depends('paid_amount', 'invoiced_amount')
     def action_amount_paid(self):

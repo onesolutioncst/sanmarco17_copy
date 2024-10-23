@@ -31,7 +31,11 @@ class sale_order(models.Model):
     project_enddate = fields.Date('Project Start Date', tracking=True, copy=False)
     is_warehouse = fields.Boolean('IS Warehouse')
     project_task_type_ids = fields.Many2many('project.task.type', string="Project Stages", copy=False)
-    can_see_contract_terms = fields.Boolean('Can See Contract Terms', compute="calc_can_see_contract_terms", copy=False)
+    def get_can_see_contract_terms(self):
+        if self.user_has_groups('sale_costsheet.group_costsheet_contract_terms'):
+            return True
+
+    can_see_contract_terms = fields.Boolean('Can See Contract Terms', compute="calc_can_see_contract_terms", default=get_can_see_contract_terms)
 
     product_amount_is_discount = fields.Float(string= 'Is Discount Amount', compute="calc_product_type_amount", store=True)
     product_amount_refundable = fields.Float(string= 'Is Refundable Amount', compute="calc_product_type_amount", store=True)
