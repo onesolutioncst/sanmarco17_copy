@@ -27,7 +27,7 @@ class SaleOrderUpdate(models.Model):
             amount_total = 0.0
             amount_residual = 0.0
             record.recalc_fields = True
-            for invoice in self.invoice_ids.filtered(lambda invoice: invoice.state in ['draft', 'posted']):
+            for invoice in record.invoice_ids.filtered(lambda invoice: invoice.state in ['draft', 'posted']):
                 amount_total += invoice.amount_total
                 amount_residual += invoice.amount_residual
             record.invoiced_amount = amount_total
