@@ -109,6 +109,7 @@
                 </xpath>
 
                 <xpath expr="//field[@name='move_raw_ids']//tree" position="inside">
+                    <field name="recalc_fields" invisible="1"/>
                     <field name="qty_orders" optional="hide" sum="total"/>
                     <field name="qty_orders_cost" optional="hide" sum="total"/>
                     <field name="remaining_qty" optional="hide" sum="total"/>
@@ -119,17 +120,9 @@
                     <field name="qty_orders_agreement_cost" optional="hide" sum="total"/>
                     <field name="remaining_qty_agreement" optional="hide" sum="total"/>
                     <field name="remaining_qty_agreement_cost" optional="hide" sum="total"/>
-
                     <field name="agreement_unit_price_before" optional="hide" sum="total"/>
                     <field name="constru_standard_price" optional="hide" sum="total"/>
-                    <!--                    <control>-->
-                    <!--                        <button name="action_add_from_catalog" string="Catalog" type="object" class="px-4 btn-link"-->
-                    <!--                                context="{'order_id': parent.id}"/>-->
-                    <!--                    </control>-->
                 </xpath>
-                <!--                <xpath expr="//field[@name='move_raw_ids']//tree/field[@name='product_id']" position="attributes">-->
-                <!--                    <attribute name="domain">[('raw_material_production_id.is_costsheet','=',True), ('costsheet','=',True)]</attribute>-->
-                <!--                </xpath>-->
             </field>
         </record>
 
