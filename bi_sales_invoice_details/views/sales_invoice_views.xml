@@ -37,7 +37,7 @@
         <field name="inherit_id" ref="sale.view_quotation_tree_with_onboarding"/>
         <field name="arch" type="xml">
             <xpath expr="//field[@name='state']" position="after">
-                <field name="recalc_fields" invisible="1"/>
+                <field name="recalc_fields" column_invisible="True"/>
             </xpath>
         </field>
     </record>
@@ -47,7 +47,7 @@
         <field name="inherit_id" ref="sale.view_order_tree"/>
         <field name="arch" type="xml">
             <field name="state" position="after">
-                <field name="recalc_fields" invisible="1"/>
+                <field name="recalc_fields" column_invisible="True"/>
             </field>
         </field>
     </record>
