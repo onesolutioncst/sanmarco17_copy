@@ -20,7 +20,7 @@ class PurchaseOrderUpdate(models.Model):
 			record.recalc_fields = True
 			invoiced_amount = 0.0
 			amount_due = 0.0
-			for bill in self.invoice_ids:
+			for bill in self.invoice_ids.filtered(lambda invoice: invoice.state in ['draft', 'posted']):
 				invoiced_amount += bill.amount_total
 				amount_due += bill.amount_residual
 			record.invoiced_amount = invoiced_amount
