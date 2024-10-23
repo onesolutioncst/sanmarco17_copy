@@ -10,9 +10,9 @@ class SaleOrderUpdate(models.Model):
 
     invoiced_amount = fields.Float(string = 'Invoiced Amount' ,compute ='_compute_invoice_amount',compute_sudo=True , readonly=False , store=True)
     amount_due = fields.Float(string ='Amount Due',compute ='_compute_invoice_amount',compute_sudo=True, readonly=False, store=True)
-    paid_amount = fields.Float(string ='Paid Amount',compute ='_compute_invoice_amount',compute_sudo=True ,default=0.0, readonly=False, store=True)
-    remaining_amount = fields.Float(string='Remaining Amount', compute='_compute_invoice_amount', compute_sudo=True, default=0.0,
-                               readonly=False, store=True)
+    paid_amount = fields.Float(string ='Paid Amount',compute ='_compute_invoice_amount',compute_sudo=True , readonly=False, store=True)
+    remaining_amount = fields.Float(string='Remaining Amount', compute='_compute_invoice_amount', compute_sudo=True, readonly=False, store=True)
+
     amount_paid_percent = fields.Float(compute = 'action_amount_paid',compute_sudo=True, readonly=False)
     currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.user.company_id.currency_id)
     recalc_fields = fields.Boolean(compute="_compute_invoice_amount")
@@ -27,7 +27,7 @@ class SaleOrderUpdate(models.Model):
             amount_total = 0.0
             amount_residual = 0.0
             record.recalc_fields = True
-            for invoice in self.invoice_ids:
+            for invoice in self.invoice_ids.filtered(lambda invoice: invoice.state in ['draft', 'posted']):
                 amount_total += invoice.amount_total
                 amount_residual += invoice.amount_residual
             record.invoiced_amount = amount_total
