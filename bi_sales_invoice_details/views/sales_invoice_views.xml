@@ -18,10 +18,12 @@
 			<group>
 					<group>
 						<field name="currency_id" invisible="1"/>
+						<field name="recalc_fields"/>
 						<field name="invoiced_amount" widget='monetary' options="{'currency_field': 'currency_id'}" readonly="True"/>
 						<field name="amount_due" widget='monetary' options="{'currency_field': 'currency_id'}" readonly="True"/>
 						<field name="paid_amount" widget='monetary' options="{'currency_field': 'currency_id'}" readonly="True"/>
-					</group> 
+						<field name="remaining_amount" widget='monetary' options="{'currency_field': 'currency_id'}" readonly="True"/>
+					</group>
 	   
 			 </group>   
 			</xpath>
