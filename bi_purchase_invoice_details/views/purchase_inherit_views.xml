@@ -16,12 +16,15 @@
             <xpath expr="//field[@name='notes']" position="after">
                 <group>
                     <field name="currency_id" invisible="1"/>
+                    <field name="recalc_fields" invisible="1"/>
                     <field name="invoiced_amount" widget='monetary' options="{'currency_field': 'currency_id'}"
-                           readonly="True" invisible="invoiced_amount == 0.0"/>
+                           readonly="True" />
                     <field name="paid_amount" widget='monetary' options="{'currency_field': 'currency_id'}"
-                           readonly="True" invisible="paid_amount == 0.0"/>
+                           readonly="True" />
                     <field name="amount_due" widget='monetary' options="{'currency_field': 'currency_id'}"
-                           readonly="True" invisible="amount_due == 0.0"/>
+                           readonly="True" />
+                    <field name="remaining_amount" widget='monetary' options="{'currency_field': 'currency_id'}"
+                           readonly="True" />
                 </group>
             </xpath>
 

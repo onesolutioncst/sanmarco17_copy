@@ -6,22 +6,27 @@ from odoo import api, fields, models, _
 class PurchaseOrderUpdate(models.Model):
 	_inherit = 'purchase.order'
 
-	invoiced_amount = fields.Float(string = 'Invoiced Amount',compute ='_compute_invoiced_amount',compute_sudo=True)
-	amount_due = fields.Float(string ='Amount Due', compute ='_computedue',compute_sudo=True)
-	paid_amount = fields.Float(string ='Paid Amount', compute ='_computepaid',compute_sudo=True)
+	invoiced_amount = fields.Float(string = 'Invoiced Amount',compute ='_compute_invoiced_amount',compute_sudo=True, store=True)
+	amount_due = fields.Float(string ='Amount Due', compute ='_compute_invoiced_amount',compute_sudo=True, store=True)
+	paid_amount = fields.Float(string ='Paid Amount', compute ='_compute_invoiced_amount',compute_sudo=True, store=True)
+	remaining_amount = fields.Float(string='Remaining Amount', compute='_compute_invoiced_amount', compute_sudo=True,store=True)
+	recalc_fields = fields.Boolean(compute="_compute_invoiced_amount")
 	amount_paid_percent = fields.Float(compute = 'action_amount_paid',compute_sudo=True)
 	currency_id = fields.Many2one('res.currency', string='Currency', default=lambda self: self.env.user.company_id.currency_id)
 
 	@api.depends('paid_amount','invoiced_amount', 'amount_due')
 	def _compute_invoiced_amount(self):
 		for record in self:
-			invoice_ids = self.env['account.move'].search(['&',('invoice_origin','=', record.name),'|',('state','=','draft'),('state','=','posted'),('payment_state', 'not in', ['reversed', 'invoicing_legacy'])])
-			total = 0
-			if invoice_ids:
-				for bill in invoice_ids:
-					record.invoiced_amount += bill.amount_total
-			else:
-				record.invoiced_amount = total
+			record.recalc_fields = True
+			invoiced_amount = 0.0
+			amount_due = 0.0
+			for bill in self.invoice_ids:
+				invoiced_amount += bill.amount_total
+				amount_due += bill.amount_residual
+			record.invoiced_amount = invoiced_amount
+			record.amount_due = amount_due
+			record.paid_amount = invoiced_amount - amount_due
+			record.remaining_amount = record.amount_total - invoiced_amount
 
 
 	
