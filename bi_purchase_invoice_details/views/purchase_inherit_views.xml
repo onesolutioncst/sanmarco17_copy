@@ -18,17 +18,38 @@
                     <field name="currency_id" invisible="1"/>
                     <field name="recalc_fields" invisible="1"/>
                     <field name="invoiced_amount" widget='monetary' options="{'currency_field': 'currency_id'}"
-                           readonly="True" />
+                           readonly="True"/>
                     <field name="paid_amount" widget='monetary' options="{'currency_field': 'currency_id'}"
-                           readonly="True" />
+                           readonly="True"/>
                     <field name="amount_due" widget='monetary' options="{'currency_field': 'currency_id'}"
-                           readonly="True" />
+                           readonly="True"/>
                     <field name="remaining_amount" widget='monetary' options="{'currency_field': 'currency_id'}"
-                           readonly="True" />
+                           readonly="True"/>
                 </group>
             </xpath>
-
         </field>
+    </record>
 
+    <record id="purchase_order_kpis_tree_recalc" model="ir.ui.view">
+        <field name="name">purchase.order.kpis.tree.inherit.purchase.requisition</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_kpis_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="recalc_fields" column_invisible="True"/>
+            </xpath>
+        </field>
+    </record>
+
+
+    <record id="purchase_order_view_tree_recalc" model="ir.ui.view">
+        <field name="name">purchase.order.tree.inherit</field>
+        <field name="model">purchase.order</field>
+        <field name="inherit_id" ref="purchase.purchase_order_view_tree"/>
+        <field name="arch" type="xml">
+            <xpath expr="//field[@name='state']" position="after">
+                <field name="recalc_fields" column_invisible="True"/>
+            </xpath>
+        </field>
     </record>
 </odoo>
