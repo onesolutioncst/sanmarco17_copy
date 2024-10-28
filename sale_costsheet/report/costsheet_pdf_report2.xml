@@ -1,0 +1,228 @@
+<odoo>
+    <data>
+        <template id="pdf_report">
+            <t t-call="web.basic_layout">
+                <div class="page" style="text-align:center;border:2px solid black; width:100%; height:100%;">
+                    <!-- Header Section -->
+                    <div>
+                        <div class="row"
+                             style="display: flex; text-align: center;">
+                            <div class="col-4" style="text-align: left;">
+                                <p>PROJECT NAME</p>
+                                <p>CONTRACTOR</p>
+                                <p>Main Contractor</p>
+                            </div>
+                            <div class="col-4" style="text-align: center;">
+                                <p>الشركة الكويتية السويدية للتجارة العامة والمقاولات</p>
+                                <p>Options Company</p>
+                            </div>
+                            <div class="col-4" style="text-align: right;" dir="rtl">
+                                <p>اسم المشروع</p>
+                                <p>المقاول</p>
+                                <p>المقاول الرئيسي</p>
+                            </div>
+                        </div>
+
+                        <!-- First Line -->
+                        <hr style="border-top: 2px solid black; margin: 20px 0;"/>
+
+                        <!-- Certificate Details -->
+                        <div class="row" style="display: flex; justify-content: space-between; padding: 10px 0;">
+                            <div class="col-6" style="text-align: left;">Certificate No.: 2</div>
+                            <div class="col-6" style="text-align: right;">Date: 01-Oct-24</div>
+                        </div>
+
+                        <!-- Second Line -->
+                        <hr style="border-top: 2px solid black; margin: 20px 0;"/>
+
+                        <!-- Spacing -->
+                        <br/>
+                        <br/>
+
+                        <!-- Third Line -->
+                        <hr style="border-top: 2px solid black; margin: 20px 0;"/>
+
+                        <!-- Additional Section -->
+                        <div class="row" style="display: flex; text-align: center; background-color:#e6e6e6;">
+                            <div class="col-4" style="text-align: left;">
+                                <p>Item</p>
+                                <p>Subcontractor</p>
+                            </div>
+
+                            <div class="col-4" style="text-align: center; padding-top: 10px;">
+                                <p>اعمال التكييف والتهوية</p>
+                                <p>الشركة الكويتية السويدية للتجارة العامة والمقاوالت</p>
+                            </div>
+                            <div class="col-4" style="text-align: right;padding-right:1px" dir="rtl">
+                                <p>البند</p>
+                                <p>المقاول</p>
+                            </div>
+
+                        </div>
+                        <hr style="border-top: 2px solid black; margin: 20px 0;"/>
+
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="row">
+                                    <div class="col-4" style="text-align: left;">
+                                        <p>Original Contract Sum</p>
+                                        <p>Additional Works (VAV)</p>
+                                        <p>Variation Orders (+)</p>
+                                        <p>Variation Orders (-)</p>
+                                        <p>Adjusted Contract Sum</p>
+                                    </div>
+                                    <div class="col-4" style="text-align: right;" dir="rtl">
+                                        <p>قيمة العقد (التكييف)</p>
+                                        <p>قيمة العقد (التهوية)</p>
+                                        <p>الاعمال الاضافية</p>
+                                        <p>الاعمال التعديلية المضافة</p>
+                                        <p>االعمال التعديلية
+                                            الملغية
+                                        </p>
+                                        <p>المجموع الكلي للعقد</p>
+                                    </div>
+
+                                </div>
+
+
+                            </div>
+                            <!--                            <div style="border-left: 2px solid black; height: 50px; margin: 0 10px;"></div> &lt;!&ndash; Vertical Line &ndash;&gt;-->
+
+                            <div class="col-4">
+                                <div class="row">
+                                    <div class="col-3" style="text-align: left;">
+                                        <p>Date Sign.C</p>
+                                        <br/>
+                                        <p>Duration C</p>
+
+                                    </div>
+                                    <div class="col-1" style="text-align: right;" dir="rtl">
+                                        <!--                                    <hr style="border-top: 2px solid black;width:20px;"/>-->
+                                        <!--                                    <hr style="border-top: 2px solid black; margin: 20px 0;"/>-->
+                                        <!--                                    <hr style="border-top: 2px solid black; margin: 20px 0;"/>-->
+                                        <!--                                    <hr style="border-top: 2px solid black; margin: 20px 0;"/>-->
+                                        <!--                                    <hr style="border-top: 2px solid black; margin: 20px 0;"/>-->
+                                        <!--                                    <hr style="border-top: 2px solid black; margin: 20px 0;"/>-->
+                                    </div>
+
+
+                                </div>
+
+                            </div>
+                        </div>
+                        <hr style="border-top: 2px solid black; margin: 20px 0;"/>
+
+                        <div class="row">
+                            <div class="col-8">
+                                <div class="row">
+                                    <div class="col-4" style="text-align: left;">
+                                        <p>A. Value of Executed Works Part A</p>
+                                        <p>B. Value of Executed Works - Additional Works ( Part B )</p>
+                                        <p>C. Value of Executed Variation Orders</p>
+                                        <p>D. Total Value of Work (A+B+C)</p>
+                                        <p>F. Less Previous Payment Certifiacates
+                                            Retention 10%
+                                            Insurance 100 KD
+                                        </p>
+                                        <p>G. Amount Due this Certificate(D-E-F)</p>
+                                    </div>
+                                    <div class="col-4" style="text-align: right;" dir="rtl">
+                                        <p>قيمة الاعمال المنجزة من العقد</p>
+                                        <p>قيمة الاعمال التعديلية</p>
+                                        <p>مجموع الاعمال المنجزة</p>
+                                        <p>خصم الدفعات السابقة
+                                            خصم محجوز الضمان
+                                            خصم التأمين
+                                        </p>
+                                        <p>المبلغ المستحق
+                                        </p>
+
+                                    </div>
+
+
+                                </div>
+
+
+                            </div>
+                            <!--                            <div style="border-left: 2px solid black; height: 50px; margin: 0 10px;"></div> &lt;!&ndash; Vertical Line &ndash;&gt;-->
+
+                            <div class="col-4">
+                                <div class="col-3" style="text-align: left;">
+                                    <p>توريد وتركيب المكاين الداخلية</p>
+                                    <br/>
+                                    <p>توريد وتركيب التهوية</p>
+
+                                </div>
+                                <div class="col-1" style="text-align: right;" dir="rtl">
+                                    <!--                                    <hr style="border-top: 2px solid black; margin: 20px 0;"/>-->
+                                    <!--                                    <hr style="border-top: 2px solid black; margin: 20px 0;"/>-->
+                                    <!--                                    <hr style="border-top: 2px solid black; margin: 20px 0;"/>-->
+                                    <!--                                    <hr style="border-top: 2px solid black; margin: 20px 0;"/>-->
+                                    <!--                                    <hr style="border-top: 2px solid black; margin: 20px 0;"/>-->
+                                    <!--                                    <hr style="border-top: 2px solid black; margin: 20px 0;"/>-->
+                                </div>
+
+                            </div>
+                        </div>
+                        <hr style="border-top: 2px solid black; margin: 20px 0;"/>
+
+                        <div class="row" style="display: flex; justify-content: space-between; padding: 10px 0;">
+                            <div class="col-6" style="text-align: left;">KUWAITI DINARS:</div>
+                        </div>
+                        <hr style="border-top: 2px solid black; margin: 20px 0;"/>
+                        <div class="row" style="display: flex; justify-content: space-between; padding: 10px 0;">
+                            <div class="col-6" style="text-align: left;">
+                                <span>
+                                    <hr style="width:40%"/>
+                                </span>
+                                <span>Subcontractor توقيع المقاول
+                                </span>
+
+                            </div>
+                            <div class="col-6" style="text-align: left;">
+                                <span>
+                                    <hr style="width:40%"/>
+                                </span>
+                                <span>Projects Manager المهندس او مدير المشروع
+                                </span>
+                            </div>
+                        </div>
+
+
+                    </div>
+
+
+                </div>
+
+
+            </t>
+        </template>
+        <record id="paperformat_invoice" model="report.paperformat">
+            <field name="name">A4 invoice</field>
+            <field name="default" eval="True"/>
+            <field name="format">A4</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">3</field>
+            <field name="margin_bottom">5</field>
+            <field name="margin_left">5</field>
+            <field name="margin_right">5</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">35</field>
+            <field name="dpi">90</field>
+        </record>
+        <record id="report_sale" model="ir.actions.report">
+            <field name="name">Costsheet Report</field>
+            <field name="model">sale.order</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">sale_costsheet.pdf_report</field>
+            <field name="report_file">sale_costsheet.pdf_report</field>
+            <field name="binding_model_id" ref="sale.model_sale_order"/>
+                    <field name="paperformat_id" ref="sale_costsheet.paperformat_invoice"/>
+            <field name="print_report_name">'%s' % (object.name)</field>
+            <field name="binding_type">report</field>
+        </record>
+
+    </data>
+</odoo>

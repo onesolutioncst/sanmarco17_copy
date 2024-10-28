@@ -1,0 +1,707 @@
+<odoo>
+    <data>
+        <template id="pdf_report">
+            <t t-call="web.basic_layout">
+                <div class="page" style="text-align:center;border:2px solid black; width:100%; height:100%;">
+                    <!-- Header Section -->
+                    <header>
+        <h1
+                style="
+            font-size: 24px;
+            text-transform: uppercase;
+            color: #333;
+            width: 50%;
+            float: left;
+          "
+        >
+            OPTIONS
+        </h1>
+        <div
+                style="
+            font-size: 24px;
+            text-transform: uppercase;
+            color: #333;
+            width: 50%;
+            float: right;
+            text-align: right;
+          "
+        >
+            <h6
+                    style="
+              background-color: grey;
+              border: 1px solid black;
+              width: fit-content;
+              padding: 5px;
+              margin: 0;
+              float: right;
+            "
+            >
+                Payment Certificate
+            </h6>
+            <br/>
+            <p style="font-size: 12px; text-decoration: underline">
+                Yarmouk VILLA ( Construction ) project
+            </p>
+        </div>
+    </header>
+                    <div style="clear: both"></div>
+                    <div style="border: 1px solid black; padding: 3px">
+                        <div style="border: 1px solid black; padding: 20px">
+                            <div style="margin: 5px 0">
+                                <div style="text-align: left; float: left; width: 50%">
+                                    <label for="projectName">
+                                        <strong>Project Name:</strong>
+                                    </label>
+                                    <input
+                                            type="text"
+                                            id="projectName"
+                                            value="Mitlaa Villa Block 3 Plot 225"
+                                            style="
+                  border: none;
+                  padding: 5px;
+                  width: calc(100% - 150px);
+                  float: right;
+                "
+                                    />
+
+                                    <!-- <label for="certificateNo"><strong>Certificate No:</strong></label>
+                                  <input
+                                    type="text"
+                                    id="certificateNo"
+                                    value="1"
+                                    style="border: none; padding: 5px; width: 50px"
+                                  /> -->
+
+                                    <!-- <label for="date" style="margin-left: 20px"
+                                    ><strong>Date:</strong></label
+                                  >
+                                  <input
+                                    type="text"
+                                    id="date"
+                                    value="23-Oct-24"
+                                    style="border: none; padding: 5px; width: 100px"
+                                  /> -->
+                                </div>
+
+                                <div
+                                        style="
+                text-align: right;
+                direction: rtl;
+                float: right;
+                width: 50%;
+              "
+                                >
+                                    <label for="projectNameAr">
+                                        <strong>اسم المشروع:</strong>
+                                    </label>
+                                    <input
+                                            type="text"
+                                            id="projectNameAr"
+                                            value="225 قسيمة - 3 قطعة - N1 المطالع"
+                                            style="
+                  border: none;
+                  text-align: center;
+                  padding: 5px;
+                  width: calc(100% - 150px);
+                  direction: rtl;
+                "
+                                    />
+
+                                    <!-- <label for="certificateNoAr"><strong>رقم الشهادة:</strong></label>
+                                  <input
+                                    type="text"
+                                    id="certificateNoAr"
+                                    value="1"
+                                    style="border: none; padding: 5px; width: 50px"
+                                  />
+
+                                  <label for="dateAr" style="margin-left: 20px"
+                                    ><strong>التاريخ:</strong></label
+                                  >
+                                  <input
+                                    type="text"
+                                    id="dateAr"
+                                    value="23-أكتوبر-24"
+                                    style="border: none; padding: 5px; width: 100px"
+                                  /> -->
+                                </div>
+                            </div>
+                            <div style="clear: both"></div>
+
+                            <div style="margin: 5px 0">
+                                <div style="text-align: left; float: left; width: 50%">
+                                    <label for="subcontractor">
+                                        <strong>contractor:</strong>
+                                    </label>
+                                    <input
+                                            type="text"
+                                            id="subcontractor"
+                                            value="Sherif Gamal Mohamed Bakr"
+                                            style="border: none; padding: 5px; width: calc(100% - 150px)"
+                                    />
+                                </div>
+                                <div
+                                        style="text-align: right; direction: rtl; float: left; width: 50%"
+                                >
+                                    <label for="subcontractorAr">
+                                        <strong>المقاول :</strong>
+                                    </label>
+                                    <input
+                                            type="text"
+                                            id="subcontractorAr"
+                                            value="شريف جميل محمد بكر"
+                                            style="border: none; padding: 5px; width: calc(100% - 150px)"
+                                    />
+                                </div>
+                            </div>
+                            <div style="clear: both"></div>
+                            <div style="margin: 5px 0">
+                                <div style="text-align: left; float: left; width: 50%">
+                                    <label for="mainContractor"
+                                    >
+                                        <strong>Main Contractor:</strong>
+                                    </label
+                                    >
+                                    <input
+                                            type="text"
+                                            id="mainContractor"
+                                            value="Options Company"
+                                            style="border: none; padding: 5px; width: calc(100% - 150px)"
+                                    />
+                                </div>
+                                <div
+                                        style="text-align: right; direction: rtl; float: left; width: 50%"
+                                >
+                                    <label for="mainContractorAr"
+                                    >
+                                        <strong>المقاول الرئيسي:</strong>
+                                    </label
+                                    >
+                                    <input
+                                            type="text"
+                                            id="mainContractorAr"
+                                            value="شركة أوبشنز"
+                                            style="border: none; padding: 5px; width: calc(100% - 150px)"
+                                    />
+                                </div>
+                            </div>
+
+                            <div style="clear: both"></div>
+                        </div>
+                        <!-- hiiiiiiiiiiiiiiiii -->
+
+                        <div style="border: 1px solid black; padding: 20px; margin-top: 2px">
+                            <div style="margin: 5px 0">
+                                <div style="text-align: left; float: left; width: 50%">
+                                    <label for="certificateNo"
+                                    >
+                                        <strong>Certificate No:</strong>
+                                    </label
+                                    >
+                                    <input
+                                            type="text"
+                                            id="certificateNo"
+                                            value="1"
+                                            style="border: none; padding: 5px; width: 50px"
+                                    />
+                                </div>
+
+                                <div
+                                        style="
+                text-align: right;
+
+                float: right;
+                width: 50%;
+              "
+                                >
+                                    <label for="date" style="margin-left: 20px"
+                                    >
+                                        <strong>Date:</strong>
+                                    </label
+                                    >
+                                    <input
+                                            type="text"
+                                            id="date2"
+                                            value="23-Oct-24"
+                                            style="border: none; padding: 5px; width: 100px"
+                                    />
+                                </div>
+                            </div>
+
+                            <div style="clear: both"></div>
+                        </div>
+                        <!-- grey -->
+
+                        <div style="border: 1px solid black; padding: 20px 0; margin-top: 2px">
+                            <div
+                                    style="
+              border-top: 1px solid black;
+              border-bottom: 1px solid black;
+              padding: 20px;
+              margin-top: 2px;
+              background-color: rgb(223, 223, 223);
+            "
+                            >
+                                <div style="margin: 5px 0">
+                                    <div style="text-align: left; float: left; width: 50%">
+                                        <div for="certificateNo" style="margin-bottom: 5px">
+                                            <strong>Item</strong>
+                                        </div>
+                                        <div for="certificateNo">
+                                            <strong>Subcontractor</strong>
+                                        </div>
+                                    </div>
+
+                                    <div
+                                            style="
+                  text-align: right;
+                  direction: rtl;
+                  float: right;
+                  width: 50%;
+                "
+                                    >
+                                        <div>
+                                            <label for="date" style="margin-left: 20px">
+                                                <strong>البند</strong>
+                                            </label>
+                                            <input
+                                                    type="text"
+                                                    id="date3"
+                                                    value="اعمال المساح الداخلي"
+                                                    style="
+                      border: none;
+                      padding: 5px;
+                      width: 100px;
+                      background-color: transparent;
+                      font-weight: bold;
+                    "
+                                            />
+                                        </div>
+                                        <div>
+                                            <label for="date" style="margin-left: 20px">
+                                                <strong>المقاول</strong>
+                                            </label>
+                                            <input
+                                                    type="text"
+                                                    id="date4"
+                                                    value="شريف جميل محمد بكر"
+                                                    style="
+                      border: none;
+                      padding: 5px;
+                      width: 100px;
+                      background-color: transparent;
+                      font-weight: bold;
+                    "
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div style="clear: both"></div>
+                            </div>
+                        </div>
+
+                        <!-- split -->
+
+                        <div style="border: 1px solid black; padding: 20px; margin-top: 2px">
+                            <div style="margin: 5px 0">
+                                <div
+                                        style="
+                text-align: left;
+                float: left;
+                width: 49%;
+                margin-right: 10px;
+              "
+                                >
+                                    <div>
+                                        <div for="date" style="width: 50%; float: left">
+                                            <strong style="float: left">البند</strong>
+                                            <strong style="float: right">hi</strong>
+                                            <div style="clear: both"></div>
+                                        </div>
+                                        <input
+                                                type="text"
+                                                id="date5"
+                                                value="اعمال المساح الداخلي"
+                                                style="
+                    border: none;
+                    border-top: 1px solid black;
+                    border-bottom: 1px solid black;
+                    width: 100px;
+                    background-color: transparent;
+                    font-weight: bold;
+                    float: right;
+                  "
+                                        />
+                                    </div>
+                                    <div>
+                                        <div for="date" style="width: 50%; float: left">
+                                            <strong style="float: left">البند</strong>
+                                            <strong style="float: right">hi</strong>
+                                            <div style="clear: both"></div>
+                                        </div>
+                                        <input
+                                                type="text"
+                                                id="date6"
+                                                value="اعمال المساح الداخلي"
+                                                style="
+                    border: none;
+                    border-top: 1px solid black;
+                    border-bottom: 1px solid black;
+                    width: 100px;
+                    background-color: transparent;
+                    font-weight: bold;
+                    float: right;
+                  "
+                                        />
+                                    </div>
+                                    <div>
+                                        <div for="date" style="width: 50%; float: left">
+                                            <strong style="float: left">البند</strong>
+                                            <strong style="float: right">hi</strong>
+                                            <div style="clear: both"></div>
+                                        </div>
+                                        <input
+                                                type="text"
+                                                id="date7"
+                                                value="اعمال المساح الداخلي"
+                                                style="
+                    border: none;
+                    border-top: 1px solid black;
+                    border-bottom: 1px solid black;
+                    width: 100px;
+                    background-color: transparent;
+                    font-weight: bold;
+                    float: right;
+                  "
+                                        />
+                                    </div>
+                                    <div>
+                                        <div for="date" style="width: 50%; float: left">
+                                            <strong style="float: left">البند</strong>
+                                            <strong style="float: right">hi</strong>
+                                            <div style="clear: both"></div>
+                                        </div>
+                                        <input
+                                                type="text"
+                                                id="date8"
+                                                value="اعمال المساح الداخلي"
+                                                style="
+                    border: none;
+                    border-top: 1px solid black;
+                    border-bottom: 1px solid black;
+                    width: 100px;
+                    background-color: transparent;
+                    font-weight: bold;
+                    float: right;
+                  "
+                                        />
+                                    </div>
+                                    <div>
+                                        <div for="date" style="width: 50%; float: left">
+                                            <strong style="float: left">البند</strong>
+                                            <strong style="float: right">hi</strong>
+                                            <div style="clear: both"></div>
+                                        </div>
+                                        <input
+                                                type="text"
+                                                id="date9"
+                                                value="اعمال المساح الداخلي"
+                                                style="
+                    border: none;
+                    border-top: 1px solid black;
+                    border-bottom: 1px solid black;
+                    width: 100px;
+                    background-color: transparent;
+                    font-weight: bold;
+                    float: right;
+                  "
+                                        />
+                                    </div>
+                                    <div>
+                                        <div for="date" style="width: 50%; float: left">
+                                            <strong style="float: left">البند</strong>
+                                            <strong style="float: right">hi</strong>
+                                            <div style="clear: both"></div>
+                                        </div>
+                                        <input
+                                                type="text"
+                                                id="date11"
+                                                value="اعمال المساح الداخلي"
+                                                style="
+                    border: none;
+                    border-top: 1px solid black;
+                    border-bottom: 1px solid black;
+                    width: 100px;
+                    background-color: transparent;
+                    font-weight: bold;
+                    float: right;
+                  "
+                                        />
+                                    </div>
+                                    <div style="clear: both"></div>
+                                </div>
+                                <div
+                                        style="
+                width: 1px;
+                height: 50px;
+                background-color: black;
+                float: left;
+              "
+                                ></div>
+
+                                <div style="text-align: left; float: right; width: 49%">
+                                    <div style="margin-bottom: 5px">
+                                        <label for="date">
+                                            <strong>hi :</strong>
+                                        </label>
+                                        <input
+                                                type="text"
+                                                id="date"
+                                                value="اعمال المساح الداخلي"
+                                                style="
+                    border: none;
+                    border-top: 1px solid black;
+                    border-bottom: 1px solid black;
+                    width: 250px;
+                    background-color: transparent;
+                    font-weight: bold;
+                    float: right;
+                  "
+                                        />
+                                    </div>
+
+                                    <div style="margin-bottom: 5px">
+                                        <label for="date">
+                                            <strong>hi :</strong>
+                                        </label>
+                                        <input
+                                                type="text"
+                                                id="date12"
+                                                value="اعمال المساح الداخلي"
+                                                style="
+                    border: none;
+                    border-top: 1px solid black;
+                    border-bottom: 1px solid black;
+                    width: 250px;
+                    background-color: transparent;
+                    font-weight: bold;
+                    float: right;
+                  "
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div style="clear: both"></div>
+                        </div>
+                        <!-- enddddd -->
+                        <div style="margin: 20px 0">
+                            <table style="width: 100%; border-collapse: collapse; border: none">
+                                <tr>
+                                    <th
+                                            style="
+                  border: 1px solid #ddd;
+                  padding: 8px;
+                  background-color: #f2f2f2;
+                "
+                                    >
+                                        Item
+                                    </th>
+                                    <th
+                                            style="
+                  border: 1px solid #ddd;
+                  padding: 8px;
+                  background-color: #f2f2f2;
+                "
+                                    >
+                                        Details
+                                    </th>
+                                    <th
+                                            style="
+                  border: 1px solid #ddd;
+                  padding: 8px;
+                  background-color: #f2f2f2;
+                "
+                                    >
+                                        Value (K.D)
+                                    </th>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 8px">A</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px">
+                                        <input
+                                                type="text"
+                                                value="Value of Executed Works (Contract)"
+                                                style="border: 1px solid #ddd; padding: 5px; width: 100%"
+                                        />
+                                    </td>
+                                    <td style="border: 1px solid #ddd; padding: 8px">
+                                        <input
+                                                type="text"
+                                                value="3,250.000"
+                                                style="border: 1px solid #ddd; padding: 5px; width: 100px"
+                                        />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 8px">B</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px">
+                                        <input
+                                                type="text"
+                                                value="Value of Additional Works"
+                                                style="border: 1px solid #ddd; padding: 5px; width: 100%"
+                                        />
+                                    </td>
+                                    <td style="border: 1px solid #ddd; padding: 8px">
+                                        <input
+                                                type="text"
+                                                value="-"
+                                                style="border: 1px solid #ddd; padding: 5px; width: 100px"
+                                        />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 8px">C</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px">
+                                        <input
+                                                type="text"
+                                                value="Value of Variation Orders"
+                                                style="border: 1px solid #ddd; padding: 5px; width: 100%"
+                                        />
+                                    </td>
+                                    <td style="border: 1px solid #ddd; padding: 8px">
+                                        <input
+                                                type="text"
+                                                value="-"
+                                                style="border: 1px solid #ddd; padding: 5px; width: 100px"
+                                        />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 8px">D</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px">
+                                        <input
+                                                type="text"
+                                                value="Total Value of Work (A+B+C)"
+                                                style="border: 1px solid #ddd; padding: 5px; width: 100%"
+                                        />
+                                    </td>
+                                    <td style="border: 1px solid #ddd; padding: 8px">
+                                        <input
+                                                type="text"
+                                                value="3,250.000"
+                                                style="border: 1px solid #ddd; padding: 5px; width: 100px"
+                                        />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 8px">F</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px">
+                                        <input
+                                                type="text"
+                                                value="Less Previous Payment Certificates"
+                                                style="border: 1px solid #ddd; padding: 5px; width: 100%"
+                                        />
+                                    </td>
+                                    <td style="border: 1px solid #ddd; padding: 8px">
+                                        <input
+                                                type="text"
+                                                value="-"
+                                                style="border: 1px solid #ddd; padding: 5px; width: 100px"
+                                        />
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td style="border: 1px solid #ddd; padding: 8px">G</td>
+                                    <td style="border: 1px solid #ddd; padding: 8px">
+                                        <input
+                                                type="text"
+                                                value="Amount Due"
+                                                style="border: 1px solid #ddd; padding: 5px; width: 100%"
+                                        />
+                                    </td>
+                                    <td style="border: 1px solid #ddd; padding: 8px">
+                                        <input
+                                                type="text"
+                                                value="3,185.000"
+                                                style="border: 1px solid #ddd; padding: 5px; width: 100px"
+                                        />
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+
+                        <footer style="margin: 20px 0">
+                            <div style="display: flex; justify-content: space-between">
+                                <div>
+                                    <label for="subcontractorSignature"
+                                    >
+                                        <strong>Subcontractor Signature:</strong>
+                                    </label
+                                    >
+                                    <input
+                                            type="text"
+                                            id="subcontractorSignature"
+                                            style="
+                  border: 1px solid #ddd;
+                  padding: 5px;
+                  width: calc(100% - 200px);
+                "
+                                    />
+                                </div>
+                                <div style="text-align: right">
+                                    <label for="projectManagerSignature"
+                                    >
+                                        <strong>Project Manager:</strong>
+                                    </label
+                                    >
+                                    <input
+                                            type="text"
+                                            id="projectManagerSignature"
+                                            style="
+                  border: 1px solid #ddd;
+                  padding: 5px;
+                  width: calc(100% - 200px);
+                "
+                                    />
+                                </div>
+                            </div>
+                        </footer>
+                    </div>
+
+
+                </div>
+
+
+            </t>
+        </template>
+        <record id="paperformat_invoice" model="report.paperformat">
+            <field name="name">A4 invoice</field>
+            <field name="default" eval="True"/>
+            <field name="format">A4</field>
+            <field name="page_height">0</field>
+            <field name="page_width">0</field>
+            <field name="orientation">Portrait</field>
+            <field name="margin_top">3</field>
+            <field name="margin_bottom">5</field>
+            <field name="margin_left">5</field>
+            <field name="margin_right">5</field>
+            <field name="header_line" eval="False"/>
+            <field name="header_spacing">35</field>
+            <field name="dpi">90</field>
+        </record>
+        <record id="report_sale" model="ir.actions.report">
+            <field name="name">Costsheet Report</field>
+            <field name="model">sale.order</field>
+            <field name="report_type">qweb-pdf</field>
+            <field name="report_name">sale_costsheet.pdf_report</field>
+            <field name="report_file">sale_costsheet.pdf_report</field>
+            <field name="binding_model_id" ref="sale.model_sale_order"/>
+            <field name="paperformat_id" ref="sale_costsheet.paperformat_invoice"/>
+            <field name="print_report_name">'%s' % (object.name)</field>
+            <field name="binding_type">report</field>
+        </record>
+
+    </data>
+</odoo>

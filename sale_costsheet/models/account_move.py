@@ -58,7 +58,12 @@ class account_move(models.Model):
 
     crm_lead_id = fields.Many2one('crm.lead', 'LEAD/Opportunity')
 
-    can_see_contract_terms = fields.Boolean('Can See Contract Terms', compute="calc_can_see_contract_terms")
+    def get_can_see_contract_terms(self):
+        if self.user_has_groups('sale_costsheet.group_costsheet_contract_terms'):
+            return True
+
+    can_see_contract_terms = fields.Boolean('Can See Contract Terms', compute="calc_can_see_contract_terms",default=get_can_see_contract_terms)
+
     def calc_can_see_contract_terms(self):
         for record in self:
             record.can_see_contract_terms = False

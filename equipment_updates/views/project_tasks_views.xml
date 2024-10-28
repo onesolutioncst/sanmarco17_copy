@@ -62,14 +62,18 @@
                                        context="{'active_test': True}"
                                        required="1"
                                        readonly="readonly_timesheet"/>
+                                <field name="work_entry_product_id"/>
+                                <field name="product_cost" sum="Total"/>
+                                <field name="validated_status" invisible="1"/>
                                 <field name="name" required="0" readonly="readonly_timesheet"/>
                                 <field name="unit_amount" widget="timesheet_uom"
                                        decoration-danger="unit_amount &gt; 24 or unit_amount &lt; 0"
                                        readonly="readonly_timesheet"/>
+                                <field name="total_timesheet_cost" sum="Total"/>
                                 <field name="project_id" column_invisible="True"/>
                                 <field name="task_id" column_invisible="True"/>
                                 <field name="company_id" column_invisible="True"/>
-                                <field name="equipment_existing_employee_id"/>
+                                <field name="equipment_existing_employee_id" invisible="1"/>
                             </tree>
                             <kanban class="o_kanban_mobile">
                                 <field name="readonly_timesheet"/>

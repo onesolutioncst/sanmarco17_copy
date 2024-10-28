@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record model="ir.ui.view" id="task_form_view_productcost">
+            <field name="name">project.task.leave.form.productworkentry</field>
+            <field name="model">project.task</field>
+            <field name="inherit_id" ref="hr_timesheet.view_task_form2_inherited"/>
+            <field name="arch" type="xml">
+                <xpath expr="//page[@name='page_timesheets']//field[@name='timesheet_ids']//field[@name='employee_id']"
+                       position="after">
+                    <field name="work_entry_product_id"/>
+                    <field name="hr_work_entry_type_id" optional="hide"/>
+                    <field name="product_cost" sum="Total"/>
+                    <field name="validated_status" invisible="1"/>
+                </xpath>
+                <xpath expr="//page[@name='page_timesheets']//field[@name='timesheet_ids']//field[@name='unit_amount']"
+                       position="after">
+                    <field name="total_timesheet_cost" sum="Total"/>
+                    <button name="create_timesheet_plan" string="Create Plan" type="object"
+                            invisible="validated_status != 'draft'"/>
+                </xpath>
+            </field>
+        </record>
+        <!-- Views definition -->
+        <record id="timesheet_view_tree_plan" model="ir.ui.view">
+            <field name="name">account.analytic.line.tree.hr_timesheet</field>
+            <field name="model">account.analytic.line</field>
+            <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_tree"/>
+            <field name="arch" type="xml">
+                <xpath expr="/tree" position="attributes">
+                    <attribute name="sample">1</attribute>
+                    <attribute name="js_class">timesheet_timer_list</attribute>
+                </xpath>
+                <xpath expr="/tree" position="inside">
+                    <field name="readonly_timesheet" column_invisible="True"/>
+                </xpath>
+            </field>
+        </record>
+
+    </data>
+</odoo>
