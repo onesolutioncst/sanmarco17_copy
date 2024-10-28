@@ -96,7 +96,7 @@ class sale_order(models.Model):
             if self.user_has_groups('sale_costsheet.group_costsheet_contract_terms'):
                 record.can_see_contract_terms=True
 
-    # @api.depends('invoice_count', 'invoice_ids', 'invoice_status', 'last_invoice_date')
+    @api.depends('invoice_count', 'invoice_ids', 'invoice_status', 'last_invoice_date')
     def calc_costsheet_total_amount(self):
         for record in self:
             retention_ar_amount = 0.0
