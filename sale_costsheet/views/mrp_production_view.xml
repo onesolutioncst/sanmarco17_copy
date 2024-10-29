@@ -109,7 +109,6 @@
                 </xpath>
 
                 <xpath expr="//field[@name='move_raw_ids']//tree" position="inside">
-                    <field name="recalc_fields" invisible="1"/>
                     <field name="qty_orders" optional="hide" sum="total"/>
                     <field name="qty_orders_cost" optional="hide" sum="total"/>
                     <field name="remaining_qty" optional="hide" sum="total"/>
