@@ -3,3 +3,4 @@
 from . import mrp_suborders
 from . import manufacture_agreement
 from . import costsheet_cancel_wizard
+from . import extra_to_consume_wizard
