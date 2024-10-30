@@ -33,7 +33,9 @@
     'website': "https://www.onesolutionc.com",
     'depends': ['project'],
     'data': [
-        'views/project_project_views.xml'
+        'data/server_action.xml',
+        'views/project_project_views.xml',
+        'views/product_product_view.xml',
     ],
     'images': [],
     'license': 'AGPL-3',

@@ -1,0 +1,12 @@
+<odoo>
+    <data>
+        <record id="model_product_product_action_calc_cost" model="ir.actions.server">
+            <field name="name">Calc Analytic Volume Cost</field>
+            <field name="model_id" ref="product.model_product_product"/>
+            <field name="binding_model_id" ref="product.model_product_product"/>
+            <field name="binding_view_types">tree</field>
+            <field name="state">code</field>
+            <field name="code">action = records.calc_product_volume_cost()</field>
+        </record>
+    </data>
+</odoo>

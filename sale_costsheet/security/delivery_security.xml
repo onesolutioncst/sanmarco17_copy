@@ -8,12 +8,15 @@
         </record>
         <record id="group_create_sub_order_agreement" model="res.groups">
             <field name="name">CostSheet: Create SubOrders and Agreement from SubOrders</field>
-<!--            <field name="comment">The user will be able to Add delivery qty up consume.</field>-->
+            <!--            <field name="comment">The user will be able to Add delivery qty up consume.</field>-->
         </record>
         <record id="group_costsheet_contract_terms" model="res.groups">
             <field name="name">CostSheet: Contract Terms</field>
             <field name="comment">The user will be able to See Contract Terms.</field>
         </record>
-
+        <record id="group_costsheet_contract_to_consume_qty" model="res.groups">
+            <field name="name">CostSheet: Add Extra To Counsume Quantity</field>
+            <field name="comment">The user will be able to Add To Extra To Consume Quantity.</field>
+        </record>
     </data>
 </odoo>

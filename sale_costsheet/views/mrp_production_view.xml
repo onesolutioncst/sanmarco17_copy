@@ -107,9 +107,10 @@
                     <field name="origin_qty_agreementpricebefore_cost" optional="hide" sum="total"/>
                     <field name="origin_qty_agreementpriceafter_cost" optional="hide" sum="total"/>
                 </xpath>
-
+                <!--                <xpath expr="//field[@name='move_raw_ids']" position="attributes">-->
+                <!--                    <attribute name="options">{'delete': [('state', 'in', ['draft','confirmed'])]}</attribute>-->
+                <!--                </xpath>-->
                 <xpath expr="//field[@name='move_raw_ids']//tree" position="inside">
-                    <field name="recalc_fields" invisible="1"/>
                     <field name="qty_orders" optional="hide" sum="total"/>
                     <field name="qty_orders_cost" optional="hide" sum="total"/>
                     <field name="remaining_qty" optional="hide" sum="total"/>
@@ -122,6 +123,12 @@
                     <field name="remaining_qty_agreement_cost" optional="hide" sum="total"/>
                     <field name="agreement_unit_price_before" optional="hide" sum="total"/>
                     <field name="constru_standard_price" optional="hide" sum="total"/>
+                    <button name="%(sale_costsheet.actionextra_to_consume_wizard)d"
+                            groups="sale_costsheet.group_costsheet_contract_to_consume_qty"
+                            context="{'default_product_id':product_id, 'default_stock_move_id': id}" type="action"
+                            icon="fa-plus"/>
+                    <button groups="sale_costsheet.group_costsheet_contract_to_consume_qty"
+                            name="view_to_consume_history" type="object" icon="fa-history"/>
                 </xpath>
             </field>
         </record>
@@ -190,5 +197,20 @@
                 </xpath>
             </field>
         </record>
+        <record id='extra_to_consume_history_view_tree' model='ir.ui.view'>
+            <field name="name">extra.to.consume.history.tree</field>
+            <field name="model">extra.to.consume.history</field>
+            <field name="arch" type="xml">
+                <tree string="To Consume Quantity History" create="0" edit="0" delete="0">
+                    <field name="mrp_manufacture_id"/>
+                    <field name="stock_move_id"/>
+                    <field name="product_id"/>
+                    <field name="extra_qty"/>
+                    <field name="qty_added_datetime"/>
+                </tree>
+            </field>
+        </record>
+
+
     </data>
 </odoo>
