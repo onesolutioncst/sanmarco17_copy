@@ -370,7 +370,7 @@ class stock_move(models.Model):
             if mrp_suborders_objs:
                 for mrp_suborders_obj in mrp_suborders_objs:
                     for move_raw_obj in mrp_suborders_obj.move_raw_ids:
-                        if move_raw_obj.product_id == record.product_id:
+                        if move_raw_obj.product_id == record.product_id and mrp_suborders_obj.main_stock_move_id.id == record.id:
                             qty_orders += move_raw_obj.quantity  #product_qty
                 if record.origin_qty > qty_orders:
                     record.remaining_qty = record.origin_qty - qty_orders
@@ -397,7 +397,7 @@ class stock_move(models.Model):
                 [('mrp_production_id', '=', record.raw_material_production_id.id), ('state','not in',['draft','cancel'])])
             for purchase_requisition_obj in purchase_requisition_objs:
                 for move_raw_obj in purchase_requisition_obj.line_ids:
-                    if move_raw_obj.product_id == record.product_id:
+                    if move_raw_obj.product_id == record.product_id and move_raw_obj.mrp_manufacture_line_id.id == record.id:
                         qty_orders_agreement += move_raw_obj.qty_ordered
                         qty_agreement += move_raw_obj.product_qty
             record.qty_orders_agreement = qty_orders_agreement
