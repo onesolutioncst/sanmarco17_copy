@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <record model="ir.ui.view" id="extra_to_consume_wizard_view">
+        <field name="name">extra_to_consume wizard</field>
+        <field name="model">extra.to.consume.wizard</field>
+        <field name="arch" type="xml">
+            <form string="Add Extra Qty" delete="0" create="0">
+                <sheet>
+                    <group>
+                        <field name="stock_move_id" invisible="1" readonly="1"/>
+                        <field name="product_id" readonly="1"/>
+                        <field name="extra_qty"/>
+                        <field name="qty_added_datetime" readonly="1"/>
+                    </group>
+                </sheet>
+                <footer>
+                    <button name="add_extra_toconsume_qty" string="Add Extra To Counsume Quantity" type="object"
+                            class="btn-primary"/>
+                    <button string="Close" class="btn-secondary" special="cancel"/>
+                </footer>
+            </form>
+        </field>
+    </record>
+
+    <record id="actionextra_to_consume_wizard" model="ir.actions.act_window">
+        <field name="name">Add Extra TO Consumne Quantity</field>
+        <field name="res_model">extra.to.consume.wizard</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="model_extra_to_consume_wizard"/>
+        <field name="target">new</field>
+    </record>
+
+</odoo>
