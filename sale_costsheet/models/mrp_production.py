@@ -71,9 +71,9 @@ class mrp_production(models.Model):
     @api.depends('product_qty','move_raw_ids', 'unit_percentage_standardprice', 'unit_percentage_agreementbefore', 'unit_percentage_agreementafter')
     def calc_sale_contract_unit_price(self):
         for record in self:
-            record.unit_price_standardprice = sum(move_raw_obj.origin_qty_cost for move_raw_obj in record.move_raw_ids) / record.product_qty
-            record.unit_price_agreementbefore = sum(move_raw_obj.origin_qty_agreementpricebefore_cost for move_raw_obj in record.move_raw_ids) / record.product_qty
-            record.unit_price_agreementafter = sum(move_raw_obj.origin_qty_agreementpriceafter_cost for move_raw_obj in record.move_raw_ids) / record.product_qty
+            record.unit_price_standardprice = sum(move_raw_obj.origin_qty * move_raw_obj.constru_standard_price for move_raw_obj in record.move_raw_ids) / record.product_qty
+            record.unit_price_agreementbefore = sum(move_raw_obj.origin_qty * move_raw_obj.agreement_unit_price_before for move_raw_obj in record.move_raw_ids) / record.product_qty
+            record.unit_price_agreementafter = sum(move_raw_obj.origin_qty * move_raw_obj.agreement_unit_price_after for move_raw_obj in record.move_raw_ids) / record.product_qty
             record.standardprice_after_percentage = record.unit_price_standardprice +record.unit_price_standardprice * record.unit_percentage_standardprice
             record.agreementbefore_after_percentage = record.unit_price_agreementbefore + record.unit_price_agreementbefore *record.unit_percentage_agreementbefore
             record.agreementafter_after_percentage = record.unit_price_agreementafter + record.unit_price_agreementafter * record.unit_percentage_agreementafter
@@ -324,7 +324,6 @@ class stock_move(models.Model):
 
             record.real_product_uom_qty = qty_orders_cancelled + record.extra_product_uom_qty + record.origin_qty - qty_orders_done
 
-
     @api.depends('total_up', 'constru_standard_price')
     def calc_total_up_cost(self):
         for record in self:
@@ -456,6 +455,30 @@ class stock_move(models.Model):
                     stock_move_report_obj.sudo().write(stock_move_report_dict)
                 else:
                     stock_move_report_obj.sudo().create(stock_move_report_dict)
+
+    def view_to_consume_history(self):
+        self.ensure_one()
+        return {
+            'name': 'History Qty Added',
+            'type': 'ir.actions.act_window',
+            'view_type': 'tree',
+            'view_mode': 'tree',
+            'target': 'new',
+            'res_model': 'extra.to.consume.history',
+            # 'res_id': self.id,
+            'context': {'default_stock_move_id': self.id,'default_product_id':self.product_id.id, 'create': False, 'delete': False},
+            'domain': [('stock_move_id','=',self.id)]
+        }
+
+class extra_to_consume_history(models.Model):
+    _name = 'extra.to.consume.history'
+    _description = 'Model to save history of extra to consume qty'
+
+    mrp_manufacture_id = fields.Many2one('mrp.production', 'Costsheet')
+    stock_move_id = fields.Many2one('stock.move', 'Component ID')
+    product_id = fields.Many2one('product.product', 'Product')
+    extra_qty = fields.Float('Extra Quantity')
+    qty_added_datetime = fields.Datetime('Time added')
 
 # class stock_move_report(models.Model):
 #     _name = "stock.move.report"

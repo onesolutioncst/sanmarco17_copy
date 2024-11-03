@@ -38,6 +38,7 @@
         'security/delivery_security.xml',
         'security/ir.model.access.csv',
         'wizard/manufacture_agreement_views.xml',
+        'wizard/extra_to_consume_wizard.xml',
         'views/mrp_production_view.xml',
         'views/sale_order_view.xml',
         'wizard/mrp_suborders_view.xml',
