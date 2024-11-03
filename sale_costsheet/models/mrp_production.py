@@ -370,7 +370,7 @@ class stock_move(models.Model):
             if mrp_suborders_objs:
                 for mrp_suborders_obj in mrp_suborders_objs:
                     for move_raw_obj in mrp_suborders_obj.move_raw_ids:
-                        if move_raw_obj.product_id == record.product_id and mrp_suborders_obj.main_stock_move_id.id == record.id:
+                        if move_raw_obj.product_id == record.product_id and move_raw_obj.main_stock_move_id.id == record.id:
                             qty_orders += move_raw_obj.quantity  #product_qty
                 if record.origin_qty > qty_orders:
                     record.remaining_qty = record.origin_qty - qty_orders
