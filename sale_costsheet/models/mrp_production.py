@@ -370,7 +370,7 @@ class stock_move(models.Model):
             if mrp_suborders_objs:
                 for mrp_suborders_obj in mrp_suborders_objs:
                     for move_raw_obj in mrp_suborders_obj.move_raw_ids:
-                        if move_raw_obj.product_id == record.product_id and mrp_suborders_obj.main_stock_move_id.id == record.id:
+                        if move_raw_obj.product_id == record.product_id and move_raw_obj.main_stock_move_id.id == record.id:
                             qty_orders += move_raw_obj.quantity  #product_qty
                 if record.origin_qty > qty_orders:
                     record.remaining_qty = record.origin_qty - qty_orders
@@ -449,6 +449,7 @@ class stock_move(models.Model):
                     'agreement_unit_price_before': record.agreement_unit_price_before,
                     'total_up': record.total_up,
                     'total_up_cost': record.total_up_cost,
+                    'raw_material_production_origin': record.raw_material_production_id.origin
                 }
                 stock_move_report_obj = self.env['stock.move.new.report'].sudo().search([('stock_move_id', '=', record.id)])
                 if stock_move_report_obj:

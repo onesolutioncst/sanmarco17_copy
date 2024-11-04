@@ -56,6 +56,7 @@ class stock_move_new_report(models.Model):
     agreement_unit_price_before = fields.Float(string='Agreement Price(Before)', readonly=True)
     total_up = fields.Float('Total Up', readonly=True)
     total_up_cost = fields.Float('Total UP Cost', readonly=True)
+    raw_material_production_origin = fields.Char('Manufacturing Source')
 
     # def _query(self):
     #     return """
