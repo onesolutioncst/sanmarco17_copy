@@ -449,6 +449,7 @@ class stock_move(models.Model):
                     'agreement_unit_price_before': record.agreement_unit_price_before,
                     'total_up': record.total_up,
                     'total_up_cost': record.total_up_cost,
+                    'raw_material_production_origin': record.raw_material_production_id.origin
                 }
                 stock_move_report_obj = self.env['stock.move.new.report'].sudo().search([('stock_move_id', '=', record.id)])
                 if stock_move_report_obj:
