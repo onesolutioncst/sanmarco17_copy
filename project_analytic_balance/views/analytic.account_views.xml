@@ -10,6 +10,8 @@
                     <field name="analytic_debit"/>
                     <field name="analytic_credit"/>
                     <field name="analytic_balance"/>
+                    <field name="number_of_meters_project"/>
+                    <field name="meter_price"/>
                 </field>
             </field>
         </record>
