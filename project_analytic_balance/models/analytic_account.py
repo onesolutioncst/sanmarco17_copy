@@ -7,12 +7,20 @@ from odoo import models, fields, api, _, _lt
 from odoo.exceptions import ValidationError, RedirectWarning
 
 class Project(models.Model):
-    _inherit = "project.project"
+    _inherit = "account.analytic.account"
 
     analytic_debit = fields.Monetary('Debit', related="analytic_account_id.debit", currency_field='currency_id')
     analytic_credit = fields.Monetary('Credit',  related="analytic_account_id.credit", currency_field='currency_id')
     analytic_balance = fields.Monetary('Balance',  related="analytic_account_id.balance", currency_field='currency_id')
+    number_of_meters_project = fields.Float("All Meters On Project")
+    meter_price = fields.Float('Meter Price', compute="calc_meter_price")
 
+    @api.onchange('number_of_meters_project', 'analytic_balance')
+    def calc_meter_price(self):
+        for record in self:
+            record.meter_price = 0.0
+            if record.analytic_balance > 0.0 and record.number_of_meters_project > 0.0:
+                record.meter_price = record.analytic_balance / record.number_of_meters_project
 
     # @api.depends('analytic_account_id')
     # @api.onchange('analytic_account_id')
