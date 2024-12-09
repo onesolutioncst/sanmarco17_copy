@@ -37,21 +37,29 @@ class PaymentReport(models.TransientModel):
 
         lines = []
         for payment in all_payments:
-            values = {
-                "report_id": self.id,
-                "account_payment_id": payment.id,
-                "payment_date": payment.date,
-                "partner_id": payment.partner_id.id,
-                "amount": payment.amount,
-                "currency_id": payment.currency_id.id,
-                "payment_journal_id": payment.journal_id.id,
-                "payment_method_id": payment.payment_method_id.id,
-            }
-            for invoice in payment.reconciled_invoice_ids:
-                values["invoice_journal_id"] = invoice.journal_id.id
-                values["account_move_id"] = invoice.id
-            lines += [values]
-
+            if payment.reconciled_invoice_ids:
+                for invoice in payment.reconciled_invoice_ids:
+                    payments_widget_value = invoice.invoice_payments_widget
+                    if payments_widget_value:
+                        payments_widget_list = payments_widget_value['content']
+                        for payments_widget in payments_widget_list:
+                            lines.append(
+                                {
+                                    "report_id": self.id,
+                                    "account_payment_id": payments_widget['account_payment_id'],
+                                    "payment_date": payments_widget['date'],
+                                    "partner_id": invoice.partner_id.id,
+                                    "amount": payment.amount,
+                                    "currency_id": payments_widget['currency_id'],
+                                    "payment_journal_id": payment.journal_id.id,
+                                    "payment_method_id": payment.payment_method_id.id,
+                                    "invoice_journal_id": invoice.journal_id.id,
+                                    "account_move_id": invoice.id,
+                                    "account_amount_total": invoice.amount_total,
+                                    "account_amount_paid": payments_widget['amount'],
+                                    "account_amount_duo": invoice.amount_residual,
+                                }
+                            )
         self.env["account.payment.report.line"].create(lines)
 
     def button_show_report(self):
@@ -82,12 +90,15 @@ class PaymentReportLine(models.TransientModel):
     report_id = fields.Many2one("account.payment.report")
     payment_date = fields.Date(string="Date")
     partner_id = fields.Many2one("res.partner", string="Customer")
-    amount = fields.Monetary(string="Amount")
+    amount = fields.Monetary(string="Payment Amount")
     currency_id = fields.Many2one("res.currency")
     payment_journal_id = fields.Many2one("account.journal")
     payment_journal_type = fields.Selection(related="payment_journal_id.type", store=True)
     invoice_journal_id = fields.Many2one("account.journal")
     account_move_id = fields.Many2one("account.move")
+    account_amount_total = fields.Float("Account amount Total")
+    account_amount_duo = fields.Float("Account Amount Due")
+    account_amount_paid = fields.Float("Account Amount Paid")
     account_payment_id = fields.Many2one("account.payment")
     payment_method_id = fields.Many2one("account.payment.method", string="Payment Method")
 

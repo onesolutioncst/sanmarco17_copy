@@ -39,6 +39,9 @@
                 <field name="payment_journal_id" />
                 <field name="invoice_journal_id" />
                 <field name="account_move_id" />
+                <field name="account_amount_total" sum="Total"/>
+                <field name="account_amount_paid" sum="Total"/>
+                <field name="account_amount_duo" sum="Total"/>
                 <field name="payment_method_id" />
             </tree>
         </field>

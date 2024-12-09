@@ -116,7 +116,7 @@ class account_move(models.Model):
             record.product_amount_costsheet = product_amount_dict['product_amount_costsheet']
 
 
-    @api.depends('line_ids')
+    @api.depends('invoice_line_ids')
     def calc_costsheet_total_amount(self):
         for record in self:
             retention_ar_amount = 0.0
